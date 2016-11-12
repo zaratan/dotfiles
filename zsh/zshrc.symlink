@@ -1,41 +1,56 @@
-# shortcut to this dotfiles path is $ZSH
-export ZSH=$HOME/.dotfiles
+export ZSH=$HOME/.oh-my-zsh
 
-# your project folder that we can `c [tab]` to
-export PROJECTS=~/Code
+ZSH_THEME="agnoster"
 
-# Stash your environment variables in ~/.localrc. This means they'll stay out
-# of your main dotfiles repository (which may be public, like this one), but
-# you'll have access to them in your scripts.
-if [[ -a ~/.localrc ]]
-then
-  source ~/.localrc
+plugins=(git brew bundler bower cap docker gem git-flow meteor tmux npm osx rails rvm vagrant zsh-syntax-highlighting z web-search nvm zsh-completions)
+
+source ~/.kube-comp
+
+if [ -e "$HOME/.aliases" ]; then
+  source "$HOME/.aliases"
 fi
 
-# all of our zsh files
-typeset -U config_files
-config_files=($ZSH/**/*.zsh)
-
-# load the path files
-for file in ${(M)config_files:#*/path.zsh}
-do
-  source $file
+for function in ~/.oh-my-zsh/custom/functions/*; do
+  source $function
 done
 
-# load everything but the path and completion files
-for file in ${${config_files:#*/path.zsh}:#*/completion.zsh}
-do
-  source $file
-done
+# prompt
+export RPS1='$(rvm_prompt_info)'
+export ZSH_TMUX_AUTOSTART=true
+export ZSH_TMUX_AUTOQUIT=false
 
-# initialize autocomplete here, otherwise functions won't be loaded
-autoload -U compinit
-compinit
+# for root
 
-# load every completion after autocomplete loads
-for file in ${(M)config_files:#*/completion.zsh}
-do
-  source $file
-done
+source $ZSH/oh-my-zsh.sh
+#eval "$(hub alias -s)"
 
-unset config_files
+# User configuration
+
+export PATH="$HOME/bin:$HOME/.bin:/usr/local/bin:/usr/local/texlive/2013/bin/x86_64-darwin:./bin:$PATH"
+export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+export PATH="~/bin:$PATH"
+export PATH="$HOME/jam/TT/cmd:$HOME/jam/TT/bin:$PATH"
+export DEFAULT_USER="Zaratan"
+
+
+#Preferred editor for local and remote sessions
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+else
+  export EDITOR='vim'
+fi
+
+# ssh
+export SSH_KEY_PATH="~/.ssh/zaratan"
+#z
+
+eval `gdircolors ~/.dircolors.256dark`
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f /Users/Zaratan/Gcloud/path.zsh.inc ]; then
+  source '/Users/Zaratan/Gcloud/path.zsh.inc'
+fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f /Users/Zaratan/Gcloud/completion.zsh.inc ]; then
+  source '/Users/Zaratan/Gcloud/completion.zsh.inc'
+fi

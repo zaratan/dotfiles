@@ -1,0 +1,102 @@
+#remap prefix key (remember to remap caps lock too)
+set -g prefix C-a
+unbind C-b
+bind C-a send-prefix
+
+#remove delay on key press
+set -s escape-time 1
+
+#set base index
+set -g base-index 1
+setw -g pane-base-index 1
+
+#reload config
+bind r source-file ~/.tmux.conf \; display "Configuration reloaded!"
+
+#splitting
+bind | split-window -h
+bind _ split-window -v
+
+#moving through pane
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+#moving through windows
+bind -r C-h select-window -t :-
+bind -r C-l select-window -t :+
+bind-key -n C-right next
+bind-key -n C-left prev
+
+#resizing panes
+bind -r H resize-pane -L 5
+bind -r J resize-pane -D 5
+bind -r K resize-pane -U 5
+bind -r L resize-pane -R 5
+
+#mouse <3
+setw -g mouse on
+set -g mouse-select-pane on
+set -g mouse-select-window on
+set -g mouse-resize-pane on
+bind -n WheelUpPane if-shell -F -t = "#{mouse_any_flag}" "send-keys -M" "if -Ft= '#{pane_in_mode}' 'send-keys -M' 'select-pane -t=; copy-mode -e; send-keys -M'"
+bind -n WheelDownPane select-pane -t= \; send-keys -M
+
+# increase scrollback lines
+set -g history-limit 10000
+
+#more color
+set -g default-terminal 'screen-256color'
+
+# default statusbar colors
+set -g status-bg black
+set -g status-fg yellow
+set -g status-attr default
+
+# default window title colors
+setw -g window-status-fg brightblue
+setw -g window-status-bg default
+
+# active window title colors
+setw -g window-status-current-fg yellow
+setw -g window-status-current-bg default
+setw -g window-status-current-attr dim
+
+# pane border
+set -g pane-border-fg black
+set -g pane-border-bg default
+set -g pane-active-border-fg yellow
+set -g pane-active-border-bg default
+
+# command line/message text
+set -g message-bg black
+set -g message-fg yellow
+
+# pane number display
+set -g display-panes-active-colour yellow
+set -g display-panes-colour brightblue
+
+# clock
+setw -g clock-mode-colour yellow
+# --- end colors
+
+#Status bar config
+set -g status-utf8 on
+set -g status-justify centre
+set -g status-left-length 40
+set -g status-left "#[bg=black]Session: #S (#I/#P) #(battery)"
+set -g status-right-length 50
+
+#notifications
+setw -g monitor-activity on
+set -g visual-activity on
+
+#copy-vi style
+setw -g mode-keys vi
+bind-key -t vi-copy 'v' begin-selection
+bind-key -t vi-copy y copy-pipe "reattach-to-user-namespace pbcopy"
+
+unbind -t vi-copy Enter
+bind-key -t vi-copy Enter copy-pipe "reattach-to-user-namespace pbcopy"
+set -g default-command 'reattach-to-user-namespace $SHELL --login'

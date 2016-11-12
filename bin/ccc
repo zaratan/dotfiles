@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+require 'exchange'
+
+raise StandardError, "must provide 3 args, quantity, from currency and to currency in that order" if ARGV.size != 3
+
+number = ARGV[0].to_i
+from_currency = ARGV[1].to_sym
+to_currency = ARGV[2].to_sym
+
+p number.in(from_currency).to(to_currency).value.to_f

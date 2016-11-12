@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+
+FACTIONS = [
+  "Alien",
+  "Pirate", 
+  "Zombie", 
+  "Gnome", 
+  "Dino", 
+  "Robot", 
+  "Mage", 
+  "Ninja", 
+  "Geek", 
+  "Cthuluh's minion", 
+  "Miskato", 
+  "Grands anciens", 
+  "Insmouths", 
+  "Fée", 
+  "Poney", 
+  "Chat", 
+  "Princesse"
+].shuffle!
+
+class SmashUp
+
+  attr_accessor :playing_factions
+
+  def initialize(number_players)
+    attribute_factions
+  end
+
+  def attribute_factions
+    @playing_factions = []
+    number_players.times do 
+      @playing_factions << FACTIONS.pop(2)
+    end
+  end
+
+  def print_factions
+    playing_factions.each do |player|
+      STDIN.gets
+      p player
+    end
+  end
+end
+
+def number_players
+  (ARGV[0] || 1).to_i
+end
+
+SmashUp.new(number_players).print_factions

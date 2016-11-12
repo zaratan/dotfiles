@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+def ping(i)
+  `ping 192.168.0.#{i+2} 2> /dev/null`
+end
+  200.times do |i|
+    Thread.new do 
+      ping(i+2)
+    end
+  end
+  sleep 33332

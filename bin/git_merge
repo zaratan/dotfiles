@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+raise StandardError, "" if ARGV.size != 1
+
+branch_name = ARGV[0]
+print `git co #{branch_name}`
+print `git pull`
+print `git co develop`
+print `git merge #{branch_name}`
