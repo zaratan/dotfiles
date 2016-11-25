@@ -41,6 +41,8 @@ nnoremap <silent> <C-ç> :exe "resize -5"<CR>
 nnoremap <silent> <C-à> :exe "vertical resize -5"<CR>
 nnoremap <silent> <C-è> :exe "vertical resize +5"<CR>
 
+nnoremap <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar><CR>
+
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
@@ -50,8 +52,8 @@ nnoremap jj gt
 
 filetype off          " required!
 
-set rtp+=~/.vim/bundle/vundle/
 
+set rtp+=~/.vim/bundle/vundle
 call vundle#rc()
 
 "let Vundle manage Vundle
@@ -59,6 +61,8 @@ call vundle#rc()
 Bundle 'gmarik/vundle'
 Plugin 'mattn/emmet-vim'
 Bundle 'vim-ruby/vim-ruby'
+Bundle 'scrooloose/nerdtree'
+Bundle 'Xuyuanp/nerdtree-git-plugin'
 Bundle 'tpope/vim-bundler'
 Bundle 'tpope/vim-cucumber'
 Bundle 'tpope/vim-abolish'

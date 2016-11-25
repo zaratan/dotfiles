@@ -10,10 +10,6 @@ if [ -e "$HOME/.aliases" ]; then
   source "$HOME/.aliases"
 fi
 
-for function in ~/.oh-my-zsh/custom/functions/*; do
-  source $function
-done
-
 # prompt
 export RPS1='$(rvm_prompt_info)'
 export ZSH_TMUX_AUTOSTART=true
@@ -30,7 +26,7 @@ export PATH="$HOME/bin:$HOME/.bin:/usr/local/bin:/usr/local/texlive/2013/bin/x86
 export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
 export PATH="~/bin:$PATH"
 export PATH="$HOME/jam/TT/cmd:$HOME/jam/TT/bin:$PATH"
-export DEFAULT_USER="Zaratan"
+export DEFAULT_USER="pasind"
 
 
 #Preferred editor for local and remote sessions
@@ -44,7 +40,7 @@ fi
 export SSH_KEY_PATH="~/.ssh/zaratan"
 #z
 
-eval `gdircolors ~/.dircolors.256dark`
+# eval `gdircolors ~/.dircolors.256dark`
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f /Users/Zaratan/Gcloud/path.zsh.inc ]; then
   source '/Users/Zaratan/Gcloud/path.zsh.inc'
@@ -54,3 +50,5 @@ fi
 if [ -f /Users/Zaratan/Gcloud/completion.zsh.inc ]; then
   source '/Users/Zaratan/Gcloud/completion.zsh.inc'
 fi
+
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting

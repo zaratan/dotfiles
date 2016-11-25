@@ -28,7 +28,7 @@
 [color]
   ui = true
 [github]
-  user = skizzk
+  user = denispasin
 [filter "hawser"]
   clean = git hawser clean %f
   smudge = git hawser smudge %f
