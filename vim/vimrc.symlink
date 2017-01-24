@@ -65,20 +65,26 @@ call vundle#rc()
 "let Vundle manage Vundle
 "required!
 Bundle 'gmarik/vundle'
-Plugin 'mattn/emmet-vim'
 Bundle 'vim-ruby/vim-ruby'
 Bundle 'scrooloose/nerdtree'
 Bundle 'Xuyuanp/nerdtree-git-plugin'
 Bundle 'tpope/vim-bundler'
 Bundle 'tpope/vim-cucumber'
-Bundle 'tpope/vim-abolish'
 Bundle 'tpope/vim-haml'
 Bundle 'tpope/vim-markdown'
+Plugin 'rust-lang/rust.vim'
+Bundle 'groenewege/vim-less'
+Bundle "pangloss/vim-javascript"
+Bundle 'elzr/vim-json'
 Bundle 'tpope/vim-rails'
 Bundle 'xenoterracide/html.vim'
 Bundle 'kchmck/vim-coffee-script'
-Bundle 'scrooloose/syntastic'
 Bundle 'thoughtbot/vim-rspec'
+Bundle "sheerun/vim-polyglot"
+Bundle "Slava/vim-spacebars"
+
+Bundle 'scrooloose/syntastic'
+Bundle 'tpope/vim-abolish'
 Bundle 'altercation/vim-colors-solarized'
 Bundle 'rking/ag.vim'
 Bundle 'tpope/vim-fugitive'
@@ -89,8 +95,6 @@ Bundle 'rizzatti/dash.vim'
 Bundle 'mattn/webapi-vim'
 Bundle 'mattn/gist-vim'
 Bundle 'rodjek/vim-puppet'
-Plugin 'mustache/vim-mustache-handlebars'
-Bundle "pangloss/vim-javascript"
 Bundle 'othree/javascript-libraries-syntax.vim'
 Bundle 'mileszs/ack.vim'
 Plugin 'rust-lang/rust.vim'
@@ -103,8 +107,6 @@ let g:airline_powerline_fonts = 1
 
 set background=dark " dark | light "
 colorscheme solarized
-
-let g:mustache_abbreviations = 1
 
 set regexpengine=1
 
@@ -138,6 +140,14 @@ inoremap <Tab> <c-r>=InsertTabWrapper()<cr>
 
 let g:used_javascript_libs = 'jquery,underscore'
 
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
 filetype plugin indent on     " required!
-let g:user_emmet_install_global = 0
-autocmd FileType html,css EmmetInstall
+

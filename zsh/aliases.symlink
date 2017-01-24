@@ -1,1 +1,36 @@
+# Unix
+alias tlf="tail -f"
+alias mkdir='mkdir -p'
+alias ...='../..'
+alias l='ls --color=auto'
+alias ll='ls -al'
+alias lh='ls -Alh'
+alias e="$EDITOR"
+alias v="$VISUAL"
+
+# Bundler
+alias b="bundle"
+
+# Tests and Specs
+alias cuc="bundle exec cucumber"
+
+# Rubygems
+alias gi="gem install"
+alias giv="gem install -v"
+
+# Rails
+alias migrate="bundle exec rake db:migrate"
+alias m="migrate"
+alias rk="rake"
+alias rs="b exec ./bin/rspec"
+
+# Shame
+alias shame="ag -i '(TODO|FIXME|XXX)'"
+alias SHAME="ag -i '((TODO|FIXME|XXX) ){3}'"
+
+# git
+alias gdiff="git difftool -y -x 'colordiff -y -W $COLUMNS'"
+alias gpuf="git-wtf; sleep 15; g push -f"
+
+#partical
 alias mf="mdfind -onlyin ./ -name"
