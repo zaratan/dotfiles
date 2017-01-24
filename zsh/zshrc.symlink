@@ -19,6 +19,8 @@ export ZSH_TMUX_AUTOQUIT=false
 
 source $ZSH/oh-my-zsh.sh
 #eval "$(hub alias -s)"
+#
+eval `gdircolors ~/.dircolors.256dark`
 
 # User configuration
 

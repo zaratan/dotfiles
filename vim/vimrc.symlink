@@ -97,7 +97,6 @@ Bundle 'mattn/gist-vim'
 Bundle 'rodjek/vim-puppet'
 Bundle 'othree/javascript-libraries-syntax.vim'
 Bundle 'mileszs/ack.vim'
-Plugin 'rust-lang/rust.vim'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'ngmy/vim-rubocop'
 
