@@ -85,7 +85,7 @@ setw -g clock-mode-colour yellow
 set -g status-utf8 on
 set -g status-justify centre
 set -g status-left-length 40
-set -g status-left "#[bg=black]Session: #S (#I/#P) #(battery)"
+set -g status-left "#[bg=black]Session: #S (#I/#P) #(~/bin/battery)"
 set -g status-right-length 50
 
 #notifications

@@ -50,7 +50,13 @@ nnoremap <C-l> <C-w>l
 
 nnoremap jj gt
 
+inoremap II <Esc>I
+inoremap AA <Esc>A
+inoremap OO <Esc>o
+inoremap UU <Esc>ui
+
 filetype off          " required!
+
 
 
 set rtp+=~/.vim/bundle/vundle
@@ -88,6 +94,8 @@ Bundle "pangloss/vim-javascript"
 Bundle 'othree/javascript-libraries-syntax.vim'
 Bundle 'mileszs/ack.vim'
 Plugin 'rust-lang/rust.vim'
+Plugin 'tpope/vim-unimpaired'
+Plugin 'ngmy/vim-rubocop'
 
 
 set laststatus=2

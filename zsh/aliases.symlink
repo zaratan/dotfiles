@@ -1,1 +1,1 @@
-
+alias mf="mdfind -onlyin ./ -name"
