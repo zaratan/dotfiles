@@ -7,6 +7,7 @@ alias ll='ls -al'
 alias lh='ls -Alh'
 alias e="$EDITOR"
 alias v="$VISUAL"
+alias s="z s"
 
 # Bundler
 alias b="bundle"
