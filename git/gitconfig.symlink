@@ -6,6 +6,7 @@
   aa = add --all
   st = status
   br = branch
+  ll = branch --list
   ca = commit --amend
   ci = commit -v
   co = checkout
