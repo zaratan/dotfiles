@@ -17,7 +17,11 @@ FACTIONS = [
   "Fée", 
   "Poney", 
   "Chat", 
-  "Princesse"
+  "Princesse",
+  "Bear cavalery",
+  "Steampunk",
+  "Ghost",
+  "Plante tueuses",
 ].shuffle!
 
 class SmashUp
