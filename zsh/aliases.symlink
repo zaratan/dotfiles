@@ -35,3 +35,10 @@ alias gpuf="git-wtf; sleep 15; g push -f"
 
 #partical
 alias mf="mdfind -onlyin ./ -name"
+
+alias staging_go="ssh -t rm-st-dk-02 sudo docker exec -ti staging_app_1 /bin/bash"
+
+# Vagrant
+alias vup="vagrant up"
+alias vssh="vagrant ssh"
+alias vrecreate="vagrant destroy -f; vagrant up"
