@@ -68,4 +68,4 @@ cask 'spotify'
 cask 'vagrant'
 cask 'toggldesktop'
 
-mas '715768417'
+mas 'thing', id: 715768417
