@@ -28,7 +28,7 @@ export PATH="$HOME/bin:$HOME/.bin:/usr/local/bin:/usr/local/texlive/2013/bin/x86
 export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
 export PATH="~/bin:$PATH"
 export PATH="$HOME/jam/TT/cmd:$HOME/jam/TT/bin:$PATH"
-export DEFAULT_USER="pasind"
+export DEFAULT_USER="Zaratan"
 
 
 #Preferred editor for local and remote sessions

@@ -22,6 +22,10 @@ FACTIONS = [
   "Steampunk",
   "Ghost",
   "Plante tueuses",
+  "Teddy Bear",
+  "Granma",
+  "Rockers",
+  "Explorators",
 ].shuffle!
 
 class SmashUp
