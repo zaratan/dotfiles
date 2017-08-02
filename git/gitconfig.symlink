@@ -40,3 +40,7 @@
   required = true
 [pull]
   rebase = true
+[diff]
+	tool = vimdiff
+[difftool]
+	prompt = false

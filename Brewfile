@@ -67,5 +67,6 @@ cask 'steam'
 cask 'spotify'
 cask 'vagrant'
 cask 'toggldesktop'
+cask 'muzzle'
 
 mas 'thing', id: 715768417

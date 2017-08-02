@@ -100,3 +100,5 @@ set -g @plugin 'tmux-plugins/tmux-yank'
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run '~/.tmux/plugins/tpm/tpm'
+setw -g mode-keys vi
+#bind-key -T copy-mode-vi 'v' send -X begin-selection
