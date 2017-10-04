@@ -14,8 +14,8 @@ setw -g pane-base-index 1
 bind r source-file ~/.tmux.conf \; display "Configuration reloaded!"
 
 #splitting
-bind | split-window -h
-bind _ split-window -v
+bind | split-window -h -c '#{pane_current_path}'
+bind _ split-window -v -c '#{pane_current_path}'
 
 #moving through pane
 bind h select-pane -L
