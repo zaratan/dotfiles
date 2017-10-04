@@ -3,13 +3,10 @@ export ZSH=$HOME/.oh-my-zsh
 
 ZSH_THEME="agnoster"
 
-plugins=(git brew bundler bower heroku cap docker gem git-flow meteor tmux npm osx rails rvm vagrant zsh-syntax-highlighting z web-search nvm zsh-completions yarn)
+plugins=(git brew bundler bower heroku cap docker gem git-flow meteor tmux npm osx rails rvm vagrant zsh-syntax-highlighting z web-search nvm zsh-completions yarn docker-compose)
 
 source ~/.kube-comp
 
-if [ -e "$HOME/.aliases" ]; then
-  source "$HOME/.aliases"
-fi
 
 # prompt
 export RPS1='$(rvm_prompt_info)'
@@ -21,6 +18,9 @@ export ZSH_TMUX_AUTOQUIT=false
 source $ZSH/oh-my-zsh.sh
 #eval "$(hub alias -s)"
 #
+if [ -e "$HOME/.aliases" ]; then
+  source "$HOME/.aliases"
+fi
 
 # User configuration
 

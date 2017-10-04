@@ -5,9 +5,14 @@ alias ...='../..'
 alias l='ls --color=auto'
 alias ll='ls -al'
 alias lh='ls -Alh'
-alias e="$EDITOR"
-alias v="$VISUAL"
+alias vim='vim -O'
+alias e="vim"
+alias v="vim"
 alias s="z s"
+
+# Docker
+alias d="docker"
+alias dc="docker-compose"
 
 # Bundler
 alias b="bundle"
@@ -24,6 +29,7 @@ alias migrate="bundle exec rake db:migrate"
 alias m="migrate"
 alias rk="rake"
 alias rs="b exec ./bin/rspec"
+alias t="b exec rspec"
 
 # Shame
 alias shame="ag -i '(TODO|FIXME|XXX)'"
@@ -31,7 +37,7 @@ alias SHAME="ag -i '((TODO|FIXME|XXX) ){3}'"
 
 # git
 alias gdiff="git difftool -y -x 'colordiff -y -W $COLUMNS'"
-alias gpuf="git-wtf; sleep 15; g push -f"
+alias gpuf="git-wtf; echo 'Are you sure you want to force push this ? (Ctrl-c if not, sleeping 15 sec)' ;sleep 15; g push --force-with-lease"
 
 #partical
 alias mf="mdfind -onlyin ./ -name"
