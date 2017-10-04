@@ -3,7 +3,7 @@ export ZSH=$HOME/.oh-my-zsh
 
 ZSH_THEME="agnoster"
 
-plugins=(git brew bundler bower cap docker gem git-flow meteor tmux npm osx rails rvm vagrant zsh-syntax-highlighting z web-search nvm zsh-completions heroku)
+plugins=(git brew bundler bower heroku cap docker gem git-flow meteor tmux npm osx rails rvm vagrant zsh-syntax-highlighting z web-search nvm zsh-completions yarn)
 
 source ~/.kube-comp
 
@@ -54,5 +54,35 @@ if [ -f /Users/Zaratan/Gcloud/completion.zsh.inc ]; then
 fi
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+<<<<<<< HEAD
 
 eval $(thefuck --alias)
+=======
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
+export PATH=./node_modules/.bin:$PATH
+
+eval $(thefuck --alias)
+
+# place this after nvm initialization!
+autoload -U add-zsh-hook
+load-nvmrc() {
+  local node_version="$(nvm version)"
+  local nvmrc_path="$(nvm_find_nvmrc)"
+
+  if [ -n "$nvmrc_path" ]; then
+    local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
+
+    if [ "$nvmrc_node_version" = "N/A" ]; then
+      nvm install
+    elif [ "$nvmrc_node_version" != "$node_version" ]; then
+      nvm use
+    fi
+  elif [ "$node_version" != "$(nvm version default)" ]; then
+    echo "Reverting to nvm default version"
+    nvm use default
+  fi
+}
+add-zsh-hook chpwd load-nvmrc
+load-nvmrc
+>>>>>>> update

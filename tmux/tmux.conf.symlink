@@ -77,7 +77,6 @@ setw -g clock-mode-colour yellow
 # --- end colors
 
 #Status bar config
-set -g status-utf8 on
 set -g status-justify centre
 set -g status-left-length 40
 set -g status-left "#[bg=black]Session: #S (#I/#P) #(~/bin/battery)"
@@ -92,11 +91,19 @@ set -g visual-activity on
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'tmux-plugins/tmux-yank'
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @plugin 'tmux-plugins/tmux-continuum'
 
 # Other examples:
 # set -g @plugin 'github_username/plugin_name'
 # set -g @plugin 'git@github.com/user/plugin'
 # set -g @plugin 'git@bitbucket.com/user/plugin'
+set -g @continuum-restore 'on'
+set -g set-clipboard on
+bind-key -T copy-mode-vi 'v' send -X begin-selection
+bind-key -T copy-mode-vi 'V' send -X select-line
+bind-key -T copy-mode-vi 'r' send -X rectangle-toggle
+bind-key -T copy-mode-vi 'y' send -X copy-pipe-and-cancel "xclip -in -selection clipboard"
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run '~/.tmux/plugins/tpm/tpm'

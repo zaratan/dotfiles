@@ -26,6 +26,10 @@ FACTIONS = [
   "Granma",
   "Rockers",
   "Explorators",
+  "Power Rangers",
+  "magical girls",
+  "Pokemon",
+  "Kaiju"
 ].shuffle!
 
 class SmashUp

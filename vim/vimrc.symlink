@@ -67,21 +67,17 @@ call vundle#rc()
 Bundle 'gmarik/vundle'
 Bundle 'vim-ruby/vim-ruby'
 Bundle 'scrooloose/nerdtree'
-Bundle 'Xuyuanp/nerdtree-git-plugin'
 Bundle 'tpope/vim-bundler'
 Bundle 'tpope/vim-cucumber'
 Bundle 'tpope/vim-haml'
 Bundle 'tpope/vim-markdown'
 Plugin 'rust-lang/rust.vim'
-Bundle 'groenewege/vim-less'
 Bundle "pangloss/vim-javascript"
 Bundle 'elzr/vim-json'
 Bundle 'tpope/vim-rails'
 Bundle 'xenoterracide/html.vim'
-Bundle 'kchmck/vim-coffee-script'
 Bundle 'thoughtbot/vim-rspec'
 Bundle "sheerun/vim-polyglot"
-Bundle "Slava/vim-spacebars"
 
 Bundle 'scrooloose/syntastic'
 Bundle 'tpope/vim-abolish'
@@ -94,8 +90,6 @@ Bundle 'rizzatti/funcoo.vim'
 Bundle 'rizzatti/dash.vim'
 Bundle 'mattn/webapi-vim'
 Bundle 'mattn/gist-vim'
-Bundle 'rodjek/vim-puppet'
-Bundle 'othree/javascript-libraries-syntax.vim'
 Bundle 'mileszs/ack.vim'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'ngmy/vim-rubocop'
@@ -108,19 +102,6 @@ set background=dark " dark | light "
 colorscheme solarized
 
 set regexpengine=1
-
-set wildmode=list:longest
-set wildmenu                "enable ctrl-n and ctrl-p to scroll thru matches
-set wildignore=*.o,*.obj,*~ "stuff to ignore when tab completing
-set wildignore+=*vim/backups*
-set wildignore+=*sass-cache*
-set wildignore+=*DS_Store*
-set wildignore+=vendor/rails/**
-set wildignore+=vendor/cache/**
-set wildignore+=*.gem
-set wildignore+=log/**
-set wildignore+=tmp/**
-set wildignore+=*.png,*.jpg,*.gif
 
 " Tab completion
 " will insert tab at beginning of line,
@@ -151,4 +132,5 @@ let g:syntastic_check_on_wq = 0
 filetype plugin indent on     " required!
 
 let g:syntastic_ruby_checkers = ['rubocop']
-let g:syntastic_javascript_checkers = ['jshint']
+let g:syntastic_javascript_eslint_exe='$(npm bin)/eslint'
+let g:syntastic_javascript_checkers = ['eslint']
