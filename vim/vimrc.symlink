@@ -31,16 +31,6 @@ set clipboard=unnamed
 
 autocmd Filetype gitcommit setlocal spell textwidth=72
 
-nnoremap <silent> _ :exe "resize +1"<CR>
-nnoremap <silent> ç :exe "resize -1"<CR>
-nnoremap <silent> à :exe "vertical resize -1"<CR>
-nnoremap <silent> è :exe "vertical resize +1"<CR>
-
-nnoremap <silent> <C-_> :exe "resize +5"<CR>
-nnoremap <silent> <C-ç> :exe "resize -5"<CR>
-nnoremap <silent> <C-à> :exe "vertical resize -5"<CR>
-nnoremap <silent> <C-è> :exe "vertical resize +5"<CR>
-
 nnoremap <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar><CR>
 
 nnoremap <C-h> <C-w>h
@@ -56,8 +46,6 @@ inoremap OO <Esc>o
 inoremap UU <Esc>ui
 
 filetype off          " required!
-
-
 
 set rtp+=~/.vim/bundle/vundle
 call vundle#rc()
@@ -92,8 +80,6 @@ Bundle 'mattn/webapi-vim'
 Bundle 'mattn/gist-vim'
 Bundle 'mileszs/ack.vim'
 Plugin 'tpope/vim-unimpaired'
-Plugin 'ngmy/vim-rubocop'
-
 
 set laststatus=2
 let g:airline_powerline_fonts = 1

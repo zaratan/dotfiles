@@ -54,10 +54,6 @@ if [ -f /Users/Zaratan/Gcloud/completion.zsh.inc ]; then
 fi
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-<<<<<<< HEAD
-
-eval $(thefuck --alias)
-=======
 export ANDROID_HOME="$HOME/Library/Android/sdk"
 export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
 export PATH=./node_modules/.bin:$PATH
@@ -85,4 +81,3 @@ load-nvmrc() {
 }
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
->>>>>>> update
