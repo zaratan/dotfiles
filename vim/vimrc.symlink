@@ -33,12 +33,7 @@ autocmd Filetype gitcommit setlocal spell textwidth=72
 
 nnoremap <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar><CR>
 
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
-
-nnoremap jj gt
+" nnoremap jj gt
 
 inoremap II <Esc>I
 inoremap AA <Esc>A
@@ -53,21 +48,11 @@ call vundle#rc()
 "let Vundle manage Vundle
 "required!
 Bundle 'gmarik/vundle'
-Bundle 'vim-ruby/vim-ruby'
 Bundle 'scrooloose/nerdtree'
 Bundle 'tpope/vim-bundler'
-Bundle 'tpope/vim-cucumber'
-Bundle 'tpope/vim-haml'
-Bundle 'tpope/vim-markdown'
-Plugin 'rust-lang/rust.vim'
-Bundle "pangloss/vim-javascript"
-Bundle 'elzr/vim-json'
 Bundle 'tpope/vim-rails'
-Bundle 'xenoterracide/html.vim'
 Bundle 'thoughtbot/vim-rspec'
 Bundle "sheerun/vim-polyglot"
-
-Bundle 'scrooloose/syntastic'
 Bundle 'tpope/vim-abolish'
 Bundle 'altercation/vim-colors-solarized'
 Bundle 'rking/ag.vim'
@@ -78,46 +63,66 @@ Bundle 'rizzatti/funcoo.vim'
 Bundle 'rizzatti/dash.vim'
 Bundle 'mattn/webapi-vim'
 Bundle 'mattn/gist-vim'
-Bundle 'mileszs/ack.vim'
+"Bundle 'mileszs/ack.vim'
+Bundle 'w0rp/ale'
 Plugin 'tpope/vim-unimpaired'
+Plugin 'SirVer/ultisnips'
+Plugin 'honza/vim-snippets'
+Plugin 'Valloric/YouCompleteMe'
+Plugin 'epilande/vim-es2015-snippets'
+Plugin 'epilande/vim-react-snippets'
+
+let g:UltiSnipsExpandTrigger       ="<c-l>"
+let g:UltiSnipsJumpForwardTrigger  = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+
+" Enable tabbing through list of results
+function! g:UltiSnips_Complete()
+    call UltiSnips#ExpandSnippet()
+    if g:ulti_expand_res == 0
+        if pumvisible()
+            return "\<C-n>"
+        else
+            call UltiSnips#JumpForwards()
+            if g:ulti_jump_forwards_res == 0
+               return "\<TAB>"
+            endif
+        endif
+    endif
+    return ""
+endfunction
+
+au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
+
+" Expand snippet or return
+let g:ulti_expand_res = 0
+function! Ulti_ExpandOrEnter()
+    call UltiSnips#ExpandSnippet()
+    if g:ulti_expand_res
+        return ''
+    else
+        return "\<return>"
+endfunction
+
+" Set <enter> as primary trigger
+inoremap <return> <C-R>=Ulti_ExpandOrEnter()<CR>
 
 set laststatus=2
 let g:airline_powerline_fonts = 1
+let g:airline#extensions#ale#enabled = 1
 
 set background=dark " dark | light "
 colorscheme solarized
 
 set regexpengine=1
 
-" Tab completion
-" will insert tab at beginning of line,
-" will use completion if not at beginning
-set wildmode=list:longest,list:full
-set complete=.,w,t
-function! InsertTabWrapper()
-  let col = col('.') - 1
-  if !col || getline('.')[col - 1] !~ '\k'
-    return "\<tab>"
-  else
-    return "\<c-p>"
-  endif
-endfunction
-inoremap <Tab> <c-r>=InsertTabWrapper()<cr>
+let g:javascript_plugin_flow = 1
+let g:ale_linters = {
+      \   'javascript': ['eslint', 'flow'],
+      \   'ruby': ['rubocop'],
+      \   'scss': ['scss_lint'],
+      \}
 
 let g:used_javascript_libs = 'jquery,underscore'
 
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-
 filetype plugin indent on     " required!
-
-let g:syntastic_ruby_checkers = ['rubocop']
-let g:syntastic_javascript_eslint_exe='$(npm bin)/eslint'
-let g:syntastic_javascript_checkers = ['eslint', 'jshint']
-let g:syntastic_scss_checkers = ['scss_lint']
