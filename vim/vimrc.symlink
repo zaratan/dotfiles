@@ -32,6 +32,8 @@ set clipboard=unnamed
 autocmd Filetype gitcommit setlocal spell textwidth=72
 
 nnoremap <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar><CR>
+nnoremap <F6> :lw<CR>
+nnoremap <F7> :lcl<CR>
 
 inoremap III <Esc>I
 inoremap AAA <Esc>A
