@@ -72,49 +72,24 @@ Bundle 'w0rp/ale'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
-Plugin 'Valloric/YouCompleteMe'
 Plugin 'epilande/vim-es2015-snippets'
 Plugin 'epilande/vim-react-snippets'
 Bundle 'christoomey/vim-tmux-navigator'
 
-let g:UltiSnipsExpandTrigger       ="<c-l>"
-let g:UltiSnipsJumpForwardTrigger  = "<tab>"
-let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+let g:tmux_navigator_no_mappings = 1
 
-" Enable tabbing through list of results
-function! g:UltiSnips_Complete()
-    call UltiSnips#ExpandSnippet()
-    if g:ulti_expand_res == 0
-        if pumvisible()
-            return "\<C-n>"
-        else
-            call UltiSnips#JumpForwards()
-            if g:ulti_jump_forwards_res == 0
-               return "\<TAB>"
-            endif
-        endif
-    endif
-    return ""
-endfunction
-
-au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
-
-" Expand snippet or return
-let g:ulti_expand_res = 0
-function! Ulti_ExpandOrEnter()
-    call UltiSnips#ExpandSnippet()
-    if g:ulti_expand_res
-        return ''
-    else
-        return "\<return>"
-endfunction
-
-" Set <enter> as primary trigger
-inoremap <return> <C-R>=Ulti_ExpandOrEnter()<CR>
+nnoremap <silent> <c-s-l> :TmuxNavigateLeft<cr>
+nnoremap <silent> <c-s-k> :TmuxNavigateDown<cr>
+nnoremap <silent> <c-s-j> :TmuxNavigateUp<cr>
+nnoremap <silent> <c-s-h> :TmuxNavigateRight<cr>
 
 let g:UltiSnipsEditSplit="vertical"
 let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips', 'UltiSnips']
 
+let g:UltiSnipsExpandTrigger       = "<c-l>"
+let g:UltiSnipsListSnippets        = "<c-k>"
+let g:UltiSnipsJumpForwardTrigger  = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 
 set wildmode=list:longest,list:full
 
@@ -124,6 +99,18 @@ let g:airline#extensions#ale#enabled = 1
 
 set background=dark " dark | light "
 colorscheme solarized
+
+" Tab completion
+set complete=.,w,t,b,i
+function! InsertTabWrapper()
+  let col = col('.') - 1
+  if !col || getline('.')[col - 1] !~ '\k'
+    return "\<tab>"
+  else
+    return "\<c-p>"
+  endif
+endfunction
+inoremap <Tab> <c-r>=InsertTabWrapper()<cr>
 
 set regexpengine=1
 
