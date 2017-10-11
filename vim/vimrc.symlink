@@ -33,12 +33,16 @@ autocmd Filetype gitcommit setlocal spell textwidth=72
 
 nnoremap <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar><CR>
 
-" nnoremap jj gt
+inoremap III <Esc>I
+inoremap AAA <Esc>A
+inoremap OOO <Esc>o
 
-inoremap II <Esc>I
-inoremap AA <Esc>A
-inoremap OO <Esc>o
-inoremap UU <Esc>ui
+nnoremap ¬      :tabprevious<CR>
+nnoremap ˙      :tabnext<CR>
+nnoremap <C-t>  :tabnew<CR> 
+inoremap ¬      <Esc>:tabprevious<CR>i
+inoremap ˙      <Esc>:tabnext<CR>i
+inoremap <C-t>  <Esc>:tabnew<CR>
 
 filetype off          " required!
 
@@ -63,7 +67,7 @@ Bundle 'rizzatti/funcoo.vim'
 Bundle 'rizzatti/dash.vim'
 Bundle 'mattn/webapi-vim'
 Bundle 'mattn/gist-vim'
-"Bundle 'mileszs/ack.vim'
+Bundle 'mileszs/ack.vim'
 Bundle 'w0rp/ale'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'SirVer/ultisnips'
@@ -71,6 +75,7 @@ Plugin 'honza/vim-snippets'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'epilande/vim-es2015-snippets'
 Plugin 'epilande/vim-react-snippets'
+Bundle 'christoomey/vim-tmux-navigator'
 
 let g:UltiSnipsExpandTrigger       ="<c-l>"
 let g:UltiSnipsJumpForwardTrigger  = "<tab>"
@@ -106,6 +111,12 @@ endfunction
 
 " Set <enter> as primary trigger
 inoremap <return> <C-R>=Ulti_ExpandOrEnter()<CR>
+
+let g:UltiSnipsEditSplit="vertical"
+let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips', 'UltiSnips']
+
+
+set wildmode=list:longest,list:full
 
 set laststatus=2
 let g:airline_powerline_fonts = 1
