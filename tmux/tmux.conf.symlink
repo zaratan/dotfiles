@@ -81,8 +81,8 @@ setw -g clock-mode-colour yellow
 
 #Status bar config
 set -g status-justify centre
-set -g status-left-length 40
-set -g status-right-length 50
+set -g status-left-length 60
+set -g status-right-length 70
 
 #notifications
 setw -g monitor-activity on
@@ -98,6 +98,7 @@ set -g @plugin 'tmux-plugins/tmux-continuum'
 set -g @plugin 'tmux-plugins/tmux-battery'
 set -g @plugin 'tmux-plugins/tmux-cpu'
 set -g @plugin 'tmux-plugins/tmux-open'
+set -g @plugin 'robhurring/tmux-spotify'
 
 # Other examples:
 # set -g @plugin 'github_username/plugin_name'
@@ -110,8 +111,8 @@ bind-key -T copy-mode-vi 'V' send -X select-line
 bind-key -T copy-mode-vi 'r' send -X rectangle-toggle
 bind-key -T copy-mode-vi 'y' send -X copy-pipe-and-cancel "xclip -in -selection clipboard"
 
-set -g status-left "#[bg=black]Session: #S (#I/#P) |#{battery_status_fg} Batt: #{battery_percentage} #{battery_remain}"
-set -g status-right '#{cpu_fg_color} CPU: #{cpu_percentage} #[fg=yellow]| %a %d-%h %H:%M '
+set -g status-left "#[bg=black]Session: #S (#I/#P) |#{battery_status_fg} Batt: #{battery_percentage} #{battery_remain}|#{cpu_fg_color} CPU: #{cpu_percentage} #[fg=yellow]"
+set -g status-right '♫ #{spotify_artist}: #{spotify_track} | %a %d-%h %H:%M '
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run '~/.tmux/plugins/tpm/tpm'

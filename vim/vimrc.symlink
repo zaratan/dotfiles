@@ -39,11 +39,11 @@ inoremap III <Esc>I
 inoremap AAA <Esc>A
 inoremap OOO <Esc>o
 
-nnoremap ¬      :tabprevious<CR>
-nnoremap ˙      :tabnext<CR>
+nnoremap ¬      :tabnext<CR>
+nnoremap ˙      :tabprevious<CR>
 nnoremap <C-t>  :tabnew<CR> 
-inoremap ¬      <Esc>:tabprevious<CR>i
-inoremap ˙      <Esc>:tabnext<CR>i
+inoremap ¬      <Esc>:tabnext<CR>i
+inoremap ˙      <Esc>:tabprevious<CR>i
 inoremap <C-t>  <Esc>:tabnew<CR>
 
 filetype off          " required!
