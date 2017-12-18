@@ -86,7 +86,7 @@ set -g status-right-length 70
 
 #notifications
 setw -g monitor-activity on
-set -g visual-activity on
+set -g visual-activity off
 
 #copy-vi style
 # List of plugins
