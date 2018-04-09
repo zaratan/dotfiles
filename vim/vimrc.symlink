@@ -30,8 +30,10 @@ set t_Co=256
 set clipboard=unnamed
 
 autocmd Filetype gitcommit setlocal spell textwidth=72
+autocmd Filetype markdown setlocal spell spelllang=fr
+autocmd Filetype markdown hi SpellBad cterm=underline ctermfg=red
 
-nnoremap <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar><CR>
+nnoremap <F5> :ALEFix<CR>
 nnoremap <F6> :lw<CR>
 nnoremap <F7> :lcl<CR>
 
@@ -117,10 +119,17 @@ inoremap <Tab> <c-r>=InsertTabWrapper()<cr>
 set regexpengine=1
 
 let g:javascript_plugin_flow = 1
+
+let g:ale_fixers = {}
+let g:ale_fixers['javascript'] = ['prettier']
+let g:ale_javascript_prettier_options = '--single-quote --trailing-comma all --no-semi'
+let g:ale_fix_on_save = 1
+
 let g:ale_linters = {
       \   'javascript': ['eslint', 'flow'],
       \   'ruby': ['rubocop'],
       \   'scss': ['scss_lint'],
+      \   'html': ['tidy'],
       \}
 
 let g:used_javascript_libs = 'jquery,underscore'
