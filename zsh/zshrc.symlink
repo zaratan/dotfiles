@@ -7,7 +7,6 @@ plugins=(git brew bundler bower heroku cap docker gem git-flow meteor tmux npm o
 
 source ~/.kube-comp
 
-
 # prompt
 export RPS1='$(rvm_prompt_info)'
 export ZSH_TMUX_AUTOSTART=true
@@ -16,7 +15,7 @@ export ZSH_TMUX_AUTOQUIT=false
 # for root
 
 source $ZSH/oh-my-zsh.sh
-#eval "$(hub alias -s)"
+eval "$(hub alias -s)"
 #
 if [ -e "$HOME/.aliases" ]; then
   source "$HOME/.aliases"
