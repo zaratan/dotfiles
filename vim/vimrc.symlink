@@ -201,3 +201,6 @@ let g:ale_linters = {
 let g:used_javascript_libs = 'jquery,underscore'
 
 filetype plugin indent on     " required!
+if filereadable($HOME . "/.vimrc.local")
+  source $HOME/.vimrc.local
+endif
