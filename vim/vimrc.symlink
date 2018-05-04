@@ -188,6 +188,7 @@ let g:javascript_plugin_flow = 1
 
 let g:ale_fixers = {}
 let g:ale_fixers['javascript'] = ['prettier']
+let g:ale_fixers['ruby'] = ['rubocop']
 let g:ale_javascript_prettier_options = '--single-quote --trailing-comma all --no-semi'
 let g:ale_fix_on_save = 1
 
