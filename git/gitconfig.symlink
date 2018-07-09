@@ -42,3 +42,5 @@
   tool = vimdiff
 [difftool]
   prompt = false
+[rerere]
+	enabled = true

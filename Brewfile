@@ -1,9 +1,7 @@
 cask_args appdir: '/Applications'
 
 tap 'homebrew/bundle'
-tap 'puma/puma'
 
-brew 'asciinema'
 brew 'axel'
 brew 'base64'
 brew 'coreutils'
@@ -27,7 +25,6 @@ brew 'openssl'
 brew 'perl'
 brew 'postgresql'
 brew 'reattach-to-user-namespace'
-brew 'puma/puma/puma-dev'
 brew 'python'
 brew 'readline'
 brew 'redis'

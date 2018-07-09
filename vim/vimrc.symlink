@@ -57,8 +57,8 @@ call vundle#rc()
 "required!
 Bundle 'gmarik/vundle'
 Bundle 'scrooloose/nerdtree'
-Bundle 'tpope/vim-bundler'
 Bundle 'tpope/vim-rails'
+Bundle 'mhinz/vim-signify'
 Bundle 'thoughtbot/vim-rspec'
 Bundle "sheerun/vim-polyglot"
 Bundle 'tpope/vim-abolish'
@@ -74,10 +74,10 @@ Bundle 'mattn/gist-vim'
 Bundle 'mileszs/ack.vim'
 Bundle 'w0rp/ale'
 Plugin 'tpope/vim-unimpaired'
-Plugin 'SirVer/ultisnips'
-Plugin 'honza/vim-snippets'
-Plugin 'epilande/vim-es2015-snippets'
-Plugin 'epilande/vim-react-snippets'
+"Plugin 'SirVer/ultisnips'
+"Plugin 'honza/vim-snippets'
+"Plugin 'epilande/vim-es2015-snippets'
+"Plugin 'epilande/vim-react-snippets'
 Bundle 'christoomey/vim-tmux-navigator'
 Plugin 'dhruvasagar/vim-zoom'
 
@@ -183,6 +183,8 @@ endfunction
 inoremap <Tab> <c-r>=InsertTabWrapper()<cr>
 
 set regexpengine=1
+
+let g:gitgutter_signs = 0
 
 let g:javascript_plugin_flow = 1
 
