@@ -84,3 +84,4 @@ load-nvmrc() {
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 eval "$(direnv hook zsh)"
+source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh

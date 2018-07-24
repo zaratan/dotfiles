@@ -10,7 +10,8 @@
   ca = commit --amend
   ci = commit -v
   co = checkout
-  pr = !hub pull-request
+  pr = pull-request
+  ppr = pull-request
   lg = log --graph --pretty=format:'%C(bold)–%Creset %C(red bold)%h%d%Creset | %C(green)%an%Creset | %C(magenta)%cr%Creset | %C(cyan)%s%Creset'
   lgp = log -p
   lgn = log --name-only
