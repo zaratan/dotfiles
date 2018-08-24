@@ -86,3 +86,5 @@ load-nvmrc
 eval "$(direnv hook zsh)"
 source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=6'
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

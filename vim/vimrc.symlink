@@ -1,9 +1,7 @@
 syntax on
 set number
 set showmatch
-set mouse=a
 set tw:1337
-set si
 set hls is
 set showcmd
 set autoread 
@@ -21,9 +19,10 @@ filetype indent on    " Enable filetype-specific indenting
 filetype plugin on    " Enable filetype-specific plugins
 filetype plugin indent on
 
-if &term =~ '^screen'
-  set ttymouse=xterm2
-endif
+" mouse support
+set mouse=a
+" mouse support on more than 220 col
+set ttymouse=sgr
 
 " colorecting colorscheme
 set t_Co=256
@@ -57,11 +56,19 @@ call vundle#rc()
 "required!
 Bundle 'gmarik/vundle'
 Bundle 'scrooloose/nerdtree'
+Plugin 'Xuyuanp/nerdtree-git-plugin'
+Plugin 'junegunn/fzf'
+Plugin 'junegunn/fzf.vim'
 Bundle 'tpope/vim-rails'
 Bundle 'mhinz/vim-signify'
 Bundle 'thoughtbot/vim-rspec'
 Bundle "sheerun/vim-polyglot"
 Bundle 'tpope/vim-abolish'
+Plugin 'tpope/vim-eunuch'
+Plugin 'tpope/vim-commentary'
+Plugin 'tpope/vim-endwise'
+Plugin 'docunext/closetag.vim'
+Plugin 'easymotion/vim-easymotion'
 Bundle 'altercation/vim-colors-solarized'
 Bundle 'rking/ag.vim'
 Bundle 'tpope/vim-fugitive'
@@ -74,77 +81,25 @@ Bundle 'mattn/gist-vim'
 Bundle 'mileszs/ack.vim'
 Bundle 'w0rp/ale'
 Plugin 'tpope/vim-unimpaired'
-"Plugin 'SirVer/ultisnips'
-"Plugin 'honza/vim-snippets'
-"Plugin 'epilande/vim-es2015-snippets'
-"Plugin 'epilande/vim-react-snippets'
+Plugin 'SirVer/ultisnips'
+Plugin 'honza/vim-snippets'
+Plugin 'epilande/vim-es2015-snippets'
+Plugin 'epilande/vim-react-snippets'
 Bundle 'christoomey/vim-tmux-navigator'
 Plugin 'dhruvasagar/vim-zoom'
+if has('nvim')
+  Plugin 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+  Plugin 'Shougo/deoplete.nvim'
+  Plugin 'roxma/nvim-yarp'
+  Plugin 'roxma/vim-hug-neovim-rpc'
+endif
 
-" Rename.vim  -  Rename a buffer within Vim and on the disk
-"
-" Copyright June 2007-2011 by Christian J. Robinson <heptite@gmail.com>
-"
-" Distributed under the terms of the Vim license.  See ":help license".
-"
-" Usage:
-"
-" :Rename[!] {newname}
+let g:deoplete#enable_at_startup = 1
 
-command! -nargs=* -complete=file -bang Rename call Rename(<q-args>, '<bang>')
-
-function! Rename(name, bang)
-	let l:name    = a:name
-	let l:oldfile = expand('%:p')
-
-	if bufexists(fnamemodify(l:name, ':p'))
-		if (a:bang ==# '!')
-			silent exe bufnr(fnamemodify(l:name, ':p')) . 'bwipe!'
-		else
-			echohl ErrorMsg
-			echomsg 'A buffer with that name already exists (use ! to override).'
-			echohl None
-			return 0
-		endif
-	endif
-
-	let l:status = 1
-
-	let v:errmsg = ''
-	silent! exe 'saveas' . a:bang . ' ' . l:name
-
-	if v:errmsg =~# '^$\|^E329'
-		let l:lastbufnr = bufnr('$')
-
-		if expand('%:p') !=# l:oldfile && filewritable(expand('%:p'))
-			if fnamemodify(bufname(l:lastbufnr), ':p') ==# l:oldfile
-				silent exe l:lastbufnr . 'bwipe!'
-			else
-				echohl ErrorMsg
-				echomsg 'Could not wipe out the old buffer for some reason.'
-				echohl None
-				let l:status = 0
-			endif
-
-			if delete(l:oldfile) != 0
-				echohl ErrorMsg
-				echomsg 'Could not delete the old file: ' . l:oldfile
-				echohl None
-				let l:status = 0
-			endif
-		else
-			echohl ErrorMsg
-			echomsg 'Rename failed for some reason.'
-			echohl None
-			let l:status = 0
-		endif
-	else
-		echoerr v:errmsg
-		let l:status = 0
-	endif
-
-	return l:status
-endfunction
+nmap ; :Buffers<CR>
+nmap <Leader>t :Files<CR>
+nmap <Leader>r :Tags<CR>
 
 let g:tmux_navigator_no_mappings = 1
 
@@ -177,10 +132,10 @@ function! InsertTabWrapper()
   if !col || getline('.')[col - 1] !~ '\k'
     return "\<tab>"
   else
-    return "\<c-p>"
+    return deoplete#mappings#manual_complete()
   endif
 endfunction
-inoremap <Tab> <c-r>=InsertTabWrapper()<cr>
+inoremap <silent><expr> <Tab> InsertTabWrapper()
 
 set regexpengine=1
 
