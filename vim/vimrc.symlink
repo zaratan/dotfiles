@@ -13,11 +13,9 @@ set expandtab
 set autoindent
 set smartindent
 set smarttab
+set encoding=utf-8
 set nocompatible      " We're running Vim, not Vi!
-filetype on           " Enable filetype detection
-filetype indent on    " Enable filetype-specific indenting
-filetype plugin on    " Enable filetype-specific plugins
-filetype plugin indent on
+filetype off           " Enable filetype detection
 
 " mouse support
 set mouse=a
@@ -35,6 +33,7 @@ autocmd Filetype markdown hi SpellBad cterm=underline ctermfg=red
 nnoremap <F5> :ALEFix<CR>
 nnoremap <F6> :lw<CR>
 nnoremap <F7> :lcl<CR>
+nnoremap <F8> :call LanguageClient_contextMenu()<CR>
 
 inoremap III <Esc>I
 inoremap AAA <Esc>A
@@ -49,53 +48,60 @@ inoremap <C-t>  <Esc>:tabnew<CR>
 
 filetype off          " required!
 
-set rtp+=~/.vim/bundle/vundle
-call vundle#rc()
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
 
 "let Vundle manage Vundle
 "required!
-Bundle 'gmarik/vundle'
-Bundle 'scrooloose/nerdtree'
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'roxma/nvim-yarp'
+Plugin 'roxma/vim-hug-neovim-rpc'
+Plugin 'Shougo/deoplete.nvim'
+Plugin 'Shougo/neco-syntax'
+Plugin 'autozimu/languageclient-neovim'
+Plugin 'scrooloose/nerdtree'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'junegunn/fzf'
 Plugin 'junegunn/fzf.vim'
-Bundle 'tpope/vim-rails'
-Bundle 'mhinz/vim-signify'
-Bundle 'thoughtbot/vim-rspec'
-Bundle "sheerun/vim-polyglot"
-Bundle 'tpope/vim-abolish'
+Plugin 'tpope/vim-rails'
+Plugin 'mhinz/vim-signify'
+Plugin 'thoughtbot/vim-rspec'
+Plugin 'sheerun/vim-polyglot'
+Plugin 'tpope/vim-abolish'
 Plugin 'tpope/vim-eunuch'
 Plugin 'tpope/vim-commentary'
 Plugin 'tpope/vim-endwise'
 Plugin 'docunext/closetag.vim'
 Plugin 'easymotion/vim-easymotion'
-Bundle 'altercation/vim-colors-solarized'
-Bundle 'rking/ag.vim'
-Bundle 'tpope/vim-fugitive'
-Bundle 'airblade/vim-gitgutter'
-Bundle 'bling/vim-airline'
-Bundle 'rizzatti/funcoo.vim'
-Bundle 'rizzatti/dash.vim'
-Bundle 'mattn/webapi-vim'
-Bundle 'mattn/gist-vim'
-Bundle 'mileszs/ack.vim'
-Bundle 'w0rp/ale'
+Plugin 'altercation/vim-colors-solarized'
+Plugin 'rking/ag.vim'
+Plugin 'tpope/vim-fugitive'
+Plugin 'airblade/vim-gitgutter'
+Plugin 'bling/vim-airline'
+Plugin 'rizzatti/funcoo.vim'
+Plugin 'rizzatti/dash.vim'
+Plugin 'mattn/webapi-vim'
+Plugin 'mattn/gist-vim'
+Plugin 'mileszs/ack.vim'
+Plugin 'w0rp/ale'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 Plugin 'epilande/vim-es2015-snippets'
 Plugin 'epilande/vim-react-snippets'
-Bundle 'christoomey/vim-tmux-navigator'
+Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'dhruvasagar/vim-zoom'
-if has('nvim')
-  Plugin 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-  Plugin 'Shougo/deoplete.nvim'
-  Plugin 'roxma/nvim-yarp'
-  Plugin 'roxma/vim-hug-neovim-rpc'
-endif
+
+call vundle#end()            " required
+filetype plugin indent on    " required
 
 let g:deoplete#enable_at_startup = 1
+set completeopt+=noinsert
+
+let g:LanguageClient_serverCommands = {
+    \ 'ruby': ['solargraph','stdio']
+    \ }
+
 
 nmap ; :Buffers<CR>
 nmap <Leader>t :Files<CR>
@@ -126,13 +132,12 @@ set background=dark " dark | light "
 colorscheme solarized
 
 " Tab completion
-set complete=.,w,t,b,i
 function! InsertTabWrapper()
   let col = col('.') - 1
   if !col || getline('.')[col - 1] !~ '\k'
     return "\<tab>"
   else
-    return deoplete#mappings#manual_complete()
+    return "\<CR>"
   endif
 endfunction
 inoremap <silent><expr> <Tab> InsertTabWrapper()
