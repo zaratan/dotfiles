@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+`figlet -f banner "#{ARGV[0]}" | sed -e's/#/:#{ARGV[1]}:/g' | sed -e's/ /:#{ARGV[2]}:/g' | pbcopy`
