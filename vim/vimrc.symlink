@@ -137,10 +137,14 @@ function! InsertTabWrapper()
   if !col || getline('.')[col - 1] !~ '\k'
     return "\<tab>"
   else
-    return "\<CR>"
+    if pumvisible()
+      return "\<C-n>" 
+    else
+      return deoplete#mappings#manual_complete()
+    endif
   endif
 endfunction
-inoremap <silent><expr> <Tab> InsertTabWrapper()
+inoremap <silent><expr> <Tab> InsertTabWrapper()      
 
 set regexpengine=1
 
