@@ -9,7 +9,12 @@ cd "$(dirname $0)"/..
 # Run Homebrew through the Brewfile
 echo "› brew bundle"
 brew bundle
-ln -s `pwd`/bin ~/bin
+
+if [[ ! -L ~/bin ]]; then
+  ln -s `pwd`/bin ~/bin
+fi
 # find the installers and run them iteratively
 find . -name install.sh | while read installer ; do sh -c "${installer}" ; done
-curl -L https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh | sh
+if [[ ! -d ~/.oh-my-zsh ]]; then
+  curl -L https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh | sh
+fi

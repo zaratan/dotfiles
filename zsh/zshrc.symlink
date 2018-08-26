@@ -1,11 +1,8 @@
 eval `gdircolors ~/.dircolors.256dark`
 export ZSH=$HOME/.oh-my-zsh
-
 ZSH_THEME="agnoster"
 
 plugins=(vscode git brew bundler bower heroku cap docker gem git-flow meteor tmux npm osx rails rvm vagrant zsh-syntax-highlighting z web-search nvm zsh-completions yarn docker-compose)
-
-source ~/.kube-comp
 
 # prompt
 export RPS1='$(rvm_prompt_info)'
@@ -13,7 +10,6 @@ export ZSH_TMUX_AUTOSTART=true
 export ZSH_TMUX_AUTOQUIT=false
 
 # for root
-
 source $ZSH/oh-my-zsh.sh
 eval "$(hub alias -s)"
 #
@@ -26,65 +22,47 @@ fi
 export PATH="$HOME/bin:$HOME/.bin:/usr/local/bin:/usr/local/texlive/2013/bin/x86_64-darwin:./bin:$PATH"
 export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
 export PATH="~/bin:$PATH"
-export PATH="$HOME/jam/TT/cmd:$HOME/jam/TT/bin:$PATH"
 export DEFAULT_USER="Zaratan"
 
 if [ -e "$HOME/.zshrc.local" ]; then
   source "$HOME/.zshrc.local"
 fi
 
-#Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
-else
-  export EDITOR='vim'
-fi
+export EDITOR='vim'
 
 # ssh
 export SSH_KEY_PATH="~/.ssh/zaratan"
 #z
 
-# eval `gdircolors ~/.dircolors.256dark`
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f /Users/Zaratan/Gcloud/path.zsh.inc ]; then
-  source '/Users/Zaratan/Gcloud/path.zsh.inc'
-fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f /Users/Zaratan/Gcloud/completion.zsh.inc ]; then
-  source '/Users/Zaratan/Gcloud/completion.zsh.inc'
-fi
-
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-export ANDROID_HOME="$HOME/Library/Android/sdk"
-export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
 export PATH=./node_modules/.bin:$PATH
 
 eval $(thefuck --alias)
 
 # place this after nvm initialization!
-autoload -U add-zsh-hook
-load-nvmrc() {
-  local node_version="$(nvm version)"
-  local nvmrc_path="$(nvm_find_nvmrc)"
+# autoload -U add-zsh-hook
+# load-nvmrc() {
+#   local node_version="$(nvm version)"
+#   local nvmrc_path="$(nvm_find_nvmrc)"
 
-  if [ -n "$nvmrc_path" ]; then
-    local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
+#   if [ -n "$nvmrc_path" ]; then
+#     local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
 
-    if [ "$nvmrc_node_version" = "N/A" ]; then
-      nvm install
-    elif [ "$nvmrc_node_version" != "$node_version" ]; then
-      nvm use
-    fi
-  elif [ "$node_version" != "$(nvm version default)" ]; then
-    echo "Reverting to nvm default version"
-    nvm use default
-  fi
-}
-add-zsh-hook chpwd load-nvmrc
-load-nvmrc
-eval "$(direnv hook zsh)"
+#     if [ "$nvmrc_node_version" = "N/A" ]; then
+#       nvm install
+#     elif [ "$nvmrc_node_version" != "$node_version" ]; then
+#       nvm use
+#     fi
+#   elif [ "$node_version" != "$(nvm version default)" ]; then
+#     echo "Reverting to nvm default version"
+#     nvm use default
+#   fi
+# }
+# add-zsh-hook chpwd load-nvmrc
+# load-nvmrc
+# eval "$(direnv hook zsh)"
+# echo "envm"
 source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=6'
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f ~/.fzf ] && source ~/.fzf

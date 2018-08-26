@@ -16,6 +16,12 @@ $ZSH/homebrew/install.sh 2>&1
 echo "› brew update"
 brew update
 
+
+$ZSH/script/bootstrap
+
 # Install software
 echo "› $ZSH/script/install"
 $ZSH/script/install
+
+echo "Upgrading"
+brew upgrade

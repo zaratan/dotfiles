@@ -22,6 +22,10 @@ set mouse=a
 " mouse support on more than 220 col
 set ttymouse=sgr
 
+" Persistent undo !
+set undofile                 "turn on the feature  
+set undodir=$HOME/.vim/undo  "directory where the undo files will be stored
+
 " colorecting colorscheme
 set t_Co=256
 set clipboard=unnamed
