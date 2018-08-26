@@ -98,11 +98,6 @@ filetype plugin indent on    " required
 let g:deoplete#enable_at_startup = 1
 set completeopt+=noinsert
 
-let g:LanguageClient_serverCommands = {
-    \ 'ruby': ['solargraph','stdio']
-    \ }
-
-
 nmap ; :Buffers<CR>
 nmap <Leader>t :Files<CR>
 nmap <Leader>r :Tags<CR>
@@ -166,9 +161,14 @@ let g:ale_linters = {
       \   'html': ['tidy'],
       \}
 
+let g:LanguageClient_serverCommands = {
+    \ 'javascript': ['flow-language-server', '--stdio'],
+    \ 'javascript.jsx': ['flow-language-server', '--stdio'],
+    \ 'ruby': ['solargraph','stdio']
+    \ }
+
 let g:used_javascript_libs = 'jquery,underscore'
 
-filetype plugin indent on     " required!
 if filereadable($HOME . "/.vimrc.local")
   source $HOME/.vimrc.local
 endif
