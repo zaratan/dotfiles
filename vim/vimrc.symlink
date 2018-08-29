@@ -53,6 +53,7 @@ inoremap <C-t>  <Esc>:tabnew<CR>
 filetype off          " required!
 
 set rtp+=~/.vim/bundle/Vundle.vim
+set rtp+=/usr/local/opt/fzf
 call vundle#begin()
 
 "let Vundle manage Vundle
@@ -103,7 +104,7 @@ let g:deoplete#enable_at_startup = 1
 set completeopt+=noinsert
 
 nmap ; :Buffers<CR>
-nmap <Leader>t :Files<CR>
+nmap <Leader>e :Files<CR>
 nmap <Leader>r :Tags<CR>
 
 let g:tmux_navigator_no_mappings = 1

@@ -65,3 +65,4 @@ source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=6'
 
 [ -L ~/.fzf ] && source ~/.fzf
+eval "$(direnv hook zsh)"
