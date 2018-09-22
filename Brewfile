@@ -50,7 +50,7 @@ brew 'zsh-autosuggestions'
 
 cask 'alfred'
 cask 'bettertouchtool'
-cask 'dashlane'
+cask 'dash'
 cask 'deluge'
 cask 'discord'
 cask 'docker'
