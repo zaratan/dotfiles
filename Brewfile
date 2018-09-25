@@ -1,6 +1,7 @@
 cask_args appdir: '/Applications'
 
 tap 'homebrew/bundle'
+tap prisma/prisma
 
 brew 'axel'
 brew 'base64'
@@ -27,6 +28,7 @@ brew 'nvm'
 brew 'openssl'
 brew 'perl'
 brew 'postgresql'
+brew 'prisma'
 brew 'python'
 brew 'reattach-to-user-namespace'
 brew 'readline'
