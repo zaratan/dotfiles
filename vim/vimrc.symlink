@@ -15,16 +15,16 @@ set smartindent
 set smarttab
 set encoding=utf-8
 set nocompatible      " We're running Vim, not Vi!
-filetype off           " Enable filetype detection
+filetype off           " Enable filetype detection.
 
 " mouse support
 set mouse=a
-" mouse support on more than 220 col
+" mouse support on more than 220 cols
 set ttymouse=sgr
 
 " Persistent undo !
 set undofile                 "turn on the feature  
-set undodir=$HOME/.vim/undo  "directory where the undo files will be stored
+set undodir=$HOME/.vim/undo  "directory where the undo files will be stored.
 
 " colorecting colorscheme
 set t_Co=256
@@ -59,7 +59,7 @@ set rtp+=~/.vim/bundle/Vundle.vim
 set rtp+=/usr/local/opt/fzf
 call vundle#begin()
 
-"let Vundle manage Vundle
+"Let Vundle manage Vundle
 "required!
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'roxma/nvim-yarp'
@@ -101,6 +101,7 @@ Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'dhruvasagar/vim-zoom'
 Plugin 'mechatroner/rainbow_csv'
 Plugin 'kshenoy/vim-signature'
+Plugin 'rhysd/vim-grammarous'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -135,6 +136,10 @@ let g:airline#extensions#ale#enabled = 1
 
 set background=dark " dark | light "
 colorscheme solarized
+
+let g:grammarous#default_comments_only_filetypes = {
+      \ '*' : 1, 'help' : 0, 'markdown' : 0,
+      \ }
 
 " Tab completion
 function! InsertTabWrapper()
