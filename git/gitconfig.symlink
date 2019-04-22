@@ -45,3 +45,7 @@
   prompt = false
 [rerere]
 	enabled = true
+[user]
+	signingKey = 44DD34402A26BDCB
+[hub]
+	host = git.autodesk.com

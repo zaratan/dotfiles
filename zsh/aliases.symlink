@@ -5,7 +5,7 @@ alias ...='../..'
 alias l='ls --color=auto'
 alias ll='ls -al'
 alias lh='ls -Alh'
-alias vim='vim -O'
+alias vimo='vim -O'
 alias e="vim"
 alias v="vim"
 alias s="z s"

@@ -1,7 +1,7 @@
 cask_args appdir: '/Applications'
 
 tap 'homebrew/bundle'
-tap prisma/prisma
+tap 'prisma/prisma'
 
 brew 'axel'
 brew 'base64'
@@ -75,5 +75,3 @@ cask 'steam'
 cask 'spotify'
 cask 'vagrant'
 cask 'virtualbox'
-
-mas 'thing', id: 715768417

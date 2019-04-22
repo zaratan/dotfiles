@@ -43,6 +43,9 @@ inoremap III <Esc>I
 inoremap AAA <Esc>A
 inoremap OOO <Esc>o
 
+nnoremap <D-s> :w<cr>
+inoremap <D-s> <Esc>:w<cr>i
+
 nnoremap ¬      :tabnext<CR>
 nnoremap ˙      :tabprevious<CR>
 nnoremap <C-t>  :tabnew<CR> 
@@ -96,6 +99,8 @@ Plugin 'epilande/vim-es2015-snippets'
 Plugin 'epilande/vim-react-snippets'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'dhruvasagar/vim-zoom'
+Plugin 'mechatroner/rainbow_csv'
+Plugin 'kshenoy/vim-signature'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -154,8 +159,9 @@ let g:javascript_plugin_flow = 1
 
 let g:ale_fixers = {}
 let g:ale_fixers['ruby'] = ['rubocop']
-let g:ale_fixers['javascript'] = ['prettier-eslint']
-let g:ale_fixers['ruby'] = ['rubocop']
+let g:ale_fixers['javascript'] = ['eslint']
+let g:ale_fixers['json'] = ['prettier']
+let g:ale_fixers['tex'] = ['textlint']
 let g:ale_javascript_prettier_eslint_options = '--single-quote --trailing-comma all --no-semi'
 let g:ale_fix_on_save = 1
 
@@ -164,6 +170,8 @@ let g:ale_linters = {
       \   'ruby': ['rubocop'],
       \   'scss': ['scss_lint'],
       \   'html': ['tidy'],
+      \   'json': ['prettier'],
+      \   'tex':  ['textlint'],
       \}
 
 let g:LanguageClient_serverCommands = {
