@@ -62,11 +62,11 @@ call vundle#begin()
 "Let Vundle manage Vundle
 "required!
 Plugin 'VundleVim/Vundle.vim'
-Plugin 'roxma/nvim-yarp'
-Plugin 'roxma/vim-hug-neovim-rpc'
-Plugin 'Shougo/deoplete.nvim'
-Plugin 'Shougo/neco-syntax'
-Plugin 'autozimu/languageclient-neovim'
+" Plugin 'roxma/nvim-yarp'
+" Plugin 'roxma/vim-hug-neovim-rpc'
+" Plugin 'Shougo/deoplete.nvim'
+" Plugin 'Shougo/neco-syntax'
+" Plugin 'autozimu/languageclient-neovim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'junegunn/fzf'
@@ -102,12 +102,13 @@ Plugin 'dhruvasagar/vim-zoom'
 Plugin 'mechatroner/rainbow_csv'
 Plugin 'kshenoy/vim-signature'
 Plugin 'rhysd/vim-grammarous'
+Plugin 'neoclide/coc.nvim'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
 
-let g:deoplete#enable_at_startup = 1
-set completeopt+=noinsert
+" let g:deoplete#enable_at_startup = 1
+" set completeopt+=noinsert
 
 nmap ; :Buffers<CR>
 nmap <Leader>e :Files<CR>
@@ -123,10 +124,10 @@ nnoremap <silent> <c-s-h> :TmuxNavigateRight<cr>
 let g:UltiSnipsEditSplit="vertical"
 let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips', 'UltiSnips']
 
-let g:UltiSnipsExpandTrigger       = "<c-l>"
-let g:UltiSnipsListSnippets        = "<c-k>"
-let g:UltiSnipsJumpForwardTrigger  = "<tab>"
-let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+" let g:UltiSnipsExpandTrigger       = "<c-l>"
+" let g:UltiSnipsListSnippets        = "<c-k>"
+" let g:UltiSnipsJumpForwardTrigger  = "<tab>"
+" let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 
 set wildmode=list:longest,list:full
 
@@ -142,19 +143,19 @@ let g:grammarous#default_comments_only_filetypes = {
       \ }
 
 " Tab completion
-function! InsertTabWrapper()
-  let col = col('.') - 1
-  if !col || getline('.')[col - 1] !~ '\k'
-    return "\<tab>"
-  else
-    if pumvisible()
-      return "\<C-n>" 
-    else
-      return deoplete#mappings#manual_complete()
-    endif
-  endif
-endfunction
-inoremap <silent><expr> <Tab> InsertTabWrapper()      
+" function! InsertTabWrapper()
+"   let col = col('.') - 1
+"   if !col || getline('.')[col - 1] !~ '\k'
+"     return "\<tab>"
+"   else
+"     if pumvisible()
+"       return "\<C-n>" 
+"     else
+"       return deoplete#mappings#manual_complete()
+"     endif
+"   endif
+" endfunction
+" inoremap <silent><expr> <Tab> InsertTabWrapper()      
 
 set regexpengine=1
 
