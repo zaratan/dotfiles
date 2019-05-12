@@ -2,6 +2,7 @@
   "extends": [
     "airbnb",
     "prettier",
+    "plugin:prettier/recommended",
     "prettier/react"
   ],
   "parser": "babel-eslint",
@@ -31,13 +32,10 @@
     "prefer-const": [
       "error",
       {
-        "destructuring": "all",
+        "destructuring": "all"
       }
     ],
-    "arrow-body-style": [
-      2,
-      "as-needed"
-    ],
+    "arrow-body-style": [2, "as-needed"],
     "no-unused-expressions": [
       2,
       {
@@ -71,10 +69,7 @@
     "react/jsx-filename-extension": [
       1,
       {
-        "extensions": [
-          ".js",
-          ".jsx"
-        ]
+        "extensions": [".js", ".jsx"]
       }
     ],
     "radix": 0,
@@ -82,14 +77,7 @@
       2,
       {
         "hoist": "all",
-        "allow": [
-          "resolve",
-          "reject",
-          "done",
-          "next",
-          "err",
-          "error"
-        ]
+        "allow": ["resolve", "reject", "done", "next", "err", "error"]
       }
     ],
     "quotes": [
@@ -106,20 +94,18 @@
         "trailingComma": "es5",
         "singleQuote": true,
         "printWidth": 80,
+        "semi": true
       }
     ],
     "jsx-a11y/href-no-hash": "off",
     "jsx-a11y/anchor-is-valid": [
       "warn",
       {
-        "aspects": [
-          "invalidHref"
-        ]
+        "aspects": ["invalidHref"]
       }
-    ]
+    ],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   },
-  "plugins": [
-    // "html",
-    "prettier"
-  ]
+  "plugins": ["prettier", "react-hooks"]
 }

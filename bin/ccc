@@ -1,7 +1,13 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 require 'exchange'
 
-raise StandardError, "must provide 3 args, quantity, from currency and to currency in that order" if ARGV.size != 3
+Exchange.configuration = Exchange::Configuration.new do |c|
+  c.api.subclass = :ecb
+end
+
+raise StandardError, 'must provide 3 args, quantity, from currency and to currency in that order' if ARGV.size != 3
 
 number = ARGV[0].to_i
 from_currency = ARGV[1].to_sym
