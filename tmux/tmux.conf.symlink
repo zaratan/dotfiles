@@ -99,6 +99,10 @@ set -g @plugin 'tmux-plugins/tmux-battery'
 set -g @plugin 'tmux-plugins/tmux-cpu'
 set -g @plugin 'tmux-plugins/tmux-open'
 set -g @plugin 'robhurring/tmux-spotify'
+set -g @plugin 'seebi/tmux-colors-solarized'
+set -g @colors-solarized 'dark'
+set -g default-terminal "screen-256color"
+set -ga terminal-overrides ",xterm-256color:Tc"
 
 # Other examples:
 # set -g @plugin 'github_username/plugin_name'

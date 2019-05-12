@@ -15,7 +15,11 @@ set smartindent
 set smarttab
 set encoding=utf-8
 set nocompatible      " We're running Vim, not Vi!
-filetype off           " Enable filetype detection.
+
+" True colors in vim
+set termguicolors
+let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 
 " mouse support
 set mouse=a
@@ -27,7 +31,7 @@ set undofile                 "turn on the feature
 set undodir=$HOME/.vim/undo  "directory where the undo files will be stored.
 
 " colorecting colorscheme
-set t_Co=256
+" set t_Co=256
 set clipboard=unnamed
 
 autocmd Filetype gitcommit setlocal spell textwidth=72
@@ -53,62 +57,66 @@ inoremap ¬      <Esc>:tabnext<CR>i
 inoremap ˙      <Esc>:tabprevious<CR>i
 inoremap <C-t>  <Esc>:tabnew<CR>
 
-filetype off          " required!
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
 
-set rtp+=~/.vim/bundle/Vundle.vim
+call plug#begin('~/.vim/plugged')
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
+Plug 'tpope/vim-rails'
+Plug 'mhinz/vim-signify'
+Plug 'thoughtbot/vim-rspec'
+Plug 'sheerun/vim-polyglot'
+Plug 'tpope/vim-abolish'
+Plug 'tpope/vim-eunuch'
+Plug 'tpope/vim-commentary'
+Plug 'docunext/closetag.vim'
+Plug 'easymotion/vim-easymotion'
+Plug 'lifepillar/vim-solarized8'
+Plug 'rking/ag.vim'
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+Plug 'bling/vim-airline'
+Plug 'rizzatti/funcoo.vim'
+Plug 'rizzatti/dash.vim'
+Plug 'mattn/webapi-vim'
+Plug 'mattn/gist-vim'
+Plug 'mileszs/ack.vim'
+Plug 'w0rp/ale'
+Plug 'tpope/vim-unimpaired'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+Plug 'epilande/vim-es2015-snippets'
+Plug 'epilande/vim-react-snippets'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'dhruvasagar/vim-zoom'
+Plug 'mechatroner/rainbow_csv'
+Plug 'kshenoy/vim-signature'
+Plug 'rhysd/vim-grammarous'
+Plug 'neoclide/coc.nvim', {'tag': '*', 'do': './install.sh'}
+call plug#end()
+
 set rtp+=/usr/local/opt/fzf
-call vundle#begin()
 
-"Let Vundle manage Vundle
-"required!
-Plugin 'VundleVim/Vundle.vim'
-" Plugin 'roxma/nvim-yarp'
-" Plugin 'roxma/vim-hug-neovim-rpc'
-" Plugin 'Shougo/deoplete.nvim'
-" Plugin 'Shougo/neco-syntax'
-" Plugin 'autozimu/languageclient-neovim'
-Plugin 'scrooloose/nerdtree'
-Plugin 'Xuyuanp/nerdtree-git-plugin'
-Plugin 'junegunn/fzf'
-Plugin 'junegunn/fzf.vim'
-Plugin 'tpope/vim-rails'
-Plugin 'mhinz/vim-signify'
-Plugin 'thoughtbot/vim-rspec'
-Plugin 'sheerun/vim-polyglot'
-Plugin 'tpope/vim-abolish'
-Plugin 'tpope/vim-eunuch'
-Plugin 'tpope/vim-commentary'
-Plugin 'tpope/vim-endwise'
-Plugin 'docunext/closetag.vim'
-Plugin 'easymotion/vim-easymotion'
-Plugin 'altercation/vim-colors-solarized'
-Plugin 'rking/ag.vim'
-Plugin 'tpope/vim-fugitive'
-Plugin 'airblade/vim-gitgutter'
-Plugin 'bling/vim-airline'
-Plugin 'rizzatti/funcoo.vim'
-Plugin 'rizzatti/dash.vim'
-Plugin 'mattn/webapi-vim'
-Plugin 'mattn/gist-vim'
-Plugin 'mileszs/ack.vim'
-Plugin 'w0rp/ale'
-Plugin 'tpope/vim-unimpaired'
-Plugin 'SirVer/ultisnips'
-Plugin 'honza/vim-snippets'
-Plugin 'epilande/vim-es2015-snippets'
-Plugin 'epilande/vim-react-snippets'
-Plugin 'christoomey/vim-tmux-navigator'
-Plugin 'dhruvasagar/vim-zoom'
-Plugin 'mechatroner/rainbow_csv'
-Plugin 'kshenoy/vim-signature'
-Plugin 'rhysd/vim-grammarous'
-Plugin 'neoclide/coc.nvim'
+" Quality of life for completion
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-call vundle#end()            " required
-filetype plugin indent on    " required
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
 
-" let g:deoplete#enable_at_startup = 1
-" set completeopt+=noinsert
+inoremap <silent><expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
 
 nmap ; :Buffers<CR>
 nmap <Leader>e :Files<CR>
@@ -136,27 +144,11 @@ let g:airline_powerline_fonts = 1
 let g:airline#extensions#ale#enabled = 1
 
 set background=dark " dark | light "
-colorscheme solarized
+colorscheme solarized8
 
 let g:grammarous#default_comments_only_filetypes = {
       \ '*' : 1, 'help' : 0, 'markdown' : 0,
       \ }
-
-" Tab completion
-" function! InsertTabWrapper()
-"   let col = col('.') - 1
-"   if !col || getline('.')[col - 1] !~ '\k'
-"     return "\<tab>"
-"   else
-"     if pumvisible()
-"       return "\<C-n>" 
-"     else
-"       return deoplete#mappings#manual_complete()
-"     endif
-"   endif
-" endfunction
-" inoremap <silent><expr> <Tab> InsertTabWrapper()      
-
 set regexpengine=1
 
 let g:gitgutter_signs = 0
@@ -178,6 +170,7 @@ let g:ale_linters = {
       \   'html': ['tidy'],
       \   'json': ['prettier'],
       \   'tex':  ['textlint'],
+      \   'markdown':  ['prettier'],
       \}
 
 let g:LanguageClient_serverCommands = {
@@ -191,3 +184,5 @@ let g:used_javascript_libs = 'jquery,underscore'
 if filereadable($HOME . "/.vimrc.local")
   source $HOME/.vimrc.local
 endif
+
+
