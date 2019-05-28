@@ -5,6 +5,7 @@ tap 'prisma/prisma'
 
 brew 'axel'
 brew 'base64'
+brew 'cmake'
 brew 'coreutils'
 brew 'curl'
 brew 'ffmpeg'

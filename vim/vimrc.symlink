@@ -163,6 +163,7 @@ let g:ale_fixers['tex'] = ['textlint']
 let g:ale_fixers['markdown'] = ['prettier']
 let g:ale_javascript_prettier_eslint_options = '--single-quote --trailing-comma all --no-semi'
 let g:ale_fix_on_save = 1
+let g:ale_ruby_rubocop_executable = 'bundle'
 
 let g:ale_linters = {
       \   'javascript': ['eslint', 'flow'],

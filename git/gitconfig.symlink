@@ -44,8 +44,8 @@
 [difftool]
   prompt = false
 [rerere]
-	enabled = true
+  enabled = true
 [user]
-	signingKey = 44DD34402A26BDCB
+  signingKey = 44DD34402A26BDCB
 [hub]
-	host = git.autodesk.com
+  host = git.autodesk.com
