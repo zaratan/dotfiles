@@ -15,6 +15,14 @@ set smartindent
 set smarttab
 set encoding=utf-8
 set nocompatible      " We're running Vim, not Vi!
+set lazyredraw " Do not redraw in the middle of a Macro.
+
+" Case in search are Automtic. Put one capital letter and it's case sensitive, otherwise case Insensitive
+set smartcase 
+set ignorecase
+
+" Capital Q repeat last macro
+nnoremap Q @@
 
 " True colors in vim
 set termguicolors
@@ -37,6 +45,8 @@ set clipboard=unnamed
 autocmd Filetype gitcommit setlocal spell textwidth=72
 autocmd Filetype markdown setlocal spell spelllang=fr
 autocmd Filetype markdown hi SpellBad cterm=underline ctermfg=red
+autocmd Filetype Jenkinsfile set softtabstop=4
+autocmd Filetype Jenkinsfile set shiftwidth=4
 
 nnoremap <F5> :ALEFix<CR>
 nnoremap <F6> :lw<CR>

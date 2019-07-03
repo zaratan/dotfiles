@@ -78,3 +78,5 @@ cask 'steam'
 cask 'spotify'
 cask 'vagrant'
 cask 'virtualbox'
+
+mas 'Todoist', id: 585829637
