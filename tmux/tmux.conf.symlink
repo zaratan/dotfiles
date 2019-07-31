@@ -48,17 +48,17 @@ set -g history-limit 10000
 set -g default-terminal 'screen-256color'
 
 # default statusbar colors
-set -g status-style fg=yellow,bg=black,default
+set -g status-style fg=yellow,bg=black
 
 # default window title colors
-setw -g window-status-style bg=default,fg=brightblue
+setw -g window-status-style fg=brightblue,bg=default
 
 # active window title colors
 setw -g window-status-current-style fg=yellow,bg=default
 
 # pane border
 set -g pane-border-style fg=black,bg=default
-set -g pane-active-border-style bg=default,fg=yellow
+set -g pane-active-border-style fg=yellow
 
 # command line/message text
 set -g message-style bg=black,fg=yellow
@@ -91,8 +91,6 @@ set -g @plugin 'tmux-plugins/tmux-battery'
 set -g @plugin 'tmux-plugins/tmux-cpu'
 set -g @plugin 'tmux-plugins/tmux-open'
 set -g @plugin 'robhurring/tmux-spotify'
-set -g @plugin 'seebi/tmux-colors-solarized'
-set -g @colors-solarized 'dark'
 set -g default-terminal "screen-256color"
 set -ga terminal-overrides ",xterm-256color:Tc"
 
@@ -107,7 +105,7 @@ bind-key -T copy-mode-vi 'V' send -X select-line
 bind-key -T copy-mode-vi 'r' send -X rectangle-toggle
 bind-key -T copy-mode-vi 'y' send -X copy-pipe-and-cancel "xclip -in -selection clipboard"
 
-set -g status-left "#[bg=black]Session: #S (#I/#P) |#{battery_status_fg} Batt: #{battery_percentage} #{battery_remain}|#{cpu_fg_color} CPU: #{cpu_percentage} #[fg=yellow]"
+set -g status-left "#[bg=black]Session: #S (#I/#P) |#{battery_color_fg} Batt: #{battery_percentage} #{battery_remain} #[fg=default]|#{cpu_fg_color} CPU: #{cpu_percentage} #[fg=yellow]"
 set -g status-right '♫ #{spotify_artist}: #{spotify_track} | %a %d-%h %H:%M '
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
