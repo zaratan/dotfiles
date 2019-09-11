@@ -87,7 +87,7 @@ Plug 'rizzatti/dash.vim'
 Plug 'mattn/webapi-vim'
 Plug 'mattn/gist-vim'
 Plug 'mileszs/ack.vim'
-Plug 'w0rp/ale'
+Plug 'dense-analysis/ale'
 Plug 'tpope/vim-unimpaired'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
@@ -98,7 +98,7 @@ Plug 'dhruvasagar/vim-zoom'
 Plug 'mechatroner/rainbow_csv'
 Plug 'kshenoy/vim-signature'
 Plug 'rhysd/vim-grammarous'
-Plug 'neoclide/coc.nvim', {'tag': '*', 'do': './install.sh'}
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 call plug#end()
 
 set rtp+=/usr/local/opt/fzf
@@ -157,6 +157,7 @@ let g:javascript_plugin_flow = 1
 
 let g:ale_fixers = {}
 let g:ale_fixers['ruby'] = ['rubocop']
+let g:ale_fixers['rake'] = ['rubocop']
 let g:ale_fixers['javascript'] = ['eslint']
 let g:ale_fixers['json'] = ['prettier']
 let g:ale_fixers['tex'] = ['textlint']
@@ -168,6 +169,7 @@ let g:ale_ruby_rubocop_executable = 'bundle'
 let g:ale_linters = {
       \   'javascript': ['eslint', 'flow'],
       \   'ruby': ['rubocop'],
+      \   'rake': ['rubocop'],
       \   'scss': ['scss_lint'],
       \   'html': ['tidy'],
       \   'json': ['prettier'],
