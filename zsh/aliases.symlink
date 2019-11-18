@@ -13,6 +13,7 @@ alias s="z s"
 # Docker
 alias d="docker"
 alias dc="docker-compose"
+alias docker_stop_all="docker ps | awk  '{print $1}' | grep -v CON | xargs -P 5 docker stop"
 
 # Bundler
 alias b="bundle"
@@ -54,3 +55,4 @@ alias vrecreate="vagrant destroy -f; vagrant up"
 # FIXME when spotify is safe, clean this
 alias sp="~/bin/spotify"
 alias ld="command -v dip >/dev/null 2>&1 && eval \"\`dip console\`\" || echo \"Dip not installed here :(\""
+

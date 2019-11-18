@@ -34,6 +34,13 @@ set undodir=$HOME/.vim/undo  "directory where the undo files will be stored.
 " set t_Co=256
 set clipboard=unnamed
 
+"folding
+set foldmethod=syntax   
+set foldnestmax=10
+" set nofoldenable
+set foldlevel=100
+nnoremap <Space> za
+
 autocmd Filetype gitcommit setlocal spell textwidth=72
 autocmd Filetype markdown setlocal spell spelllang=fr
 autocmd Filetype markdown hi SpellBad cterm=underline ctermfg=red
@@ -68,6 +75,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
+Plug 'vim-ruby/vim-ruby'
 Plug 'tpope/vim-rails'
 Plug 'mhinz/vim-signify'
 Plug 'thoughtbot/vim-rspec'
