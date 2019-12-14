@@ -103,8 +103,8 @@ bind-key -T copy-mode-vi 'r' send -X rectangle-toggle
 bind-key -T copy-mode-vi 'y' send -X copy-pipe-and-cancel "xclip -in -selection clipboard"
 
 set -g status-interval 60
-set -g status-left "#[bg=black]Session: #S (#I/#P)"# |#{cpu_fg_color} CPU: #{cpu_percentage} #[fg=yellow]"
-set -g status-right '%a %d-%h %H:%M '
+set -g status-left "#[bg=black]Session: #S (#I/#P)"
+set -g status-right "%a %d-%h %H:%M"
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run '~/.tmux/plugins/tpm/tpm'

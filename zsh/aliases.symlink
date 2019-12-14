@@ -55,4 +55,5 @@ alias vrecreate="vagrant destroy -f; vagrant up"
 # FIXME when spotify is safe, clean this
 alias sp="~/bin/spotify"
 alias ld="command -v dip >/dev/null 2>&1 && eval \"\`dip console\`\" || echo \"Dip not installed here :(\""
+alias vim="nvim -O"
 
