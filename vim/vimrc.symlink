@@ -256,10 +256,10 @@ nmap <Leader>r :Tags<CR>
 " movement mappings
 let g:tmux_navigator_no_mappings = 1
 
-nnoremap <silent> <c-left> :TmuxNavigateLeft<cr>
-nnoremap <silent> <c-down> :TmuxNavigateDown<cr>
-nnoremap <silent> <c-up> :TmuxNavigateUp<cr>
-nnoremap <silent> <c-right> :TmuxNavigateRight<cr>
+nnoremap <silent> <C-L> :TmuxNavigateLeft<cr>
+nnoremap <silent> <C-K> :TmuxNavigateDown<cr>
+nnoremap <silent> <C-J> :TmuxNavigateUp<cr>
+nnoremap <silent> <C-H> :TmuxNavigateRight<cr>
 
 " set wildmode=list:longest,list:full
 
