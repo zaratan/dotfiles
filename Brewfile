@@ -48,6 +48,7 @@ brew 'zsh-syntax-highlighting'
 brew 'zsh-autosuggestions'
 
 cask 'alfred'
+cask 'bettertouchtool'
 cask 'brave-browser'
 cask 'dash'
 cask 'deluge'
