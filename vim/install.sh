@@ -5,4 +5,6 @@ fi
 if [[ ! -d ~/.config/nvim ]]; then
   mkdir -p ~/.config/nvim
 fi
-ln -s ./vimrc.symlink ~/.config/nvim/init.vim
+if [[ ! -f ~/.config/nvim/init.vim ]]; then
+  ln -s `pwd`/vim/vimrc.symlink `pwd`/../.config/nvim/init.vim
+fi

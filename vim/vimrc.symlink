@@ -118,9 +118,22 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 Plug 'hail2u/vim-css3-syntax'
 Plug 'meain/vim-package-info', {'do': 'npm install' }
+Plug 'yardnsm/vim-import-cost', { 'do': 'npm install' }
+Plug 'joker1007/vim-ruby-heredoc-syntax'
 call plug#end()
 
 set rtp+=/usr/local/opt/fzf
+
+" Vim import auto
+" Must only run in nvim
+if has('nvim')
+  augroup import_cost_auto_run
+    autocmd!
+    autocmd InsertLeave *.js,*.jsx,*.ts,*.tsx ImportCost
+    autocmd BufEnter *.js,*.jsx,*.ts,*.tsx ImportCost
+    autocmd CursorHold *.js,*.jsx,*.ts,*.tsx ImportCost
+  augroup END
+endif
 
 " ########################### START coc CONFIG ###############################
 " if hidden is not set, TextEdit might fail.
