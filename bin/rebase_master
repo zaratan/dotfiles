@@ -1,0 +1,37 @@
+#!/bin/zsh
+
+export CURRENT_G_BRANCH="`git branch --show-current`"
+
+echo "Rebasing $CURRENT_G_BRANCH on master"
+
+CURRENT_STATUS="`git status --short`"
+
+if [[ $CURRENT_STATUS != "" ]]; then
+  echo "There's some uncommited changes. Do you want to auto-stash? [Y/n] "
+  read AUTO_STASH
+  echo $AUTO_STASH
+  if [[ $AUTO_STASH == "y" || $AUTO_STASH == "" || $AUTO_STASH == "yes" || $AUTO_STASH == "Y" || $AUTO_STASH == "YES" ]]; then
+    AUTO_STASH="y"
+    echo "Stashing current changes."
+    git stash
+  else
+    echo "Stopping now. Please stash or commit manually."
+    exit 0
+  fi
+fi
+
+(
+  git checkout master &&
+  git pull --rebase &&
+  git checkout jkdsugdsyujhdsbusdk &&
+  git checkout $CURRENT_G_BRANCH &&
+  git rebase master
+) || (
+  git checkout $CURRENT_G_BRANCH &&
+  echo "Something went wrong, please check your output." &&
+  exit 1
+)
+
+if [[ $AUTO_STASH == "y" ]]; then
+  echo "You have stashed change. When the rebase process is done, run git stash pop."
+fi
