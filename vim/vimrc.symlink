@@ -118,7 +118,7 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 Plug 'hail2u/vim-css3-syntax'
 Plug 'meain/vim-package-info', {'do': 'npm install' }
-Plug 'yardnsm/vim-import-cost', { 'do': 'npm install' }
+Plug 'A/vim-import-cost', { 'do': 'npm install' }
 Plug 'joker1007/vim-ruby-heredoc-syntax'
 call plug#end()
 
