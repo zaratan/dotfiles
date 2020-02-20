@@ -23,7 +23,6 @@ fi
 (
   git checkout master &&
   git pull --rebase &&
-  git checkout jkdsugdsyujhdsbusdk &&
   git checkout $CURRENT_G_BRANCH &&
   git rebase master
 ) || (
