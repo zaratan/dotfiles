@@ -335,7 +335,7 @@ let g:coc_global_extensions = [
   \ 'coc-solargraph',
   \ 'coc-yaml',
   \ 'coc-flow',
-  \ 'coc-emmet ',
+  \ 'coc-tsserver ',
   \ 'coc-tailwindcss',
   \ 'coc-python',
   \ 'coc-marketplace', 
