@@ -70,5 +70,9 @@ source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=6'
 
+export LANG=fr_FR.UTF-8
+export LC_ALL=fr_FR.UTF-8
+eval "$(pyenv init -)"
+
 [ -L ~/.fzf ] && source ~/.fzf
 eval "$(direnv hook zsh)"
