@@ -45,9 +45,5 @@
   prompt = false
 [rerere]
   enabled = true
-[user]
-  signingKey = 44DD34402A26BDCB
-	name = Denis <Zaratan> Pasin
-	email = denis.pasin@gmail.com
 [hub]
   host = git.autodesk.com
