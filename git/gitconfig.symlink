@@ -47,3 +47,6 @@
   enabled = true
 [hub]
   host = git.autodesk.com
+[user]
+  name = Denis <Zaratan> Pasin
+  email = zaratan@hey.com

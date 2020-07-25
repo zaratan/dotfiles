@@ -105,7 +105,6 @@ Plug 'rizzatti/dash.vim'
 Plug 'mattn/webapi-vim'
 Plug 'mattn/gist-vim'
 Plug 'mileszs/ack.vim'
-Plug 'dense-analysis/ale'
 Plug 'honza/vim-snippets'
 Plug 'epilande/vim-es2015-snippets'
 Plug 'epilande/vim-react-snippets'
@@ -118,7 +117,6 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 Plug 'hail2u/vim-css3-syntax'
 Plug 'meain/vim-package-info', {'do': 'npm install' }
-Plug 'A/vim-import-cost', { 'do': 'npm install' }
 Plug 'joker1007/vim-ruby-heredoc-syntax'
 call plug#end()
 
@@ -126,14 +124,14 @@ set rtp+=/usr/local/opt/fzf
 
 " Vim import auto
 " Must only run in nvim
-if has('nvim')
-  augroup import_cost_auto_run
-    autocmd!
-    autocmd InsertLeave *.js,*.jsx,*.ts,*.tsx ImportCost
-    autocmd BufEnter *.js,*.jsx,*.ts,*.tsx ImportCost
-    autocmd CursorHold *.js,*.jsx,*.ts,*.tsx ImportCost
-  augroup END
-endif
+" if has('nvim')
+"   augroup import_cost_auto_run
+"     autocmd!
+"     autocmd InsertLeave *.js,*.jsx,*.ts,*.tsx ImportCost
+"     autocmd BufEnter *.js,*.jsx,*.ts,*.tsx ImportCost
+"     autocmd CursorHold *.js,*.jsx,*.ts,*.tsx ImportCost
+"   augroup END
+" endif
 
 " ########################### START coc CONFIG ###############################
 " if hidden is not set, TextEdit might fail.
@@ -278,7 +276,6 @@ nnoremap <silent> <C-H> :TmuxNavigateRight<cr>
 
 set laststatus=2
 let g:airline_powerline_fonts = 1
-let g:airline#extensions#ale#enabled = 1
 
 set background=dark " dark | light "
 colorscheme solarized8
@@ -291,30 +288,6 @@ set regexpengine=1
 let g:gitgutter_signs = 0
 
 let g:javascript_plugin_flow = 1
-
-let g:ale_fixers = {}
-let g:ale_fixers['ruby'] = ['rubocop']
-let g:ale_fixers['rake'] = ['rubocop']
-let g:ale_fixers['javascript'] = ['eslint']
-let g:ale_fixers['javascriptreact'] = ['eslint']
-let g:ale_fixers['json'] = ['prettier']
-let g:ale_fixers['tex'] = ['textlint']
-let g:ale_fixers['markdown'] = ['prettier']
-let g:ale_javascript_prettier_eslint_options = '--single-quote --trailing-comma all --no-semi'
-let g:ale_fix_on_save = 1
-let g:ale_ruby_rubocop_executable = 'bundle'
-
-let g:ale_linters = {
-      \   'javascript': ['eslint', 'flow'],
-      \   'javascriptreact': ['eslint', 'flow'],
-      \   'ruby': ['rubocop'],
-      \   'rake': ['rubocop'],
-      \   'scss': ['scss_lint'],
-      \   'html': ['tidy'],
-      \   'json': ['prettier'],
-      \   'tex':  ['textlint'],
-      \   'markdown':  ['prettier'],
-      \}
 
 let g:LanguageClient_serverCommands = {
     \ 'javascript': ['flow-language-server', '--stdio'],
