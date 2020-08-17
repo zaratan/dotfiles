@@ -1,0 +1,12 @@
+#! /bin/zsh
+
+export VAULT_ADDR=https://civ1.dv.adskengineer.net:8200
+values_main=`vault write -format=json account/627791357434/sts/Application-Ops ttl=8h`
+export AWS_ACCESS_KEY_ID=`echo $values_main | jq '.data.access_key' -r`
+export AWS_SECRET_ACCESS_KEY=`echo $values_main | jq '.data.secret_key' -r`
+export AWS_SESSION_TOKEN=`echo $values_main | jq '.data.security_token' -r`
+
+echo "[default]" > ~/.aws/credentials
+echo aws_access_key_id=$AWS_ACCESS_KEY_ID >> ~/.aws/credentials  
+echo aws_secret_access_key=$AWS_SECRET_ACCESS_KEY >> ~/.aws/credentials
+echo aws_session_token=$AWS_SESSION_TOKEN >> ~/.aws/credentials
