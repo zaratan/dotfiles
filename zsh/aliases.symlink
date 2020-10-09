@@ -57,4 +57,4 @@ alias sp="~/bin/spotify"
 alias ld="command -v dip >/dev/null 2>&1 && eval \"\`dip console\`\" || echo \"Dip not installed here :(\""
 alias vim="nvim -O"
 
-alias raf="rubocop -P -f fi | xargs rubocop -a"
+alias raf="rubocop -P -f fi | xargs rubocop -A"

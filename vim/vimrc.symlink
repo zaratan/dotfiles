@@ -328,6 +328,17 @@ let g:used_javascript_libs = 'jquery,underscore'
 "   \ 'coc-docker',
 "   \ ]
 
+" let g:ale_fixers = {}
+" let g:ale_fixers['ruby'] = ['rubocop']
+" let g:ale_fixers['rake'] = ['rubocop']
+" let g:ale_fixers['javascript'] = ['eslint']
+" let g:ale_fixers['javascriptreact'] = ['eslint']
+" let g:ale_fixers['json'] = ['prettier']
+" let g:ale_fixers['tex'] = ['textlint']
+" let g:ale_fixers['markdown'] = ['prettier']
+" let g:ale_fix_on_save = 1
+" let g:ale_ruby_rubocop_executable = 'bundle'
+
 if has('nvim')
   if filereadable($HOME . "/.nvimrc.local")
     source $HOME/.nvimrc.local
