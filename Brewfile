@@ -60,6 +60,7 @@ brew 'zsh-syntax-highlighting'
 brew 'zsh-autosuggestions'
 
 cask 'alfred'
+cask 'basecamp'
 cask 'bettertouchtool'
 cask 'brave-browser'
 cask 'dash'
