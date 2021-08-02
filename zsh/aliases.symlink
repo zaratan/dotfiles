@@ -58,3 +58,4 @@ alias ld="command -v dip >/dev/null 2>&1 && eval \"\`dip console\`\" || echo \"D
 alias vim="nvim -O"
 
 alias raf="rubocop -P -f fi | xargs rubocop -A"
+alias dop="dev_oops"

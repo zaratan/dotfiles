@@ -13,7 +13,6 @@ export ZSH_TMUX_AUTOQUIT=false
 
 # for root
 source $ZSH/oh-my-zsh.sh
-eval "$(hub alias -s)"
 #
 if [ -e "$HOME/.aliases" ]; then
   source "$HOME/.aliases"
@@ -82,3 +81,6 @@ eval "$(pyenv init -)"
 
 [ -L ~/.fzf ] && source ~/.fzf
 eval "$(direnv hook zsh)"
+
+# GH
+source /usr/local/share/zsh/site-functions/_gh

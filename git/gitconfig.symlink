@@ -28,7 +28,7 @@
 [color]
   ui = true
 [github]
-  user = denispasin
+  user = zaratan
 [filter "hawser"]
   clean = git hawser clean %f
   smudge = git hawser smudge %f
@@ -50,3 +50,17 @@
 [user]
   name = Denis <Zaratan> Pasin
   email = zaratan@hey.com
+[pager]
+    diff = delta
+    log = delta
+    reflog = delta
+    show = delta
+
+[delta]
+  plus-style = "syntax #012800"
+    minus-style = "syntax #340001"
+    syntax-theme = Solarized (dark)
+    navigate = true
+
+[interactive]
+    diffFilter = delta --color-only

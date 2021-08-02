@@ -1,0 +1,10 @@
+#! /usr/bin/env zsh
+
+git checkout master && \
+  git pull --rebase && \
+  export BRANCH="trigger_jenkins_`date +%s`" && \
+  git checkout -b "$BRANCH" && \
+  git commit --allow-empty -m 'Trigger Jenkins' && \
+  git push --set-upstream origin "$BRANCH" && \
+  gh pr create -f -r kiktevs && \
+  git checkout master

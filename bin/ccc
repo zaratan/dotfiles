@@ -4,9 +4,10 @@
 begin
   require 'exchange'
 rescue LoadError
-  p "Gem uninstalled. Installing…"
-  `gem install exchange`
-  p "Please relaunch"
+  p 'Gem uninstalled. Installing…'
+  `gem install specific_install`
+  `gem specific_install https://github.com/wilco/exchange`
+  p 'Please relaunch'
   exit 0
 end
 

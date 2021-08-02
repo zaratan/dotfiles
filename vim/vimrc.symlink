@@ -80,6 +80,8 @@ else
   endif
 endif
 
+let g:ale_disable_lsp = 1
+
 call plug#begin('~/.vim/plugged')
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
@@ -118,7 +120,14 @@ Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 Plug 'hail2u/vim-css3-syntax'
 Plug 'meain/vim-package-info', {'do': 'npm install' }
 Plug 'joker1007/vim-ruby-heredoc-syntax'
+" Plug 'dense-analysis/ale'
+Plug 'kevinoid/vim-jsonc'
+Plug 'HerringtonDarkholme/yats.vim'
+Plug 'rust-lang/rust.vim'
+
 call plug#end()
+
+let g:rustfmt_autosave = 1
 
 set rtp+=/usr/local/opt/fzf
 
@@ -270,7 +279,12 @@ nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
 " fzf mappings
 nmap ; :Buffers<CR>
-nmap <Leader>e :Files<CR>
+silent! !git rev-parse --is-inside-work-tree
+if v:shell_error == 0
+  nmap <Leader>e :GFiles --cached --others --exclude-standard<CR>
+else
+  nmap <Leader>e :Files<CR>
+endif
 nmap <Leader>r :Tags<CR>
 
 " movement mappings
@@ -298,11 +312,11 @@ let g:gitgutter_signs = 0
 
 let g:javascript_plugin_flow = 1
 
-let g:LanguageClient_serverCommands = {
-    \ 'javascript': ['flow-language-server', '--stdio'],
-    \ 'javascript.jsx': ['flow-language-server', '--stdio'],
-    \ 'ruby': ['solargraph','stdio']
-    \ }
+" let g:LanguageClient_serverCommands = {
+"     \ 'javascript': ['flow-language-server', '--stdio'],
+"     \ 'javascript.jsx': ['flow-language-server', '--stdio'],
+"     \ 'ruby': ['solargraph','stdio']
+"     \ }
 
 let g:used_javascript_libs = 'jquery,underscore'
 
@@ -328,16 +342,20 @@ let g:used_javascript_libs = 'jquery,underscore'
 "   \ 'coc-docker',
 "   \ ]
 
-" let g:ale_fixers = {}
-" let g:ale_fixers['ruby'] = ['rubocop']
-" let g:ale_fixers['rake'] = ['rubocop']
+let g:ale_fixers = {}
+let g:ale_fixers['ruby'] = ['rubocop', 'prettier']
+let g:ale_fixers['rake'] = ['rubocop', 'prettier']
+let g:ale_fixers['json'] = ['prettier']
+let g:ale_fixers['jsonc'] = ['prettier']
 " let g:ale_fixers['javascript'] = ['eslint']
 " let g:ale_fixers['javascriptreact'] = ['eslint']
 " let g:ale_fixers['json'] = ['prettier']
 " let g:ale_fixers['tex'] = ['textlint']
 " let g:ale_fixers['markdown'] = ['prettier']
-" let g:ale_fix_on_save = 1
-" let g:ale_ruby_rubocop_executable = 'bundle'
+let g:ale_fix_on_save = 1
+let g:ale_ruby_rubocop_executable = 'bundle'
+
+command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
 
 if has('nvim')
   if filereadable($HOME . "/.nvimrc.local")
@@ -348,3 +366,17 @@ else
     source $HOME/.vimrc.local
   endif
 endif
+
+" Run jest for current project
+command! -nargs=0 Jest :call  CocAction('runCommand', 'jest.projectTest')
+
+" Run jest for current file
+command! -nargs=0 JestCurrent :call  CocAction('runCommand', 'jest.fileTest', ['%'])
+
+" Run jest for current test
+nnoremap <leader>te :call CocAction('runCommand', 'jest.singleTest')<CR>
+
+" Init jest in current cwd, require global jest command exists
+command! JestInit :call CocAction('runCommand', 'jest.init')
+
+set re=0
