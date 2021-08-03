@@ -68,3 +68,6 @@ alias du="dust"
 
 # DUF > DF
 alias df="duf --theme dark"
+
+# Moar is less
+alias less="moar"
