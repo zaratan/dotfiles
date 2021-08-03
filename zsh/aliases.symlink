@@ -65,3 +65,6 @@ alias cat="bat --paging=never"
 
 # DUST > DU
 alias du="dust"
+
+# DUF > DF
+alias df="duf --theme dark"
