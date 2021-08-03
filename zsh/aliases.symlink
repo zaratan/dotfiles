@@ -62,3 +62,6 @@ alias dop="dev_oops"
 
 # BAT == CAT
 alias cat="bat --paging=never"
+
+# DUST > DU
+alias du="dust"
