@@ -51,16 +51,15 @@
   name = Denis <Zaratan> Pasin
   email = zaratan@hey.com
 [pager]
-    diff = delta
-    log = delta
-    reflog = delta
-    show = delta
+  diff = delta
+  log = delta
+  reflog = delta
+  show = delta
 
 [delta]
-  plus-style = "syntax #012800"
-    minus-style = "syntax #340001"
-    syntax-theme = Solarized (dark)
-    navigate = true
+  syntax-theme = Solarized (dark)
+  navigate = true
+  line-numbers = true
 
 [interactive]
-    diffFilter = delta --color-only
+  diffFilter = delta --color-only
