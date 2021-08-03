@@ -59,3 +59,6 @@ alias vim="nvim -O"
 
 alias raf="rubocop -P -f fi | xargs rubocop -A"
 alias dop="dev_oops"
+
+# BAT == CAT
+alias cat="bat --paging=never"

@@ -84,3 +84,6 @@ eval "$(direnv hook zsh)"
 
 # GH
 source /usr/local/share/zsh/site-functions/_gh
+
+# BAT
+export BAT_THEME="Solarized (dark)"
