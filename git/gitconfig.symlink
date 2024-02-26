@@ -8,7 +8,7 @@
   br = branch
   ll = branch --list
   ca = commit --amend
-  ci = commit -v
+  ci = commit -v -S
   co = checkout
   pr = pull-request
   ppr = pull-request
@@ -25,6 +25,7 @@
   smudge = git media smudge %f
 [push]
   default = upstream
+  autoSetupRemote = true
 [color]
   ui = true
 [github]
@@ -50,6 +51,7 @@
 [user]
   name = Denis <Zaratan> Pasin
   email = zaratan@hey.com
+	signingkey = 4E5D7B12072F47F1
 [pager]
   diff = delta
   log = delta
@@ -66,3 +68,5 @@
 
 [init]
   defaultBranch = main
+[commit]
+	gpgsign = true

@@ -8,7 +8,6 @@ alias lh='ls -Alh'
 alias vimo='vim -O'
 alias e="vim"
 alias v="vim"
-alias s="z s"
 
 # Docker
 alias d="docker"
@@ -71,3 +70,13 @@ alias df="duf --theme dark"
 
 # Moar is less
 alias less="moar"
+alias python="python3"
+
+# SGPT
+alias ss="sg -se"
+alias sg="sgpt --no-animation"
+alias sgc="sg --code"
+
+# Dev Oops
+alias doo="dev_oops"
+alias calc="bc --expression"

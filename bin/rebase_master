@@ -2,7 +2,7 @@
 
 export CURRENT_G_BRANCH="`git branch --show-current`"
 
-echo "Rebasing $CURRENT_G_BRANCH on master"
+echo "Rebasing $CURRENT_G_BRANCH on main"
 
 CURRENT_STATUS="`git status --short`"
 
@@ -21,10 +21,10 @@ if [[ $CURRENT_STATUS != "" ]]; then
 fi
 
 (
-  git checkout master &&
+  git checkout main &&
   git pull --rebase &&
   git checkout $CURRENT_G_BRANCH &&
-  git rebase master
+  git rebase main
 ) || (
   git checkout $CURRENT_G_BRANCH &&
   echo "Something went wrong, please check your output." &&

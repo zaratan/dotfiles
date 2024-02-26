@@ -1,0 +1,5 @@
+#! /usr/bin/arch -x86_64 /bin/zsh
+
+export PATH="/usr/local/bin/:$PATH"
+
+gameportingtoolkit ~/my-game-prefix 'C:\Program Files (x86)\Steam\steam.exe'
