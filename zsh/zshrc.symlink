@@ -35,7 +35,7 @@ export PATH="$PYENV_ROOT/bin:$PATH"
 export PATH="$HOME/bin:$HOME/.bin:/opt/homebrew/sbin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
 export PATH="~/bin:$PATH"
-export DEFAULT_USER="Zaratan"
+export DEFAULT_USER="zaratan"
 
 if [ -e "$HOME/.zshrc.local" ]; then
   source "$HOME/.zshrc.local"
@@ -88,9 +88,6 @@ export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
 # Add homebrew python binaries to path
-for bin in $(ls ~/Library/Python | sort --reverse); do
-  export PATH="$HOME/Library/Python/$bin/bin:$PATH"
-done
 
 export PATH="$HOME/.cargo/bin:$PATH"
 

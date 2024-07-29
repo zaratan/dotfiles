@@ -51,7 +51,7 @@
 [user]
   name = Denis <Zaratan> Pasin
   email = zaratan@hey.com
-	signingkey = 4E5D7B12072F47F1
+	signingkey = 27DB7B4EE1E5F694
 [pager]
   diff = delta
   log = delta
