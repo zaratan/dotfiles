@@ -46,6 +46,7 @@ nnoremap <Space> za
 autocmd Filetype gitcommit setlocal spell textwidth=72
 autocmd Filetype markdown setlocal spell spelllang=fr
 autocmd Filetype markdown hi SpellBad cterm=underline ctermfg=red
+autocmd Filetype eruby.yaml set filetype=yaml
 
 nnoremap <F5> :ALEFix<CR>
 nnoremap <F6> :lw<CR>
@@ -126,6 +127,7 @@ Plug 'HerringtonDarkholme/yats.vim'
 Plug 'rust-lang/rust.vim'
 Plug 'rodrigore/coc-tailwind-intellisense', {'do': 'npm install'}
 Plug 'github/copilot.vim'
+Plug 'dense-analysis/ale'
 
 call plug#end()
 
@@ -367,22 +369,30 @@ let g:used_javascript_libs = 'jquery,underscore'
 "   \ ]
 
 let g:ale_fixers = {}
-let g:ale_fixers['ruby'] = ['rubocop', 'prettier']
-let g:ale_fixers['rake'] = ['rubocop', 'prettier']
-let g:ale_fixers['json'] = ['prettier']
-let g:ale_fixers['jsonc'] = ['prettier']
-let g:ale_fixers['javascript'] = ['eslint']
-let g:ale_fixers['javascriptreact'] = ['eslint']
-let g:ale_fixers['typescript'] = ['eslint']
-let g:ale_fixers['typescriptreact'] = ['eslint']
+" let g:ale_fixers['ruby'] = ['rubocop', 'prettier']
+" let g:ale_fixers['rake'] = ['rubocop', 'prettier']
 " let g:ale_fixers['json'] = ['prettier']
+" let g:ale_fixers['jsonc'] = ['prettier']
+" let g:ale_fixers['javascript'] = ['eslint']
+" let g:ale_fixers['javascriptreact'] = ['eslint']
+" let g:ale_fixers['typescript'] = ['eslint']
+" let g:ale_fixers['typescriptreact'] = ['eslint']
 " let g:ale_fixers['tex'] = ['textlint']
+" let g:ale_fixers['yaml'] = ['prettier']
 " let g:ale_fixers['markdown'] = ['prettier']
+let g:ale_fixers['eruby'] = ['htmlbeautifier']
+autocmd! BufNewFile,BufRead *.yml set filetype=yaml
 let g:ale_fix_on_save = 1
-let g:ale_ruby_rubocop_executable = 'bundle'
+" let g:ale_ruby_rubocop_executable = 'bundle'
 
 command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
 autocmd BufWritePre *.rb Prettier
+autocmd BufWritePre *.rake Prettier
+autocmd BufWritePre Gemfile Prettier
+autocmd BufWritePre *.json Prettier
+autocmd BufWritePre *.jsonc Prettier
+autocmd BufWritePre *.yaml Prettier
+autocmd BufWritePre *.yml Prettier
 
 if has('nvim')
   if filereadable($HOME . "/.nvimrc.local")
