@@ -46,7 +46,6 @@ nnoremap <Space> za
 autocmd Filetype gitcommit setlocal spell textwidth=72
 autocmd Filetype markdown setlocal spell spelllang=fr
 autocmd Filetype markdown hi SpellBad cterm=underline ctermfg=red
-autocmd Filetype eruby.yaml set filetype=yaml
 
 nnoremap <F5> :ALEFix<CR>
 nnoremap <F6> :lw<CR>
@@ -116,8 +115,6 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'dhruvasagar/vim-zoom'
 Plug 'mechatroner/rainbow_csv'
 Plug 'kshenoy/vim-signature'
-Plug 'rhysd/vim-grammarous'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 Plug 'hail2u/vim-css3-syntax'
 Plug 'meain/vim-package-info', {'do': 'npm install' }
@@ -125,182 +122,25 @@ Plug 'joker1007/vim-ruby-heredoc-syntax'
 Plug 'kevinoid/vim-jsonc'
 Plug 'HerringtonDarkholme/yats.vim'
 Plug 'rust-lang/rust.vim'
-Plug 'rodrigore/coc-tailwind-intellisense', {'do': 'npm install'}
 Plug 'github/copilot.vim'
-Plug 'dense-analysis/ale'
+Plug 'williamboman/mason.nvim'
+Plug 'williamboman/mason-lspconfig.nvim'
+Plug 'neovim/nvim-lspconfig'
+Plug 'stevearc/conform.nvim'
+Plug 'hrsh7th/nvim-cmp'
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/cmp-cmdline'
+Plug 'SirVer/ultisnips'
+Plug 'quangnguyen30192/cmp-nvim-ultisnips'
+Plug 'hrsh7th/cmp-omni'
 
 call plug#end()
 
 let g:rustfmt_autosave = 1
 
 set rtp+=/usr/local/opt/fzf
-
-" Vim import auto
-" Must only run in nvim
-" if has('nvim')
-"   augroup import_cost_auto_run
-"     autocmd!
-"     autocmd InsertLeave *.js,*.jsx,*.ts,*.tsx ImportCost
-"     autocmd BufEnter *.js,*.jsx,*.ts,*.tsx ImportCost
-"     autocmd CursorHold *.js,*.jsx,*.ts,*.tsx ImportCost
-"   augroup END
-" endif
-
-" ########################### START coc CONFIG ###############################
-" May need for vim (not neovim) since coc.nvim calculate byte offset by count
-" utf-8 byte sequence.
-set encoding=utf-8
-" Some servers have issues with backup files, see #649.
-set nobackup
-set nowritebackup
-
-" Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
-" delays and poor user experience.
-set updatetime=300
-
-" Always show the signcolumn, otherwise it would shift the text each time
-" diagnostics appear/become resolved.
-set signcolumn=yes
-
-" Use tab for trigger completion with characters ahead and navigate.
-" NOTE: There's always complete item selected by default, you may want to enable
-" no select by `"suggest.noselect": true` in your configuration file.
-" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
-" other plugin before putting this into your config.
-inoremap <silent><expr> <TAB>
-      \ coc#pum#visible() ? coc#pum#next(1) :
-      \ CheckBackspace() ? "\<Tab>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
-
-" Make <CR> to accept selected completion item or notify coc.nvim to format
-" <C-g>u breaks current undo, please make your own choice.
-inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
-                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-
-function! CheckBackspace() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-
-" Use <c-space> to trigger completion.
-if has('nvim')
-  inoremap <silent><expr> <c-space> coc#refresh()
-else
-  inoremap <silent><expr> <c-@> coc#refresh()
-endif
-
-" Use `[g` and `]g` to navigate diagnostics
-" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
-nmap <silent> [g <Plug>(coc-diagnostic-prev)
-nmap <silent> ]g <Plug>(coc-diagnostic-next)
-
-" GoTo code navigation.
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-
-" Use K to show documentation in preview window.
-nnoremap <silent> K :call ShowDocumentation()<CR>
-
-function! ShowDocumentation()
-  if CocAction('hasProvider', 'hover')
-    call CocActionAsync('doHover')
-  else
-    call feedkeys('K', 'in')
-  endif
-endfunction
-
-" Highlight the symbol and its references when holding the cursor.
-autocmd CursorHold * silent call CocActionAsync('highlight')
-
-" Symbol renaming.
-nmap <leader>rn <Plug>(coc-rename)
-
-" Formatting selected code.
-xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
-
-augroup mygroup
-  autocmd!
-  " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  " Update signature help on jump placeholder.
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-augroup end
-
-" Applying codeAction to the selected region.
-" Example: `<leader>aap` for current paragraph
-xmap <leader>a  <Plug>(coc-codeaction-selected)
-nmap <leader>a  <Plug>(coc-codeaction-selected)
-
-" Remap keys for applying codeAction to the current buffer.
-nmap <leader>ac  <Plug>(coc-codeaction)
-" Apply AutoFix to problem on the current line.
-nmap <leader>qf  <Plug>(coc-fix-current)
-
-" Run the Code Lens action on the current line.
-nmap <leader>cl  <Plug>(coc-codelens-action)
-
-" Map function and class text objects
-" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
-xmap if <Plug>(coc-funcobj-i)
-omap if <Plug>(coc-funcobj-i)
-xmap af <Plug>(coc-funcobj-a)
-omap af <Plug>(coc-funcobj-a)
-xmap ic <Plug>(coc-classobj-i)
-omap ic <Plug>(coc-classobj-i)
-xmap ac <Plug>(coc-classobj-a)
-omap ac <Plug>(coc-classobj-a)
-
-" Remap <C-f> and <C-b> for scroll float windows/popups.
-if has('nvim-0.4.0') || has('patch-8.2.0750')
-  nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-  nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-  inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
-  inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
-  vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-  vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-endif
-
-" Use CTRL-S for selections ranges.
-" Requires 'textDocument/selectionRange' support of language server.
-nmap <silent> <C-s> <Plug>(coc-range-select)
-xmap <silent> <C-s> <Plug>(coc-range-select)
-
-" Add `:Format` command to format current buffer.
-command! -nargs=0 Format :call CocActionAsync('format')
-
-" Add `:Fold` command to fold current buffer.
-command! -nargs=? Fold :call     CocAction('fold', <f-args>)
-
-" Add `:OR` command for organize imports of the current buffer.
-command! -nargs=0 OR   :call     CocActionAsync('runCommand', 'editor.action.organizeImport')
-
-" Add (Neo)Vim's native statusline support.
-" NOTE: Please see `:h coc-status` for integrations with external plugins that
-" provide custom statusline: lightline.vim, vim-airline.
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-
-" Mappings for CoCList
-" Show all diagnostics.
-nnoremap <silent><nowait> <space>a  :<C-u>CocList diagnostics<cr>
-" Manage extensions.
-nnoremap <silent><nowait> <space>e  :<C-u>CocList extensions<cr>
-" Show commands.
-nnoremap <silent><nowait> <space>c  :<C-u>CocList commands<cr>
-" Find symbol of current document.
-nnoremap <silent><nowait> <space>o  :<C-u>CocList outline<cr>
-" Search workspace symbols.
-nnoremap <silent><nowait> <space>s  :<C-u>CocList -I symbols<cr>
-" Do default action for next item.
-nnoremap <silent><nowait> <space>j  :<C-u>CocNext<CR>
-" Do default action for previous item.
-nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
-" Resume latest coc list.
-nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
-" ########################### END coc CONFIG ###############################
 
 " fzf mappings
 nmap ; :Buffers<CR>
@@ -311,7 +151,6 @@ else
   nmap <Leader>e :Files<CR>
 endif
 nmap <Leader>r :Tags<CR>
-nmap <Leader>f :CocFix<CR>
 
 " movement mappings
 let g:tmux_navigator_no_mappings = 1
@@ -321,78 +160,19 @@ nnoremap <silent> <C-K> :TmuxNavigateDown<cr>
 nnoremap <silent> <C-J> :TmuxNavigateUp<cr>
 nnoremap <silent> <C-H> :TmuxNavigateRight<cr>
 
-" set wildmode=list:longest,list:full
-
 set laststatus=2
 let g:airline_powerline_fonts = 1
 
-set background=dark " dark | light "
+set background=dark
 colorscheme solarized8
 
-let g:grammarous#default_comments_only_filetypes = {
-      \ '*' : 1, 'help' : 0, 'markdown' : 0,
-      \ }
 set regexpengine=1
 
 let g:gitgutter_signs = 0
 
 let g:javascript_plugin_flow = 1
 
-" let g:LanguageClient_serverCommands = {
-"     \ 'javascript': ['flow-language-server', '--stdio'],
-"     \ 'javascript.jsx': ['flow-language-server', '--stdio'],
-"     \ 'ruby': ['solargraph','stdio']
-"     \ }
-
 let g:used_javascript_libs = 'jquery,underscore'
-
-" let g:coc_global_extensions = [
-"   \ 'coc-snippets',
-"   \ 'coc-pairs',
-"   \ 'coc-eslint', 
-"   \ 'coc-prettier', 
-"   \ 'coc-json', 
-"   \ 'coc-css', 
-"   \ 'coc-html', 
-"   \ 'coc-solargraph',
-"   \ 'coc-yaml',
-"   \ 'coc-flow',
-"   \ 'coc-tsserver ',
-"   \ 'coc-tailwindcss',
-"   \ 'coc-python',
-"   \ 'coc-marketplace', 
-"   \ 'coc-webpack', 
-"   \ 'coc-rls', 
-"   \ 'coc-ultisnips',
-"   \ 'coc-emoji',
-"   \ 'coc-docker',
-"   \ ]
-
-let g:ale_fixers = {}
-" let g:ale_fixers['ruby'] = ['rubocop', 'prettier']
-" let g:ale_fixers['rake'] = ['rubocop', 'prettier']
-" let g:ale_fixers['json'] = ['prettier']
-" let g:ale_fixers['jsonc'] = ['prettier']
-" let g:ale_fixers['javascript'] = ['eslint']
-" let g:ale_fixers['javascriptreact'] = ['eslint']
-" let g:ale_fixers['typescript'] = ['eslint']
-" let g:ale_fixers['typescriptreact'] = ['eslint']
-" let g:ale_fixers['tex'] = ['textlint']
-" let g:ale_fixers['yaml'] = ['prettier']
-" let g:ale_fixers['markdown'] = ['prettier']
-let g:ale_fixers['eruby'] = ['htmlbeautifier']
-autocmd! BufNewFile,BufRead *.yml set filetype=yaml
-let g:ale_fix_on_save = 1
-" let g:ale_ruby_rubocop_executable = 'bundle'
-
-command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
-autocmd BufWritePre *.rb Prettier
-autocmd BufWritePre *.rake Prettier
-autocmd BufWritePre Gemfile Prettier
-autocmd BufWritePre *.json Prettier
-autocmd BufWritePre *.jsonc Prettier
-autocmd BufWritePre *.yaml Prettier
-autocmd BufWritePre *.yml Prettier
 
 if has('nvim')
   if filereadable($HOME . "/.nvimrc.local")
@@ -404,17 +184,148 @@ else
   endif
 endif
 
-" Run jest for current project
-command! -nargs=0 Jest :call  CocAction('runCommand', 'jest.projectTest')
-
-" Run jest for current file
-command! -nargs=0 JestCurrent :call  CocAction('runCommand', 'jest.fileTest', ['%'])
-
-" Run jest for current test
-nnoremap <leader>te :call CocAction('runCommand', 'jest.singleTest')<CR>
-
-" Init jest in current cwd, require global jest command exists
-command! JestInit :call CocAction('runCommand', 'jest.init')
 let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips']
 
 set re=0
+
+lua << EOF
+require("mason").setup()
+
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+local mason_lspconfig = require("mason-lspconfig")
+local servers = {
+  ruby_lsp = {},
+  tsserver = {},
+  rust_analyzer = {},
+  tailwindcss = {},
+}
+
+mason_lspconfig.setup {
+  ensure_installed = vim.tbl_keys(servers),
+}
+
+mason_lspconfig.setup_handlers {
+  function(server_name)
+    require("lspconfig")[server_name].setup {
+      capabilities = capabilities,
+      on_attach = on_attach,
+      settings = servers[server_name],
+      filetypes = (servers[server_name] or {}).filetypes,
+    }
+  end
+}
+
+---@param bufnr integer
+---@param ... string
+---@return string
+local function first(bufnr, ...)
+  local conform = require("conform")
+  for i = 1, select("#", ...) do
+    local formatter = select(i, ...)
+    if conform.get_formatter_info(formatter, bufnr).available then
+      return formatter
+    end
+  end
+  return select(1, ...)
+end
+
+require("conform").setup({
+  formatters_by_ft = {
+    ruby = { "rubocop", "prettierd" },
+    javascript = { "eslint_d", "prettierd", stop_after_first = true },
+    javascriptreact = { "eslint_d", "prettierd", stop_after_first = true  },
+    typescript = { "eslint_d", "prettierd", stop_after_first = true  },
+    typescriptreact = { "eslint_d", "prettierd", stop_after_first = true },
+    json = { "prettierd" },
+    jsonc = { "prettierd" },
+    yaml = { "prettierd" },
+    markdown = { "prettierd" },
+    eruby = { "htmlbeautifier" },
+  },
+
+  format_on_save = {
+    -- These options will be passed to conform.format()
+    timeout_ms = 500,
+    lsp_format = "fallback",
+  },
+})
+vim.api.nvim_create_user_command("Format", function(args)
+  local range = nil
+  if args.count ~= -1 then
+    local end_line = vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
+    range = {
+      start = { args.line1, 0 },
+      ["end"] = { args.line2, end_line:len() },
+    }
+  end
+  require("conform").format({ async = true, lsp_format = "fallback", range = range })
+end, { range = true })
+
+-- Autocomplete
+-- Add additional capabilities supported by nvim-cmp
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+local lspconfig = require('lspconfig')
+
+-- Enable some language servers with the additional completion capabilities offered by nvim-cmp
+local servers = { 'ruby_lsp', 'tsserver' }
+for _, lsp in ipairs(servers) do
+  lspconfig[lsp].setup {
+    -- on_attach = my_custom_on_attach,
+    capabilities = capabilities,
+  }
+end
+
+-- nvim-cmp setup
+local cmp = require 'cmp'
+cmp.setup {
+  snippet = {
+    expand = function(args)
+      vim.fn["UltiSnips#Anon"](args.body)
+    end,
+  },
+  mapping = cmp.mapping.preset.insert({
+    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.abort(),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+  }),
+  sources = cmp.config.sources({
+    { name = 'nvim_lsp' },
+    { name = 'ultisnips' },
+    {
+      name = 'omni',
+      option = {
+        disable_omnifuncs = { 'v:lua.vim.lsp.omnifunc' }
+      }
+    },
+    { name = 'buffer',
+      option = {
+        get_bufnrs = function()
+          return vim.api.nvim_list_bufs()
+        end
+      }
+    },
+  }),
+}
+
+-- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline({ '/', '?' }, {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = {
+    { name = 'buffer' }
+  }
+  })
+
+-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline(':', {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = cmp.config.sources({
+  { name = 'path' }
+  }, {
+    { name = 'cmdline' }
+  }),
+  matching = { disallow_symbol_nonprefix_matching = false }
+})
+EOF
