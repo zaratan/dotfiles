@@ -132,9 +132,7 @@ Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-cmdline'
-Plug 'SirVer/ultisnips'
 Plug 'quangnguyen30192/cmp-nvim-ultisnips'
-Plug 'hrsh7th/cmp-omni'
 
 call plug#end()
 
@@ -294,12 +292,6 @@ cmp.setup {
   sources = cmp.config.sources({
     { name = 'nvim_lsp' },
     { name = 'ultisnips' },
-    {
-      name = 'omni',
-      option = {
-        disable_omnifuncs = { 'v:lua.vim.lsp.omnifunc' }
-      }
-    },
     { name = 'buffer',
       option = {
         get_bufnrs = function()
