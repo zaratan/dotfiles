@@ -136,6 +136,9 @@ Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-cmdline'
 Plug 'quangnguyen30192/cmp-nvim-ultisnips'
 Plug 'lewis6991/hover.nvim'
+Plug 'stevearc/oil.nvim'
+Plug 'nvim-tree/nvim-web-devicons'
+Plug 'echasnovski/mini.icons'
 
 call plug#end()
 
@@ -383,4 +386,9 @@ vim.keymap.set("n", "<C-n>", function() require("hover").hover_switch("next") en
 -- Mouse support
 vim.keymap.set('n', '<MouseMove>', require('hover').hover_mouse, { desc = "hover.nvim (mouse)" })
 vim.o.mousemoveevent = true
+
+require("oil").setup({
+})
+
+vim.keymap.set("n", "<leader>o", "<cmd>vs | Oil<cr>", { desc = "oil.nvim (open)" })
 EOF
