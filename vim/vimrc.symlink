@@ -139,6 +139,8 @@ Plug 'lewis6991/hover.nvim'
 Plug 'stevearc/oil.nvim'
 Plug 'nvim-tree/nvim-web-devicons'
 Plug 'echasnovski/mini.icons'
+Plug 'refractalize/oil-git-status.nvim'
+Plug 'prisma/vim-prisma'
 
 call plug#end()
 
@@ -189,6 +191,8 @@ else
 endif
 
 let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips']
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 set re=0
 
@@ -199,9 +203,10 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 local mason_lspconfig = require("mason-lspconfig")
 local servers = {
   ruby_lsp = {},
-  tsserver = {},
+  ts_ls = {},
   rust_analyzer = {},
   tailwindcss = {},
+  prismals = {},
 }
 
 mason_lspconfig.setup {
@@ -218,6 +223,8 @@ mason_lspconfig.setup_handlers {
     }
   end
 }
+
+vim.keymap.set("n", "<leader>r", function() vim.lsp.buf.rename() end, { silent = true, noremap = true })
 
 ---@param bufnr integer
 ---@param ... string
@@ -273,14 +280,7 @@ local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 local lspconfig = require('lspconfig')
 
--- Enable some language servers with the additional completion capabilities offered by nvim-cmp
-local servers = { 'ruby_lsp', 'tsserver' }
-for _, lsp in ipairs(servers) do
-  lspconfig[lsp].setup {
-    -- on_attach = my_custom_on_attach,
-    capabilities = capabilities,
-  }
-end
+
 
 -- nvim-cmp setup
 local cmp = require 'cmp'
@@ -405,8 +405,14 @@ require("oil").setup({
     ["gx"] = "actions.open_external",
     ["g."] = "actions.toggle_hidden",
     ["g\\"] = "actions.toggle_trash",
-  }
+  },
+  win_options = {
+    signcolumn = "yes:2",
+  },
 })
 
-vim.keymap.set("n", "<leader>o", "<cmd>vs | Oil<cr>", { desc = "oil.nvim (open)" })
+require("oil-git-status").setup()
+
+vim.keymap.set("n", "<leader>o", "<cmd>Oil<cr>", { desc = "oil.nvim (open)" })
+vim.keymap.set("n", "<leader>O", "<cmd>vs | Oil<cr>", { desc = "oil.nvim (open)" })
 EOF
