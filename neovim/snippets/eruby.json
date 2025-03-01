@@ -1,0 +1,7 @@
+{
+  "def?": {
+    "prefix": "def?",
+    "body": ["defined?(${1:variable}) && $1"],
+    "description": "Defined? wrapper"
+  }
+}
