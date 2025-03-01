@@ -8,13 +8,13 @@ ZSH_THEME="agnoster"
 
 # Warp Hack
 if [ $TERM_PROGRAM = WarpTerminal ]; then
-  plugins=(vscode git brew bundler docker gem meteor npm macos rails rvm z nvm yarn docker-compose)
+  plugins=(vscode git brew bundler docker gem meteor npm macos rails z nvm yarn docker-compose)
 elif [ $TERM_PROGRAM = vscode ]; then
-  plugins=(vscode git brew bundler docker gem heroku meteor npm macos rails rvm z nvm yarn docker-compose)
-  export RPS1='$(rvm_prompt_info)'
+  plugins=(vscode git brew bundler docker gem heroku meteor npm macos rails z nvm yarn docker-compose)
+  export RPS1='($(date -u "+%m/%d %H:%M:%S"))'
 else
-  plugins=(vscode git brew bundler docker gem heroku meteor tmux npm macos rails rvm z nvm yarn docker-compose)
-  export RPS1='$(rvm_prompt_info)'
+  plugins=(vscode git brew bundler docker gem heroku meteor tmux npm macos rails z nvm yarn docker-compose)
+  export RPS1='($(date -u "+%m/%d %H:%M:%S"))'
   export ZSH_TMUX_AUTOSTART=true
   export ZSH_TMUX_AUTOQUIT=false
 fi
@@ -101,3 +101,5 @@ source ~/.gh.complete.sh
 export BAT_THEME="Solarized (dark)"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 export GPG_TTY=$(tty)
+export PATH="/opt/homebrew/opt/rustup/bin:$PATH"
+export PATH="/opt/homebrew/opt/postgresql@15/bin:$PATH"

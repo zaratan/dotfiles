@@ -38,6 +38,7 @@
   clean = git lfs clean %f
   smudge = git lfs smudge %f
   required = true
+	process = git-lfs filter-process
 [pull]
   rebase = true
 [diff]
@@ -62,6 +63,7 @@
   syntax-theme = Solarized (dark)
   navigate = true
   line-numbers = true
+  side-by-side = true
 
 [interactive]
   diffFilter = delta --color-only
