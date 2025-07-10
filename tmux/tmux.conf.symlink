@@ -31,12 +31,6 @@ if-shell -b '[ "$(echo "$tmux_version < 3.0" | bc)" = 1 ]' \
 if-shell -b '[ "$(echo "$tmux_version >= 3.0" | bc)" = 1 ]' \
     "bind-key -n 'C-\\' if-shell \"$is_vim\" 'send-keys C-\\\\'  'select-pane -l'"
 
-bind-key -T copy-mode-vi 'C-h' select-pane -L
-bind-key -T copy-mode-vi 'C-j' select-pane -D
-bind-key -T copy-mode-vi 'C-k' select-pane -U
-bind-key -T copy-mode-vi 'C-l' select-pane -R
-bind-key -T copy-mode-vi 'C-\' select-pane -l
-
 #moving through windows
 bind-key -n C-right next
 bind-key -n C-S-right next
@@ -54,7 +48,7 @@ bind -r K resize-pane -U 5
 bind -r L resize-pane -R 5
 
 #mouse <3
-setw -g mouse on
+setw -g -q mouse on
 
 # increase scrollback lines
 set -g history-limit 10000
@@ -103,24 +97,14 @@ set -g visual-activity off
 #copy-vi style
 # List of plugins
 set -g @plugin 'tmux-plugins/tpm'
-set -g @plugin 'tmux-plugins/tmux-sensible'
+# set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'tmux-plugins/tmux-yank'
 set -g default-terminal "screen-256color"
 set -ga terminal-overrides ",xterm-256color:Tc"
-
-# Other examples:
-# set -g @plugin 'github_username/plugin_name'
-# set -g @plugin 'git@github.com/user/plugin'
-# set -g @plugin 'git@bitbucket.com/user/plugin'
-set -g set-clipboard on
-bind-key -T copy-mode-vi 'v' send -X begin-selection
-bind-key -T copy-mode-vi 'V' send -X select-line
-bind-key -T copy-mode-vi 'r' send -X rectangle-toggle
-bind-key -T copy-mode-vi 'y' send -X copy-pipe-and-cancel "xclip -in -selection clipboard"
 
 set -g status-interval 60
 set -g status-left "#[bg=black]Session: #S (#I/#P)"
 set -g status-right "%a %d-%h %H:%M"
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
-# run '~/.tmux/plugins/tpm/tpm'
+run '~/.tmux/plugins/tpm/tpm'

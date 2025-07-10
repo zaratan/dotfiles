@@ -80,3 +80,4 @@ alias sgc="sg --code"
 # Dev Oops
 alias doo="dev_oops"
 alias calc="bc --expression"
+alias p="pnpm"

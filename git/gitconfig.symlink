@@ -16,7 +16,7 @@
   lgp = log -p
   lgn = log --name-only
 [core]
-  editor = vim
+  editor = nvim
   autocrlf = input
   excludesfile = ~/.gitignore_global
 [filter "media"]
@@ -38,7 +38,7 @@
   clean = git lfs clean %f
   smudge = git lfs smudge %f
   required = true
-	process = git-lfs filter-process
+  process = git-lfs filter-process
 [pull]
   rebase = true
 [diff]
@@ -52,7 +52,6 @@
 [user]
   name = Denis <Zaratan> Pasin
   email = zaratan@hey.com
-	signingkey = 27DB7B4EE1E5F694
 [pager]
   diff = delta
   log = delta
@@ -71,4 +70,4 @@
 [init]
   defaultBranch = main
 [commit]
-	gpgsign = true
+  gpgsign = true
