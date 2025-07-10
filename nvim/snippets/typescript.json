@@ -1,0 +1,22 @@
+{
+  "stimuluscontroller": {
+    "prefix": "stimuluscontroller",
+    "body": [
+      "import { Controller } from '@hotwired/stimulus';",
+      "",
+      "export default class extends Controller {",
+      "  static targets = [\"\"];",
+      "  // declare xxxTraget: HTMLElement;",
+      "",
+      "  static values = {",
+      "    values: String",
+      "  };",
+      "",
+      "  connect() {",
+      "    console.log('Hello from Stimulus!');",
+      "  }",
+      "}"
+    ],
+    "description": "Stimulus Controller"
+  }
+}
