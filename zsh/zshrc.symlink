@@ -6,14 +6,11 @@ ZSH_THEME="agnoster"
 
 # prompt
 
-# Warp Hack
-if [ $TERM_PROGRAM = WarpTerminal ]; then
-  plugins=(vscode git brew bundler docker gem meteor npm macos rails z nvm yarn docker-compose)
-elif [ $TERM_PROGRAM = vscode ]; then
-  plugins=(vscode git brew bundler docker gem heroku meteor npm macos rails z nvm yarn docker-compose)
+if [ $TERM_PROGRAM = vscode ]; then
+  plugins=(vscode git brew bundler docker gem heroku npm macos rails z nvm yarn docker-compose)
   export RPS1='($(date -u "+%m/%d %H:%M:%S"))'
 else
-  plugins=(vscode git brew bundler docker gem heroku meteor tmux npm macos rails z nvm yarn docker-compose)
+  plugins=(vscode git brew bundler docker gem heroku tmux npm macos rails z nvm yarn docker-compose)
   export RPS1='($(date -u "+%m/%d %H:%M:%S"))'
   export ZSH_TMUX_AUTOSTART=true
   export ZSH_TMUX_AUTOQUIT=false
