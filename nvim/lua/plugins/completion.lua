@@ -13,6 +13,7 @@ return {
         },
         filetypes = {
           yaml = true,
+
         },
       })
 
@@ -45,14 +46,14 @@ return {
   -- },
   {
     "saghen/blink.cmp",
-    lazy = false, -- lazy loading handled internally
     -- optional: provides snippets for the snippet source
-    dependencies = "rafamadriz/friendly-snippets",
+    dependencies = { 
+      'rafamadriz/friendly-snippets', 
+    },
 
     -- use a release tag to download pre-built binaries
-    -- version = "v0.*",
-    -- OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
-    build = "cargo build --release",
+    version = '1.*',
+
     -- On musl libc based systems you need to add this flag
     -- build = 'RUSTFLAGS="-C target-feature=-crt-static" cargo build --release',
     -- build = 'nix run .#build-plugin',
@@ -63,17 +64,12 @@ return {
       -- set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
       -- adjusts spacing to ensure icons are aligned
       appearance = {
-        -- Sets the fallback highlight groups to nvim-cmp's highlight groups
-        -- Useful for when your theme doesn't support blink.cmp
-        -- will be removed in a future release
-        use_nvim_cmp_as_default = true,
-        -- Set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-        -- Adjusts spacing to ensure icons are aligned
         nerd_font_variant = "normal",
       },
       sources = {
-        default = { "lsp", "path", "snippets", "buffer" },
+        default = { "lsp", "path", "snippets", "buffer"},
       },
+      fuzzy = { implementation = "prefer_rust_with_warning" },
 
       cmdline = {
         enabled = false,
@@ -91,5 +87,9 @@ return {
         },
       },
     },
+    opts_extend = { "sources.default" }
   },
+  {
+  "giuxtaposition/blink-cmp-copilot",
+}
 }
