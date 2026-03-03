@@ -19,10 +19,6 @@
   editor = nvim
   autocrlf = input
   excludesfile = ~/.gitignore_global
-[filter "media"]
-  required = true
-  clean = git media clean %f
-  smudge = git media smudge %f
 [push]
   default = upstream
   autoSetupRemote = true
@@ -30,10 +26,6 @@
   ui = true
 [github]
   user = zaratan
-[filter "hawser"]
-  clean = git hawser clean %f
-  smudge = git hawser smudge %f
-  required = true
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
@@ -47,11 +39,6 @@
   prompt = false
 [rerere]
   enabled = true
-[hub]
-  host = git.autodesk.com
-[user]
-  name = Denis <Zaratan> Pasin
-  email = zaratan@hey.com
 [pager]
   diff = delta
   log = delta

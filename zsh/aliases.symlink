@@ -32,8 +32,8 @@ alias rs="b exec ./bin/rspec"
 alias t="b exec rspec"
 
 # Shame
-alias shame="ag -i '(TODO|FIXME|XXX)'"
-alias SHAME="ag -i '((TODO|FIXME|XXX) ){3}'"
+alias shame="rg -i '(TODO|FIXME|XXX)'"
+alias SHAME="rg -i '((TODO|FIXME|XXX) ){3}'"
 
 # git
 alias gdiff="git difftool -y -x 'colordiff -y -W $COLUMNS'"
@@ -41,7 +41,6 @@ alias gpuf="git-wtf; echo 'Are you sure you want to force push this ? (Ctrl-c if
 
 # partical
 alias mf="mdfind -onlyin ./ -name"
-alias vim="vim -O"
 alias f="fuck"
 
 alias staging_go="ssh -t rm-st-dk-02 sudo sg_docker_exec_app bash"

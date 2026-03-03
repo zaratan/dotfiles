@@ -17,6 +17,10 @@ return {
       end, { desc = "Find files (git or fallback)" })
 
       vim.keymap.set("n", "<Leader>f", require("fzf-lua").live_grep, { desc = "Live grep" })
+
+      vim.api.nvim_create_user_command("Ag", function(opts)
+        require("fzf-lua").grep({ search = opts.args })
+      end, { nargs = "?", desc = "Grep (fzf-lua)" })
     end,
   },
   {
@@ -34,7 +38,6 @@ return {
       { "<C-H>", "<cmd><C-U>TmuxNavigateRight<cr>" },
     },
   },
-  "rking/ag.vim",
   "tpope/vim-repeat",
   "kshenoy/vim-signature",
   {
