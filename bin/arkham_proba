@@ -1,0 +1,89 @@
+#!/usr/bin/env ruby
+# deck_proba.rb
+
+require 'optparse'
+
+def factorial(n)
+  return 1 if n <= 1
+  (1..n).reduce(:*)
+end
+
+def combination(n, k)
+  return 0 if k > n || k < 0
+  return 1 if k == 0 || k == n
+  factorial(n) / (factorial(k) * factorial(n - k))
+end
+
+def proba_au_moins_une(deck_size, hand_size, copies)
+  return 0 if deck_size < hand_size
+  proba_zero = combination(deck_size - copies, hand_size).to_f / 
+               combination(deck_size, hand_size)
+  1 - proba_zero
+end
+
+# Probabilité avec mulligan Arkham (sans remélange)
+def proba_avec_mulligan(deck_size, hand_size, copies)
+  # Proba en main 1
+  p_main1 = proba_au_moins_une(deck_size, hand_size, copies)
+  
+  # Proba en main 2 sachant qu'on n'a pas eu en main 1
+  # On pioche dans les (deck_size - hand_size) cartes restantes
+  p_main2_sachant_pas_main1 = proba_au_moins_une(deck_size - hand_size, hand_size, copies)
+  
+  # Proba totale : avoir en main 1 OU en main 2
+  p_main1 + (1 - p_main1) * p_main2_sachant_pas_main1
+end
+
+# Parse des arguments
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: deck_proba.rb [options]"
+  
+  opts.on("-d", "--deck SIZE", Integer, "Taille du deck") do |v|
+    options[:deck] = v
+  end
+  
+  opts.on("-m", "--main SIZE", Integer, "Taille de la main de départ") do |v|
+    options[:main] = v
+  end
+  
+  opts.on("-c", "--copies N", Integer, "Nombre d'exemplaires de la carte cherchée") do |v|
+    options[:copies] = v
+  end
+  
+  opts.on("--mulligan", "Inclure le mulligan dans le calcul") do
+    options[:mulligan] = true
+  end
+  
+  opts.on("-h", "--help", "Affiche cette aide") do
+    puts opts
+    exit
+  end
+end.parse!
+
+# Valeurs par défaut pour Arkham Horror LCG
+options[:deck] ||= 30
+options[:main] ||= 5
+options[:copies] ||= 2
+
+deck = options[:deck]
+main = options[:main]
+copies = options[:copies]
+
+proba_sans = proba_au_moins_une(deck, main, copies)
+
+puts "\n=== Horreur à Arkham - Calculateur de probabilités ==="
+puts "Deck: #{deck} cartes"
+puts "Main de départ: #{main} cartes"
+puts "Carte cherchée: #{copies} exemplaire(s) dans le deck"
+puts "\n--- Sans mulligan ---"
+puts "Probabilité: #{(proba_sans * 100).round(2)}%"
+puts "Soit environ 1 chance sur #{(1/proba_sans).round(1)}" if proba_sans > 0
+
+if options[:mulligan]
+  proba_avec = proba_avec_mulligan(deck, main, copies)
+  puts "\n--- Avec mulligan ---"
+  puts "Probabilité: #{(proba_avec * 100).round(2)}%"
+  puts "Soit environ 1 chance sur #{(1/proba_avec).round(1)}" if proba_avec > 0
+  puts "\nGain avec mulligan: +#{((proba_avec - proba_sans) * 100).round(2)} points de %"
+end

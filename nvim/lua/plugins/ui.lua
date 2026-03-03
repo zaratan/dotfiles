@@ -11,7 +11,12 @@ return {
       vim.cmd.colorscheme("solarized-osaka")
     end,
   },
-  "bling/vim-airline",
+  {
+    "bling/vim-airline",
+    init = function()
+      vim.g.airline_powerline_fonts = 1
+    end,
+  },
   {
     "kevinhwang91/nvim-ufo",
     dependencies = {

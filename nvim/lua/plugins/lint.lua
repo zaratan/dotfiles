@@ -25,7 +25,7 @@ return {
           if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
             return
           end
-          return { timeout_ms = 1000, lsp_format = "fallback" }
+          return { timeout_ms = 2000, lsp_format = "fallback" }
         end,
       })
       vim.api.nvim_create_user_command("Format", function(args)

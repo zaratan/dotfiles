@@ -1,20 +1,3 @@
--- vim.cmd([[
--- if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
---   silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
---         \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
---   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
--- endif
---
--- call plug#begin('~/.vim/plugged')
--- Plug 'tpope/vim-commentary'
--- Plug 'bling/vim-airline'
--- Plug 'm4xshen/hardtime.nvim'
--- Plug 'ggandor/leap.nvim'
--- Plug 'tris203/precognition.nvim'
---
--- call plug#end()
--- ]])
-
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then

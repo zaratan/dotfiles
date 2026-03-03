@@ -1,48 +1,48 @@
-vim.cmd([[
-set expandtab
-set number
-set shiftwidth=2
-set showmatch
-set smartindent
-set softtabstop=2
-set tw:1337
+vim.opt.expandtab = true
+vim.opt.number = true
+vim.opt.shiftwidth = 2
+vim.opt.showmatch = true
+vim.opt.smartindent = true
+vim.opt.softtabstop = 2
+vim.opt.textwidth = 1337
 
-" Persistent undo !
-set undofile                 "turn on the feature  
-set undodir=$HOME/.vim/undo  "directory where the undo files will be stored.
+-- Persistent undo
+local undodir = vim.env.HOME .. "/.vim/undo"
+vim.fn.mkdir(undodir, "p")
+vim.opt.undofile = true
+vim.opt.undodir = undodir
 
-set clipboard=unnamed
+vim.opt.clipboard = "unnamedplus"
 
-autocmd Filetype gitcommit setlocal spell textwidth=72
-autocmd Filetype eruby.yaml set filetype=yaml
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "gitcommit",
+  callback = function()
+    vim.opt_local.spell = true
+    vim.opt_local.textwidth = 72
+  end,
+})
 
-" Magic compatability with tmux
-nnoremap ¬      :tabnext<CR>
-nnoremap ˙      :tabprevious<CR>
-nnoremap <C-t>  :tabnew<CR> 
-inoremap ¬      <Esc>:tabnext<CR>i
-inoremap ˙      <Esc>:tabprevious<CR>i
-inoremap <C-t>  <Esc>:tabnew<CR>
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "eruby.yaml",
+  callback = function()
+    vim.bo.filetype = "yaml"
+  end,
+})
 
-" movement mappings
-"let g:tmux_navigator_no_mappings = 1
+-- Tab navigation (magic compatibility with tmux)
+vim.keymap.set("n", "¬", ":tabnext<CR>", { silent = true })
+vim.keymap.set("n", "˙", ":tabprevious<CR>", { silent = true })
+vim.keymap.set("n", "<C-t>", ":tabnew<CR>", { silent = true })
+vim.keymap.set("i", "¬", "<Esc>:tabnext<CR>i", { silent = true })
+vim.keymap.set("i", "˙", "<Esc>:tabprevious<CR>i", { silent = true })
+vim.keymap.set("i", "<C-t>", "<Esc>:tabnew<CR>", { silent = true })
 
-"nnoremap <silent> <C-L> :TmuxNavigateLeft<cr>
-"nnoremap <silent> <C-K> :TmuxNavigateDown<cr>
-"nnoremap <silent> <C-J> :TmuxNavigateUp<cr>
-"nnoremap <silent> <C-H> :TmuxNavigateRight<cr>
+vim.opt.laststatus = 2
 
-set laststatus=2
-let g:airline_powerline_fonts = 1
-let g:rustfmt_autosave = 1
+vim.g.rustfmt_autosave = 1
 
-set rtp+=/usr/local/opt/fzf
+vim.opt.regexpengine = 0
 
-set regexpengine=1
-
-set re=0
-
-if filereadable($HOME . "/.nvimrc.local")
-  source $HOME/.nvimrc.local
-endif
-]])
+if vim.fn.filereadable(vim.env.HOME .. "/.nvimrc.local") == 1 then
+  vim.cmd.source(vim.env.HOME .. "/.nvimrc.local")
+end
