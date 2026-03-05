@@ -12,7 +12,7 @@ alias v="vim"
 
 # Docker
 alias d="docker"
-alias dc="docker-compose"
+alias dc="docker compose"
 alias docker_stop_all="docker ps | awk  '{print $1}' | grep -v CON | xargs -P 5 docker stop"
 
 # Bundler

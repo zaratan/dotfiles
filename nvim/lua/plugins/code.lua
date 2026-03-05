@@ -2,6 +2,12 @@ return {
   "mechatroner/rainbow_csv",
   "rust-lang/rust.vim",
   {
+    "norcalli/nvim-colorizer.lua",
+    config = function()
+      require("colorizer").setup()
+    end,
+  },
+  {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     event = { "VeryLazy" },

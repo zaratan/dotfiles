@@ -1,0 +1,677 @@
+#!/usr/bin/env python3
+"""Generic Unity asset extractor using UnityPy.
+
+Usage:
+    python3 extract_unity_assets.py <data_dir> [options]
+
+Examples:
+    python3 extract_unity_assets.py ./MyGame_Data
+    python3 extract_unity_assets.py ./MyGame_Data -o ~/Desktop/output
+    python3 extract_unity_assets.py ./MyGame_Data --types Texture2D Sprite AudioClip
+    python3 extract_unity_assets.py ./MyGame_Data --list-only
+    python3 extract_unity_assets.py ./MyGame_Data --include-bundles
+"""
+
+import argparse
+import json
+import os
+import re
+import sys
+import threading
+from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass, field
+
+import UnityPy
+
+# Types that are internal Unity plumbing with no user-facing data
+SKIP_TYPES = {
+    "RectTransform", "CanvasRenderer", "Canvas", "Transform", "PreloadData",
+    "MonoScript", "AssetBundle",
+}
+
+
+@dataclass
+class ExtractionContext:
+    base_dir: str
+    out_dir: str
+    type_filter: set | None = None
+    summary: Counter = field(default_factory=Counter)
+    errors: list = field(default_factory=list)
+
+
+# ── Helpers ────────────────────────────────────────────────────
+
+def safe_name(raw_name: str) -> str:
+    if not raw_name:
+        return "unnamed"
+    for ch in '/<>:"\\|?*':
+        raw_name = raw_name.replace(ch, "_")
+    return raw_name.strip().rstrip(".")
+
+
+_path_lock = threading.Lock()
+_claimed_paths: set[str] = set()
+
+
+def unique_path(type_dir: str, base_name: str, ext: str, path_id: int) -> str:
+    with _path_lock:
+        candidate = os.path.join(type_dir, f"{base_name}{ext}")
+        if os.path.exists(candidate) or candidate in _claimed_paths:
+            candidate = os.path.join(type_dir, f"{base_name}_pid{path_id}{ext}")
+        _claimed_paths.add(candidate)
+        return candidate
+
+
+def ensure_dir(ctx: ExtractionContext, type_name: str) -> str:
+    d = os.path.join(ctx.out_dir, type_name)
+    os.makedirs(d, exist_ok=True)
+    return d
+
+
+def default_ser(o):
+    if isinstance(o, (bytes, bytearray)):
+        return f"<{len(o)} bytes>"
+    return str(o)
+
+
+# ── Asset discovery ────────────────────────────────────────────
+
+UNITYFS_MAGIC = b"UnityFS\x00"
+
+
+def _is_unity_bundle(filepath: str) -> bool:
+    """Check if a file starts with the UnityFS magic header."""
+    try:
+        with open(filepath, "rb") as f:
+            return f.read(8) == UNITYFS_MAGIC
+    except OSError:
+        return False
+
+
+def _read_null_terminated(data: bytes, offset: int) -> tuple[str, int]:
+    """Read a null-terminated string from bytes, return (string, next_offset)."""
+    end = data.index(b"\x00", offset)
+    return data[offset:end].decode("ascii", errors="replace"), end + 1
+
+
+def detect_unity_version(data_dir: str) -> str | None:
+    """Auto-detect Unity version from files in the data directory.
+
+    Tries (in order):
+    1. UnityFS header of data.unity3d (generator_version field)
+    2. UnityFS header of any .assets or bundle file
+    3. globalgamemanagers binary (contains version string)
+    """
+    # Try UnityFS files first (data.unity3d, then others)
+    candidates = []
+    for entry in sorted(os.listdir(data_dir)):
+        full = os.path.join(data_dir, entry)
+        if not os.path.isfile(full):
+            continue
+        if entry == "data.unity3d":
+            candidates.insert(0, full)
+        elif entry.endswith((".assets", ".unity3d")):
+            candidates.append(full)
+
+    for fpath in candidates:
+        try:
+            with open(fpath, "rb") as f:
+                header = f.read(128)
+            if not header.startswith(UNITYFS_MAGIC):
+                continue
+            # UnityFS header: magic(8) + format(4) + unity_version(\0) + generator_version(\0)
+            _, pos = _read_null_terminated(header, 8 + 4)  # skip "5.x.x"
+            generator_ver, _ = _read_null_terminated(header, pos)
+            if re.match(r"\d{4}\.\d+\.\d+", generator_ver):
+                return generator_ver
+        except Exception:
+            continue
+
+    return None
+
+
+def discover_assets(data_dir: str, include_bundles: bool = False) -> list[str]:
+    """Find all loadable Unity asset files in a *_Data directory."""
+    files = []
+    for entry in sorted(os.listdir(data_dir)):
+        full = os.path.join(data_dir, entry)
+        if not os.path.isfile(full):
+            continue
+        # Skip companion files (loaded automatically by UnityPy)
+        if entry.endswith((".resS", ".resource", ".manifest")):
+            continue
+        # .assets files
+        if entry.endswith(".assets"):
+            files.append(full)
+            continue
+        # globalgamemanagers (Unity engine config + assets)
+        if entry == "globalgamemanagers":
+            files.append(full)
+            continue
+        # level files (scene data)
+        if re.match(r"^level\d+$", entry):
+            files.append(full)
+            continue
+        # UnityFS bundles (e.g. data.unity3d or extensionless bundles)
+        if entry.endswith(".unity3d") or _is_unity_bundle(full):
+            files.append(full)
+            continue
+
+    # Optionally scan StreamingAssets for bundles
+    if include_bundles:
+        streaming = os.path.join(data_dir, "StreamingAssets")
+        if os.path.isdir(streaming):
+            for root, _, filenames in os.walk(streaming):
+                for fname in sorted(filenames):
+                    if fname.endswith(".manifest"):
+                        continue
+                    fpath = os.path.join(root, fname)
+                    if fname.endswith((".bundle", ".ab", ".assets", ".unity3d")):
+                        files.append(fpath)
+                    elif not os.path.splitext(fname)[1] and _is_unity_bundle(fpath):
+                        files.append(fpath)
+
+    return files
+
+
+# ── Per-type export functions ──────────────────────────────────
+
+def export_texture2d(ctx, obj, data):
+    d = ensure_dir(ctx, "Texture2D")
+    name = safe_name(data.m_Name)
+    img = data.image
+    if img.width == 0 or img.height == 0:
+        ctx.errors.append(("Texture2D", name, "0x0 image, skipped"))
+        return False
+    path = unique_path(d, name, ".png", obj.path_id)
+    img.save(path)
+    return True
+
+
+def export_sprite(ctx, obj, data):
+    d = ensure_dir(ctx, "Sprite")
+    name = safe_name(data.m_Name)
+    img = data.image
+    if img.width == 0 or img.height == 0:
+        ctx.errors.append(("Sprite", name, "0x0 image, skipped"))
+        return False
+    path = unique_path(d, name, ".png", obj.path_id)
+    img.save(path)
+    return True
+
+
+def export_audioclip(ctx, obj, data):
+    d = ensure_dir(ctx, "AudioClip")
+    if not data.samples:
+        ctx.errors.append(("AudioClip", data.m_Name, "no samples"))
+        return False
+    for sample_name, sample_data in data.samples.items():
+        sname = safe_name(sample_name)
+        base, ext = os.path.splitext(sname)
+        if not ext:
+            ext = ".wav"
+        path = unique_path(d, base, ext, obj.path_id)
+        with open(path, "wb") as f:
+            f.write(sample_data)
+    return True
+
+
+def export_textasset(ctx, obj, data):
+    d = ensure_dir(ctx, "TextAsset")
+    name = safe_name(data.m_Name)
+    content = data.m_Script
+    ext = ".txt"
+    if isinstance(content, str):
+        stripped = content.lstrip()
+        if stripped.startswith(("{", "[")):
+            ext = ".json"
+        elif stripped.startswith("<"):
+            ext = ".xml"
+        elif stripped.startswith(("---", "%YAML")):
+            ext = ".yaml"
+        raw = content.encode("utf-8")
+    else:
+        raw = content if isinstance(content, bytes) else bytes(content)
+    path = unique_path(d, name, ext, obj.path_id)
+    with open(path, "wb") as f:
+        f.write(raw)
+    return True
+
+
+def export_font(ctx, obj, data):
+    d = ensure_dir(ctx, "Font")
+    name = safe_name(data.m_Name)
+    font_bytes = data.m_FontData
+    if not font_bytes:
+        ctx.errors.append(("Font", name, "empty font data"))
+        return False
+    raw = bytes(font_bytes) if not isinstance(font_bytes, bytes) else font_bytes
+    if raw[:4] == b"OTTO":
+        ext = ".otf"
+    elif raw[:4] == b"wOFF":
+        ext = ".woff"
+    elif raw[:4] == b"wOF2":
+        ext = ".woff2"
+    else:
+        ext = ".ttf"
+    path = unique_path(d, name, ext, obj.path_id)
+    with open(path, "wb") as f:
+        f.write(raw)
+    return True
+
+
+def export_shader(ctx, obj, data):
+    d = ensure_dir(ctx, "Shader")
+    name = safe_name(data.m_Name) if data.m_Name else f"shader_pid{obj.path_id}"
+    try:
+        text = data.export()
+    except Exception:
+        text = str(data.m_Script) if hasattr(data, "m_Script") and data.m_Script else ""
+    if not text:
+        ctx.errors.append(("Shader", name, "empty shader"))
+        return False
+    path = unique_path(d, name, ".shader", obj.path_id)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(text)
+    return True
+
+
+def export_videoclip(ctx, obj, data):
+    d = ensure_dir(ctx, "VideoClip")
+    name = safe_name(data.m_Name)
+    er = data.m_ExternalResources
+    if not er.m_Source or er.m_Size == 0:
+        ctx.errors.append(("VideoClip", name, "no external resource"))
+        return False
+    res_path = os.path.join(ctx.base_dir, er.m_Source)
+    if not os.path.exists(res_path):
+        ctx.errors.append(("VideoClip", name, f"resource not found: {er.m_Source}"))
+        return False
+    ext = ".mp4"
+    if hasattr(data, "m_OriginalPath") and data.m_OriginalPath:
+        _, orig_ext = os.path.splitext(data.m_OriginalPath)
+        if orig_ext:
+            ext = orig_ext
+    path = unique_path(d, name, ext, obj.path_id)
+    with open(res_path, "rb") as src:
+        src.seek(er.m_Offset)
+        chunk = src.read(er.m_Size)
+    with open(path, "wb") as dst:
+        dst.write(chunk)
+    return True
+
+
+def export_monobehaviour(ctx, obj):
+    d = ensure_dir(ctx, "MonoBehaviour")
+    name = f"monobehaviour_pid{obj.path_id}"
+    tree = None
+    try:
+        tree = obj.read_typetree(check_read=False)
+        if isinstance(tree, dict):
+            n = tree.get("m_Name", "")
+            if n:
+                name = safe_name(n)
+    except Exception:
+        pass
+
+    if tree and isinstance(tree, dict):
+        path = unique_path(d, name, ".json", obj.path_id)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(tree, f, indent=2, default=default_ser, ensure_ascii=False)
+    else:
+        try:
+            raw = obj.get_raw_data()
+        except Exception:
+            raw = b""
+        path = unique_path(d, name, ".bin", obj.path_id)
+        with open(path, "wb") as f:
+            f.write(raw)
+    return True
+
+
+def export_material(ctx, obj, data):
+    d = ensure_dir(ctx, "Material")
+    name = safe_name(data.m_Name) if data.m_Name else f"material_pid{obj.path_id}"
+    try:
+        tree = obj.read_typetree(check_read=False)
+    except Exception:
+        tree = {"m_Name": data.m_Name}
+    path = unique_path(d, name, ".json", obj.path_id)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(tree, f, indent=2, default=default_ser, ensure_ascii=False)
+    return True
+
+
+def export_gameobject(ctx, obj, data):
+    d = ensure_dir(ctx, "GameObject")
+    name = safe_name(data.m_Name) if data.m_Name else f"gameobject_pid{obj.path_id}"
+    try:
+        tree = obj.read_typetree(check_read=False)
+    except Exception:
+        tree = {"m_Name": data.m_Name}
+    path = unique_path(d, name, ".json", obj.path_id)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(tree, f, indent=2, default=default_ser, ensure_ascii=False)
+    return True
+
+
+def export_animator(ctx, obj, data):
+    d = ensure_dir(ctx, "Animator")
+    name = safe_name(getattr(data, "m_Name", "")) or f"animator_pid{obj.path_id}"
+    try:
+        tree = obj.read_typetree(check_read=False)
+    except Exception:
+        tree = {}
+    path = unique_path(d, name, ".json", obj.path_id)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(tree, f, indent=2, default=default_ser, ensure_ascii=False)
+    return True
+
+
+def export_animationclip(ctx, obj, data):
+    d = ensure_dir(ctx, "AnimationClip")
+    name = safe_name(data.m_Name) if data.m_Name else f"animclip_pid{obj.path_id}"
+    try:
+        tree = obj.read_typetree(check_read=False)
+    except Exception:
+        tree = {"m_Name": data.m_Name}
+    path = unique_path(d, name, ".json", obj.path_id)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(tree, f, indent=2, default=default_ser, ensure_ascii=False)
+    return True
+
+
+def export_mesh(ctx, obj, data):
+    d = ensure_dir(ctx, "Mesh")
+    name = safe_name(data.m_Name) if data.m_Name else f"mesh_pid{obj.path_id}"
+    try:
+        tree = obj.read_typetree(check_read=False)
+    except Exception:
+        tree = {"m_Name": data.m_Name}
+    path = unique_path(d, name, ".json", obj.path_id)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(tree, f, indent=2, default=default_ser, ensure_ascii=False)
+    return True
+
+
+# ── Dispatcher ─────────────────────────────────────────────────
+
+EXPORTERS = {
+    "Texture2D": export_texture2d,
+    "Sprite": export_sprite,
+    "AudioClip": export_audioclip,
+    "TextAsset": export_textasset,
+    "Font": export_font,
+    "Shader": export_shader,
+    "VideoClip": export_videoclip,
+    "Material": export_material,
+    "GameObject": export_gameobject,
+    "Animator": export_animator,
+    "AnimationClip": export_animationclip,
+    "Mesh": export_mesh,
+}
+
+
+# ── Main ───────────────────────────────────────────────────────
+
+def list_assets(asset_files: list[str], type_filter: set | None):
+    """Dry-run: list types and counts without extracting."""
+    type_counts = Counter()
+    for asset_path in asset_files:
+        fname = os.path.basename(asset_path)
+        print(f"Scanning: {fname}")
+        try:
+            env = UnityPy.load(asset_path)
+        except Exception as e:
+            print(f"  ERROR loading: {e}")
+            continue
+        for obj in env.objects:
+            t = obj.type.name
+            if t not in SKIP_TYPES:
+                type_counts[t] += 1
+
+    print(f"\n{'=' * 50}")
+    print("ASSET INVENTORY")
+    print(f"{'=' * 50}")
+    total = 0
+    for t in sorted(type_counts.keys()):
+        count = type_counts[t]
+        marker = ""
+        if type_filter and t not in type_filter:
+            marker = "  (filtered out)"
+        elif t not in EXPORTERS and t != "MonoBehaviour":
+            marker = "  (no exporter, will skip)"
+        print(f"  {t:25s}: {count:5d}{marker}")
+        total += count
+    print(f"  {'TOTAL':25s}: {total:5d}")
+
+
+class ProgressTracker:
+    """Thread-safe progress counter with live display."""
+
+    def __init__(self, total_files: int):
+        self._lock = threading.Lock()
+        self.total_files = total_files
+        self.files_done = 0
+        self.assets_extracted = 0
+        self.active_files: set[str] = set()
+
+    def start_file(self, fname: str):
+        with self._lock:
+            self.active_files.add(fname)
+            self._print()
+
+    def tick(self, count: int = 1):
+        with self._lock:
+            self.assets_extracted += count
+            self._print()
+
+    def finish_file(self, fname: str, count: int):
+        with self._lock:
+            self.files_done += 1
+            self.active_files.discard(fname)
+            # Clear progress line, print final line for this file
+            sys.stderr.write(f"\r\033[K")
+            sys.stderr.flush()
+            print(f"  [{self.files_done}/{self.total_files}] {fname}: {count} assets")
+            self._print()
+
+    def _print(self):
+        active = ", ".join(sorted(self.active_files)[:3])
+        if len(self.active_files) > 3:
+            active += f" +{len(self.active_files) - 3}"
+        msg = f"\r  Extracted: {self.assets_extracted} | Processing: {active}"
+        sys.stderr.write(f"\033[K{msg}")
+        sys.stderr.flush()
+
+    def clear(self):
+        sys.stderr.write(f"\r\033[K")
+        sys.stderr.flush()
+
+
+def _process_asset_file(
+    asset_path: str, base_dir: str, out_dir: str, type_filter: set | None,
+    progress: ProgressTracker | None = None,
+) -> tuple[str, Counter, list]:
+    """Process a single asset file. Returns (filename, summary, errors)."""
+    ctx = ExtractionContext(base_dir=base_dir, out_dir=out_dir, type_filter=type_filter)
+    fname = os.path.basename(asset_path)
+
+    if progress:
+        progress.start_file(fname)
+
+    try:
+        env = UnityPy.load(asset_path)
+    except Exception as e:
+        return fname, ctx.summary, [("LOAD", fname, str(e))]
+
+    for obj in env.objects:
+        type_name = obj.type.name
+
+        if type_name in SKIP_TYPES:
+            continue
+        if ctx.type_filter and type_name not in ctx.type_filter:
+            continue
+
+        # MonoBehaviour special path
+        if type_name == "MonoBehaviour":
+            try:
+                if export_monobehaviour(ctx, obj):
+                    ctx.summary["MonoBehaviour"] += 1
+                    if progress:
+                        progress.tick()
+            except Exception as e:
+                ctx.errors.append(("MonoBehaviour", f"pid{obj.path_id}", str(e)))
+            continue
+
+        # Standard read + export
+        try:
+            data = obj.read()
+        except Exception as e:
+            ctx.errors.append((type_name, f"pid{obj.path_id}", f"read: {e}"))
+            continue
+
+        exporter = EXPORTERS.get(type_name)
+        if exporter is None:
+            continue
+
+        try:
+            if exporter(ctx, obj, data):
+                ctx.summary[type_name] += 1
+                if progress:
+                    progress.tick()
+        except Exception as e:
+            name_hint = getattr(data, "m_Name", None) or f"pid{obj.path_id}"
+            ctx.errors.append((type_name, name_hint, str(e)))
+
+    return fname, ctx.summary, ctx.errors
+
+
+def extract_assets(ctx: ExtractionContext, asset_files: list[str], jobs: int = 1):
+    """Extract all assets from the given files."""
+    os.makedirs(ctx.out_dir, exist_ok=True)
+    print(f"Output directory: {ctx.out_dir}")
+    print(f"Workers: {jobs}\n")
+
+    total_files = len(asset_files)
+    progress = ProgressTracker(total_files)
+
+    def _worker(path):
+        return _process_asset_file(path, ctx.base_dir, ctx.out_dir, ctx.type_filter, progress)
+
+    with ThreadPoolExecutor(max_workers=jobs) as pool:
+        futures = {pool.submit(_worker, p): p for p in asset_files}
+        for future in as_completed(futures):
+            try:
+                fname, summary, errors = future.result()
+                ctx.summary += summary
+                ctx.errors.extend(errors)
+                n = sum(summary.values())
+                progress.finish_file(fname, n)
+            except Exception as e:
+                path = futures[future]
+                progress.finish_file(os.path.basename(path), 0)
+                print(f"    ^ FAILED: {e}")
+
+    progress.clear()
+
+    # Summary
+    print(f"\n{'=' * 60}")
+    print("EXTRACTION SUMMARY")
+    print(f"{'=' * 60}")
+    total = 0
+    for type_name in sorted(ctx.summary.keys()):
+        count = ctx.summary[type_name]
+        total += count
+        print(f"  {type_name:20s}: {count:5d} files")
+    print(f"  {'TOTAL':20s}: {total:5d} files")
+
+    if ctx.errors:
+        print(f"\nWarnings ({len(ctx.errors)}):")
+        for typ, name, msg in ctx.errors[:30]:
+            print(f"  [{typ}] {name}: {msg}")
+        if len(ctx.errors) > 30:
+            print(f"  ... and {len(ctx.errors) - 30} more")
+
+    total_bytes = 0
+    for dirpath, _, filenames in os.walk(ctx.out_dir):
+        for f in filenames:
+            total_bytes += os.path.getsize(os.path.join(dirpath, f))
+    print(f"\nExtracted size: {total_bytes / (1024 * 1024):.1f} MB")
+    print(f"Output: {ctx.out_dir}")
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Extract assets from a Unity game's *_Data directory.",
+        epilog="Requires: pip install UnityPy",
+    )
+    parser.add_argument(
+        "data_dir",
+        help="Path to the Unity *_Data directory (e.g. ./MyGame_Data)",
+    )
+    parser.add_argument(
+        "-o", "--output",
+        help="Output directory (default: <data_dir>/extracted/)",
+    )
+    parser.add_argument(
+        "-t", "--types",
+        nargs="+",
+        metavar="TYPE",
+        help="Only extract these types (e.g. Texture2D Sprite AudioClip)",
+    )
+    parser.add_argument(
+        "--list-only",
+        action="store_true",
+        help="List asset types and counts without extracting",
+    )
+    parser.add_argument(
+        "--include-bundles",
+        action="store_true",
+        help="Also scan StreamingAssets/ for .bundle and .ab files",
+    )
+    parser.add_argument(
+        "-j", "--jobs",
+        type=int,
+        default=os.cpu_count() or 4,
+        metavar="N",
+        help="Number of parallel workers (default: number of CPUs)",
+    )
+    args = parser.parse_args()
+
+    data_dir = os.path.abspath(args.data_dir)
+    if not os.path.isdir(data_dir):
+        print(f"Error: '{data_dir}' is not a directory.", file=sys.stderr)
+        sys.exit(1)
+
+    # Auto-detect and set Unity fallback version
+    detected_ver = detect_unity_version(data_dir)
+    if detected_ver:
+        UnityPy.config.FALLBACK_UNITY_VERSION = detected_ver
+        print(f"Detected Unity version: {detected_ver}")
+
+    asset_files = discover_assets(data_dir, args.include_bundles)
+    if not asset_files:
+        print(f"Error: no Unity asset files found in '{data_dir}'.", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"Found {len(asset_files)} asset file(s) in {os.path.basename(data_dir)}/")
+    type_filter = set(args.types) if args.types else None
+
+    if args.list_only:
+        list_assets(asset_files, type_filter)
+        return
+
+    out_dir = args.output or os.path.join(data_dir, "extracted")
+    ctx = ExtractionContext(
+        base_dir=data_dir,
+        out_dir=os.path.abspath(out_dir),
+        type_filter=type_filter,
+    )
+    extract_assets(ctx, asset_files, jobs=args.jobs)
+    print("\nDone.")
+
+
+if __name__ == "__main__":
+    main()
