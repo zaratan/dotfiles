@@ -1,11 +1,12 @@
 {
-  "model": "opus",
-  "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  "permissions": {
+    "defaultMode": "plan"
   },
+  "model": "opus",
   "enabledPlugins": {
     "typescript-lsp@claude-plugins-official": true,
-    "rust-analyzer-lsp@claude-plugins-official": true
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true
   },
   "language": "Français",
   "statusLine": {
