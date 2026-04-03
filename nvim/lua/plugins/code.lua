@@ -2,9 +2,13 @@ return {
   "mechatroner/rainbow_csv",
   "rust-lang/rust.vim",
   {
-    "norcalli/nvim-colorizer.lua",
+    "brenoprata10/nvim-highlight-colors",
+    event = { "BufReadPre", "BufNewFile" },
     config = function()
-      require("colorizer").setup()
+      require("nvim-highlight-colors").setup({
+        render = "background",
+        enable_tailwind = true,
+      })
     end,
   },
   {
