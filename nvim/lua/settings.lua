@@ -13,6 +13,7 @@ vim.opt.undofile = true
 vim.opt.undodir = undodir
 
 vim.opt.clipboard = "unnamedplus"
+vim.opt.updatetime = 100
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "gitcommit",

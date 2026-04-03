@@ -38,14 +38,4 @@ return {
       { "<C-H>", "<cmd><C-U>TmuxNavigateRight<cr>" },
     },
   },
-  {
-    "tris203/precognition.nvim",
-    opts = {
-      startVisible = false,
-    },
-    config = function(_, opts)
-      require("precognition").setup(opts)
-      vim.keymap.set("n", "<LEADER>?", require("precognition").toggle)
-    end,
-  },
 }

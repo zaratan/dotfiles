@@ -1,5 +1,4 @@
 return {
-  "joker1007/vim-ruby-heredoc-syntax",
   {
     "HoganMcDonald/rails-rspec-toggle.nvim",
     config = function()

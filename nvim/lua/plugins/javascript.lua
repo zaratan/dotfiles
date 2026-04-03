@@ -25,5 +25,4 @@ return {
       vim.keymap.set({ "n" }, "<LEADER>np", require("package-info").change_version, { silent = true, noremap = true })
     end,
   },
-  "prisma/vim-prisma",
 }
