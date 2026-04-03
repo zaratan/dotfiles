@@ -65,7 +65,6 @@ return {
       end)
     end,
   },
-  { "anuvyklack/fold-preview.nvim", dependencies = "anuvyklack/keymap-amend.nvim", config = true },
   {
     "stevearc/oil.nvim",
     dependencies = {

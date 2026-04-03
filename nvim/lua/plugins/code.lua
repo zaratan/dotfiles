@@ -1,6 +1,5 @@
 return {
   "mechatroner/rainbow_csv",
-  "rust-lang/rust.vim",
   {
     "brenoprata10/nvim-highlight-colors",
     event = { "BufReadPre", "BufNewFile" },

@@ -38,8 +38,6 @@ return {
       { "<C-H>", "<cmd><C-U>TmuxNavigateRight<cr>" },
     },
   },
-  "tpope/vim-repeat",
-  "kshenoy/vim-signature",
   {
     "tris203/precognition.nvim",
     opts = {
