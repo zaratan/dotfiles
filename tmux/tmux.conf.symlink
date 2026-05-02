@@ -50,6 +50,12 @@ bind -r L resize-pane -R 5
 #mouse <3
 setw -g -q mouse on
 
+# No right clic menu
+unbind -n MouseDown3Pane
+unbind -n MouseDown3Status
+unbind -n MouseDown3StatusLeft
+unbind -n MouseDown3StatusRight
+
 # increase scrollback lines
 set -g history-limit 10000
 

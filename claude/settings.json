@@ -53,5 +53,6 @@
     "frontend-design@claude-plugins-official": true,
     "ruby-lsp@claude-plugins-official": true
   },
-  "language": "Français"
+  "language": "Français",
+  "skipAutoPermissionPrompt": true
 }
