@@ -1,7 +1,13 @@
 # Solarized Dark (built-in theme)
-theme = Solarized Dark Patched
+theme = iTerm2 Solarized Dark
+
+font-family = Monaco
+font-size = 12
 
 # macOS: Option produit les accents (é, è, à, ç, ô…).
 # Sans ça, les layouts U.S. / U.S. International activent
 # automatiquement Option-as-Alt et cassent la composition.
 macos-option-as-alt = false
+
+# Pas de prompt "Quit Ghostty?" / "Close terminal?" en sortie
+confirm-close-surface = false
