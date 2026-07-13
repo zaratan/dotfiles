@@ -7,6 +7,8 @@ Brewfile.local
 
 # Spell files re-téléchargés par nvim à la demande
 config/nvim/.config/nvim/spell/
+# Lockfile lazy.nvim : non versionné (choix : dernières versions des plugins)
+config/nvim/.config/nvim/lazy-lock.json
 
 # OrbStack recrée ses symlinks dans ~/bin (= config/bin/bin via stow)
 config/bin/bin/docker*
