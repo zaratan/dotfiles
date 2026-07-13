@@ -19,6 +19,29 @@ installer). Safe to re-run anytime — it only does what's missing.
 
 Still manual afterwards: import SSH/GPG keys, sign in to apps.
 
+### Migrating a machine from the old layout
+
+> [!WARNING]
+> Pulling this version on a machine installed with the old layout **breaks
+> every existing symlink** (`~/.zshrc`, `~/bin`, `~/.config/nvim`, …): the
+> files they point to no longer exist. The machine keeps running but any new
+> shell starts unconfigured, and `install/setup` alone will refuse to fix it
+> (Stow won't overwrite the dead links). Run `install/migrate-legacy` right
+> after pulling — don't wait, and don't close your last working terminal
+> before it succeeded.
+
+If a machine was installed before the Stow migration (`*.symlink` files,
+`script/bootstrap`), run this once after pulling:
+
+```sh
+cd ~/dotfiles && git pull && install/migrate-legacy
+```
+
+It materializes `~/.gitconfig.local`, removes the dead legacy symlinks (with
+guards: only links pointing into the repo are touched), backs up any local
+file that would collide with a package (as `*.pre-stow`), then runs
+`install/setup`.
+
 ## Layout
 
 ```

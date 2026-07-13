@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+#
+# One-shot migration from the pre-Stow layout (*.symlink + script/bootstrap)
+# to the current one. Run it once after pulling the new version:
+#
+#   cd ~/dotfiles && git pull && install/migrate-legacy
+#
+# Safe to re-run: it only touches symlinks that point inside the repo but
+# outside config/, then hands over to install/setup.
+set -euo pipefail
+
+DOTFILES="$(cd "$(dirname "$0")/.." && pwd)"
+
+GREEN=$'\033[32m' YELLOW=$'\033[33m' RESET=$'\033[0m'
+einfo() { printf ' %s*%s %s\n' "$GREEN" "$RESET" "$*"; }
+ewarn() { printf ' %s*%s %s\n' "$YELLOW" "$RESET" "$*"; }
+
+# 1. Materialize ~/.gitconfig.local: it used to be a symlink to an untracked
+#    file inside the repo; it must become a real local file.
+if [ -L "$HOME/.gitconfig.local" ]; then
+  if [ -r "$HOME/.gitconfig.local" ]; then
+    einfo "Materializing ~/.gitconfig.local"
+    tmp="$(mktemp)"
+    cat "$HOME/.gitconfig.local" > "$tmp"
+    rm "$HOME/.gitconfig.local"
+    mv "$tmp" "$HOME/.gitconfig.local"
+  else
+    ewarn "~/.gitconfig.local is a dead symlink — removing (setup will recreate it)"
+    rm "$HOME/.gitconfig.local"
+  fi
+fi
+
+# 2. Remove legacy symlinks. Guard: only links that resolve inside the repo
+#    but OUTSIDE config/ (i.e. targets that no longer exist) are removed.
+LEGACY_TARGETS=(
+  "$HOME/.zshrc" "$HOME/.aliases" "$HOME/.fzf" "$HOME/.dircolors.256dark"
+  "$HOME/.gitconfig" "$HOME/.gitignore_global"
+  "$HOME/.gemrc" "$HOME/.irbrc" "$HOME/.tmux.conf"
+  "$HOME/.eslintrc" "$HOME/.kube-comp" "$HOME/.gh.complete.sh" "$HOME/.vimrc"
+  "$HOME/bin" "$HOME/.config/nvim" "$HOME/.config/ghostty" "$HOME/.config/kitty"
+  "$HOME/.claude/CLAUDE.md" "$HOME/.claude/settings.json"
+  "$HOME/.claude/statusline-command.sh" "$HOME/.claude/agents"
+)
+for target in "${LEGACY_TARGETS[@]}"; do
+  [ -L "$target" ] || continue
+  case "$(readlink "$target")" in
+    "$DOTFILES"/config/*) ;;                       # already stow-managed
+    "$DOTFILES"/*|~/dotfiles/*)
+      einfo "Removing legacy link ${target/#$HOME/~}"
+      rm "$target"
+      ;;
+  esac
+done
+
+# 3. Real files that become stow-managed: keep them if identical, otherwise
+#    back them up as *.pre-stow so nothing is silently lost.
+adopt() {
+  local target="$1" source="$2"
+  [ -f "$target" ] && [ ! -L "$target" ] || return 0
+  if cmp -s "$target" "$source"; then
+    rm "$target"
+  else
+    mv "$target" "$target.pre-stow"
+    ewarn "${target/#$HOME/~} differed from the repo — kept as ${target/#$HOME/~}.pre-stow"
+  fi
+}
+adopt "$HOME/.tool-versions"                    "$DOTFILES/config/asdf/.tool-versions"
+adopt "$HOME/.asdfrc"                           "$DOTFILES/config/asdf/.asdfrc"
+adopt "$HOME/.default-gems"                     "$DOTFILES/config/asdf/.default-gems"
+adopt "$HOME/.config/karabiner/karabiner.json"  "$DOTFILES/config/karabiner/.config/karabiner/karabiner.json"
+
+# 4. Hand over to the regular setup.
+einfo "Legacy layout cleaned — running install/setup"
+exec "$DOTFILES/install/setup" "$@"
