@@ -1,13 +1,14 @@
-atom.symlink/.apm
-atom.symlink/.node-gyp
-atom.symlink/.storage
-atom.symlink/blob-store
-atom.symlink/compile-cache/
-atom.symlink/packages
-atom.symlink/storage
-atom.symlink/themes
-atom.symlink/blob-store
-atom.symlink/recovery
+.DS_Store
+__pycache__/
+Brewfile.lock.json
+Brewfile.local
+*.bak
+.ruby-lsp/
 
-git/gitconfig.local.symlink
-__pycache__
+# Spell files re-téléchargés par nvim à la demande
+config/nvim/.config/nvim/spell/
+
+# OrbStack recrée ses symlinks dans ~/bin (= config/bin/bin via stow)
+config/bin/bin/docker*
+config/bin/bin/kubectl
+config/bin/bin/orb*
