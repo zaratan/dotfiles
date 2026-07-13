@@ -9,5 +9,12 @@ font-size = 12
 # automatiquement Option-as-Alt et cassent la composition.
 macos-option-as-alt = false
 
+# Transmission explicite de Opt+flèches en CSI Alt (Kitty/iTerm le font
+# nativement). Utilisé par tmux pour le pane switch (bind -n M-…).
+keybind = opt+up=text:\x1b[1;3A
+keybind = opt+down=text:\x1b[1;3B
+keybind = opt+right=text:\x1b[1;3C
+keybind = opt+left=text:\x1b[1;3D
+
 # Pas de prompt "Quit Ghostty?" / "Close terminal?" en sortie
 confirm-close-surface = false
