@@ -5,6 +5,9 @@ Brewfile.local
 *.bak
 .ruby-lsp/
 
+# La mémoire Claude est personnelle : jamais dans le repo
+config/claude/.claude/memory/
+
 # Spell files re-téléchargés par nvim à la demande
 config/nvim/.config/nvim/spell/
 # Lockfile lazy.nvim : non versionné (choix : dernières versions des plugins)
