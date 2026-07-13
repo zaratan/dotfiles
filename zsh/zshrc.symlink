@@ -6,10 +6,10 @@ ZSH_THEME="agnoster"
 # prompt
 
 if [ "$TERM_PROGRAM" = "vscode" ]; then
-  plugins=(vscode git brew bundler docker gem heroku npm macos rails z yarn docker-compose)
+  plugins=(vscode git brew bundler docker gem gh npm macos rails z yarn docker-compose)
   export RPS1='($(date -u "+%m/%d %H:%M:%S"))'
 else
-  plugins=(vscode git brew bundler docker gem heroku tmux npm macos rails z yarn docker-compose)
+  plugins=(vscode git brew bundler docker gem gh tmux npm macos rails z yarn docker-compose)
   export RPS1='($(date -u "+%m/%d %H:%M:%S"))'
   export ZSH_TMUX_AUTOSTART=true
   export ZSH_TMUX_AUTOQUIT=false
@@ -27,21 +27,15 @@ fi
 
 export PATH="$HOME/bin:$HOME/.bin:/opt/homebrew/sbin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
-export DEFAULT_USER="zaratan"
 
 if [ -e "$HOME/.zshrc.local" ]; then
   source "$HOME/.zshrc.local"
 fi
 
 export EDITOR='nvim'
-
-# ssh
-export SSH_KEY_PATH="~/.ssh/zaratan"
 #z
 
 export PATH=./node_modules/.bin:$PATH
-
-eval $(thefuck --alias)
 
 eval "$(direnv hook zsh)"
 source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
@@ -55,14 +49,14 @@ export PATH="$HOME/.cargo/bin:$PATH"
 
 [ -L ~/.fzf ] && source ~/.fzf
 
-# GH
-source ~/.gh.complete.sh
+# Kubectl
+(( $+commands[kubectl] )) && source <(kubectl completion zsh)
 
 # BAT
 export BAT_THEME="Solarized (dark)"
 export GPG_TTY=$(tty)
 export PATH="/opt/homebrew/opt/rustup/bin:$PATH"
-export PATH="/opt/homebrew/opt/postgresql@15/bin:$PATH"
+export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
 
 # pnpm
 export PNPM_HOME="/Users/zaratan/Library/pnpm"

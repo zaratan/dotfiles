@@ -31,6 +31,7 @@ alias m="migrate"
 alias rk="rake"
 alias rs="b exec ./bin/rspec"
 alias t="b exec rspec"
+alias dbr="rake db:drop db:create; m"
 
 # Shame
 alias shame="rg -i '(TODO|FIXME|XXX)'"
@@ -38,21 +39,22 @@ alias SHAME="rg -i '((TODO|FIXME|XXX) ){3}'"
 
 # git
 alias gdiff="git difftool -y -x 'colordiff -y -W $COLUMNS'"
-alias gpuf="git-wtf; echo 'Are you sure you want to force push this ? (Ctrl-c if not, sleeping 15 sec)' ;sleep 15; g push --force-with-lease"
+alias gpuf="echo 'Are you sure you want to force push this ? (Ctrl-c if not, sleeping 15 sec)' ;sleep 15; g push --force-with-lease"
 
 # partical
 alias mf="mdfind -onlyin ./ -name"
-alias f="fuck"
 
 alias staging_go="ssh -t rm-st-dk-02 sudo sg_docker_exec_app bash"
+
+# Pipe my public key to my clipboard.
+alias pubkey="more ~/.ssh/zaratan.pub | pbcopy | echo '=> Public key copied to pasteboard.'"
 
 # Vagrant
 alias vup="vagrant up"
 alias vssh="vagrant ssh"
 alias vrecreate="vagrant destroy -f; vagrant up"
 
-# FIXME when spotify is safe, clean this
-alias sp="~/bin/spotify"
+alias sp="spotify"
 alias ld="command -v dip >/dev/null 2>&1 && eval \"\`dip console\`\" || echo \"Dip not installed here :(\""
 alias vim="nvim -O"
 
@@ -68,8 +70,8 @@ alias du="dust"
 # DUF > DF
 alias df="duf --theme dark"
 
-# Moar is less
-alias less="moar"
+# Moor is less
+alias less="moor"
 alias python="python3"
 
 # SGPT
