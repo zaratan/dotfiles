@@ -13,7 +13,7 @@ brew 'coreutils'
 brew 'direnv'
 brew 'fzf'
 
-# CLI de base
+# Core CLI
 brew 'bat'
 brew 'curl'
 brew 'duf'
@@ -34,7 +34,7 @@ brew 'git-lfs'
 brew 'gh'
 brew 'tig'
 
-# Dev — langages & gestionnaires
+# Dev: languages & version managers
 brew 'asdf'
 brew 'go'
 brew 'lua'
@@ -51,7 +51,7 @@ brew 'uv'
 brew 'yarn'
 brew 'wasm-pack'
 
-# Dev — outils
+# Dev tools
 brew 'cmake'
 brew 'neovim'
 brew 'prettierd'
@@ -61,30 +61,30 @@ brew 'tree-sitter-cli'
 brew 'rbspy'
 brew 'httpie'
 
-# Bases de données
+# Databases
 brew 'postgresql@17'
 brew 'redis'
 brew 'sqlite'
 
-# Cloud & déploiement
+# Cloud & deploy
 brew 'azure-cli'
 brew 'railway'
 brew 'scalingo'
 brew 'vercel-cli'
 
-# Réseau & transfert
+# Network & transfer
 brew 'axel'
 brew 'magic-wormhole'
 brew 'mosh'
 
-# Média & documents
+# Media & documents
 brew 'ffmpeg'
 brew 'imagemagick'
 brew 'sox'
 brew 'texlive'
 brew 'vips'
 
-# Divers
+# Misc
 brew 'base64'
 brew 'gnupg'
 brew 'openssl'
@@ -92,7 +92,7 @@ brew 'readline'
 brew 'shpotify'
 brew 'chiro'
 
-# Apps — quotidien
+# Apps: daily
 cask 'alfred'
 cask 'ghostty'
 cask 'obsidian'
@@ -101,7 +101,7 @@ cask 'karabiner-elements'
 cask 'gpg-suite'
 cask 'google-drive'
 
-# Apps — navigateurs
+# Apps: browsers
 cask 'brave-browser'
 cask 'firefox'
 cask 'firefox@developer-edition'
@@ -109,7 +109,7 @@ cask 'google-chrome'
 cask 'opera'
 cask 'vivaldi'
 
-# Apps — communication
+# Apps: communication
 cask 'discord'
 cask 'hey-desktop'
 cask 'microsoft-teams'
@@ -117,13 +117,13 @@ cask 'signal'
 cask 'slack'
 cask 'zoom'
 
-# Apps — dev
-# claude-code : installé via l'installeur officiel (voir install/setup)
+# Apps: dev
+# claude-code: installed through the official installer (see install/setup)
 cask 'claude'
 cask 'insomnia'
 cask 'orbstack'
 
-# Apps — jeux & hobby
+# Apps: games & hobby
 cask 'nvidia-geforce-now'
 cask 'shoggoth'
 cask 'spotify'

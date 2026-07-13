@@ -1,33 +1,33 @@
 #!/usr/bin/env bash
-# Defaults macOS raisonnables.
-# Quelques réglages inspirés de https://github.com/mathiasbynens/dotfiles/blob/master/.macos
+# Reasonable macOS defaults.
+# A few settings come from https://github.com/mathiasbynens/dotfiles/blob/master/.macos
 set -euo pipefail
 
-# Désactive press-and-hold au profit de la répétition de touche.
+# Disable press-and-hold in favor of key repeat.
 defaults write -g ApplePressAndHoldEnabled -bool false
 
-# AirDrop sur toutes les interfaces.
+# Use AirDrop over every interface.
 defaults write com.apple.NetworkBrowser BrowseAllInterfaces 1
 
-# Finder : toujours en vue liste.
+# Finder: always use list view.
 defaults write com.apple.Finder FXPreferredViewStyle Nlsv
 
-# Affiche ~/Library.
+# Show ~/Library.
 chflags nohidden ~/Library
 
-# Répétition de touche très rapide.
+# Really fast key repeat.
 defaults write NSGlobalDomain KeyRepeat -int 0
 
-# Volumes externes visibles sur le bureau.
+# Show external volumes on the desktop.
 defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
 defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
 
-# Écran de veille dans le coin bas-gauche, mot de passe immédiat.
+# Screensaver in the bottom-left hot corner, ask for password right away.
 defaults write com.apple.dock wvous-bl-corner -int 5
 defaults write com.apple.dock wvous-bl-modifier -int 0
 defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 0
 
-# Désactive guillemets et tirets « intelligents ».
+# Disable smart quotes and smart dashes.
 defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false

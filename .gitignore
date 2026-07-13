@@ -5,15 +5,15 @@ Brewfile.local
 *.bak
 .ruby-lsp/
 
-# La mémoire Claude est personnelle : jamais dans le repo
+# Claude memory is personal: never in the repo
 config/claude/.claude/memory/
 
-# Spell files re-téléchargés par nvim à la demande
+# Spell files are re-downloaded by nvim on demand
 config/nvim/.config/nvim/spell/
-# Lockfile lazy.nvim : non versionné (choix : dernières versions des plugins)
+# lazy.nvim lockfile stays local on purpose (always latest plugins)
 config/nvim/.config/nvim/lazy-lock.json
 
-# OrbStack recrée ses symlinks dans ~/bin (= config/bin/bin via stow)
+# OrbStack recreates its symlinks in ~/bin (= config/bin/bin through stow)
 config/bin/bin/docker*
 config/bin/bin/kubectl
 config/bin/bin/orb*
