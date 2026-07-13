@@ -1,3 +1,0 @@
-ln -s ~/Library/Mobile\ Documents/com~apple~CloudDocs ~/iCloud
-ln -s ~/dotfiles/bin ~/bin
-ln -s ~/Library/Application\ Support/Steam/SteamApps/common ~/Steam

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Liens pratiques vers des dossiers macOS enfouis.
+set -euo pipefail
+
+[ -e "$HOME/iCloud" ] || ln -s "$HOME/Library/Mobile Documents/com~apple~CloudDocs" "$HOME/iCloud"
+[ -e "$HOME/Steam" ]  || ln -s "$HOME/Library/Application Support/Steam/SteamApps/common" "$HOME/Steam"

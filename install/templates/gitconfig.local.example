@@ -1,0 +1,5 @@
+[user]
+  name = Your Name
+  email = you@example.com
+  # Clé GPG pour signer les commits (gpg --list-secret-keys --keyid-format short)
+  # signingkey = XXXXXXXXXXXXXXXX

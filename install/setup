@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+#
+# Bootstrap the whole machine from this repo.
+# Idempotent: safe to re-run anytime. Pass --macos to also apply system defaults.
+set -euo pipefail
+
+DOTFILES="$(cd "$(dirname "$0")/.." && pwd)"
+PACKAGES=(zsh git ruby tmux nvim ghostty claude bin asdf karabiner)
+TMPDIR="${TMPDIR:-/tmp}"
+LOG="${TMPDIR%/}/dotfiles-setup.log"
+: > "$LOG"
+
+# --- Gentoo-style output -----------------------------------------------------
+GREEN=$'\033[32m' RED=$'\033[31m' BLUE=$'\033[34m' YELLOW=$'\033[33m' RESET=$'\033[0m'
+COLS="$(tput cols 2>/dev/null || echo 80)"
+
+einfo()  { printf ' %s*%s %s\n' "$GREEN" "$RESET" "$*"; }
+ewarn()  { printf ' %s*%s %s\n' "$YELLOW" "$RESET" "$*"; }
+# OpenRC-style: ebegin ends its line; eend moves one line up, jumps to an
+# absolute column and stamps the status there. Immune to stray tty output.
+ebegin() { printf ' %s*%s %s ...\n' "$GREEN" "$RESET" "$*"; }
+eend() {
+  if [ "$1" -eq 0 ]; then
+    printf '\033[1A\033[%dG%s[ %sok%s ]%s\n' "$((COLS - 6))" "$BLUE" "$GREEN" "$BLUE" "$RESET"
+  else
+    printf '\033[1A\033[%dG%s[ %s!!%s ]%s\n' "$((COLS - 6))" "$BLUE" "$RED" "$BLUE" "$RESET"
+    ewarn "step failed — details in $LOG"
+    exit 1
+  fi
+}
+# Quiet runner: output goes to $LOG, status column tells the story.
+run() {
+  local msg="$1"; shift
+  ebegin "$msg"
+  local rc=0
+  "$@" >>"$LOG" 2>&1 || rc=$?
+  eend "$rc"
+}
+# -----------------------------------------------------------------------------
+
+einfo "Dotfiles setup — log: $LOG"
+
+# 1. Homebrew (interactive: may ask for your password)
+if ! command -v brew >/dev/null 2>&1; then
+  einfo "Installing Homebrew"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+eval "$(/opt/homebrew/bin/brew shellenv)"
+run "Checking Homebrew" brew --version
+
+# 2. Packages (install what is missing; upgrades stay a manual decision)
+export HOMEBREW_BUNDLE_NO_UPGRADE=1
+run "Installing packages from Brewfile" brew bundle --file="$DOTFILES/Brewfile"
+if [ -f "$DOTFILES/Brewfile.local" ]; then
+  run "Installing packages from Brewfile.local" brew bundle --file="$DOTFILES/Brewfile.local"
+fi
+
+# 3. Symlinks. The mkdir calls keep stow from folding these directories into
+#    the repo (apps write runtime state there, which must never reach git).
+mkdir -p "$HOME/.config/karabiner" "$HOME/.claude"
+run "Linking dotfiles with stow" \
+  stow --dir="$DOTFILES/config" --target="$HOME" --restow "${PACKAGES[@]}"
+
+# 4. Per-machine local files (never committed)
+if [ ! -f "$HOME/.gitconfig.local" ]; then
+  einfo "Creating ~/.gitconfig.local"
+  read -rp "   git name: " git_name
+  read -rp "   git email: " git_email
+  printf '[user]\n  name = %s\n  email = %s\n' "$git_name" "$git_email" > "$HOME/.gitconfig.local"
+  ewarn "add your GPG signing key to ~/.gitconfig.local later"
+fi
+if [ ! -f "$HOME/.zshrc.local" ]; then
+  run "Creating ~/.zshrc.local from template" \
+    cp "$DOTFILES/install/templates/zshrc.local.example" "$HOME/.zshrc.local"
+  ewarn "edit ~/.zshrc.local (DEFAULT_USER, SSH_KEY_PATH)"
+fi
+
+# 5. Language runtimes via asdf (versions come from config/asdf/.tool-versions)
+asdf_plugins() {
+  local plugin
+  for plugin in nodejs ruby python; do
+    asdf plugin list 2>/dev/null | grep -qx "$plugin" || asdf plugin add "$plugin"
+  done
+  asdf plugin update --all
+}
+run "Setting up asdf plugins" asdf_plugins
+run "Installing language runtimes (this can take a while)" asdf install
+
+# 6. oh-my-zsh (after stow: KEEP_ZSHRC protects our symlink)
+install_omz() {
+  RUNZSH=no KEEP_ZSHRC=yes \
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+}
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  run "Installing oh-my-zsh" install_omz
+fi
+
+# 7. tmux plugin manager + plugins
+if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+  run "Installing tpm" \
+    git clone --depth 1 https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+fi
+tmux_plugins() {
+  # install_plugins asks the tmux server: one must run, with the conf sourced.
+  if ! tmux has-session 2>/dev/null; then
+    tmux new-session -d -s _tpm_setup
+    trap 'tmux kill-session -t _tpm_setup 2>/dev/null || true' EXIT
+  else
+    # Server may predate tpm installation: re-source the conf.
+    tmux source-file "$HOME/.tmux.conf"
+  fi
+  "$HOME/.tmux/plugins/tpm/bin/install_plugins"
+}
+run "Installing tmux plugins" tmux_plugins
+
+# 8. Claude Code (official installer, not brew)
+if ! command -v claude >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/claude" ]; then
+  run "Installing Claude Code" bash -c 'curl -fsSL https://claude.ai/install.sh | bash'
+fi
+
+# 9. macOS defaults (opt-in)
+if [ "${1:-}" = "--macos" ]; then
+  run "Applying macOS defaults" "$DOTFILES/install/macos-defaults.sh"
+fi
+
+echo
+einfo "Done. Open a new terminal."
+einfo "Still manual: SSH/GPG keys, app sign-ins (see README)."

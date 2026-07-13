@@ -1,0 +1,3 @@
+# Config zsh locale à cette machine (non versionnée).
+export DEFAULT_USER="your-username"
+export SSH_KEY_PATH="~/.ssh/your-key"

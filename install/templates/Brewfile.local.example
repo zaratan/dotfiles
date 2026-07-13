@@ -1,0 +1,5 @@
+# Paquets propres à cette machine (non versionné).
+# Copier vers ~/dotfiles/Brewfile.local — install/setup l'appliquera s'il existe.
+#
+# brew 'awscli'
+# cask 'league-of-legends'
