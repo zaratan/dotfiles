@@ -11,8 +11,18 @@ return {
       vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename, { silent = true, noremap = true, desc = "LSP rename" })
       vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "LSP code action" })
       vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, { desc = "Show diagnostics" })
-      vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
-      vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+      vim.keymap.set("n", "[d", function()
+        vim.diagnostic.jump({ count = -1 })
+      end, { desc = "Previous diagnostic" })
+      vim.keymap.set("n", "]d", function()
+        vim.diagnostic.jump({ count = 1 })
+      end, { desc = "Next diagnostic" })
+
+      vim.diagnostic.config({
+        virtual_text = false,
+        virtual_lines = { current_line = true },
+        severity_sort = true,
+      })
 
       vim.lsp.inlay_hint.enable(true)
 

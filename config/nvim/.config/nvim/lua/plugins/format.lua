@@ -4,7 +4,7 @@ return {
     config = function()
       require("conform").setup({
         formatters_by_ft = {
-          ruby = { "rubocop", "prettierd" },
+          ruby = { "rubocop", "syntax_tree" },
           javascript = { "eslint_d", "eslint", "prettierd", stop_after_first = true },
           javascriptreact = { "eslint_d", "eslint", "prettierd", stop_after_first = true },
           typescript = { "eslint_d", "eslint", "prettierd", stop_after_first = true },

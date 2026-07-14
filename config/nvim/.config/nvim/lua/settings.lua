@@ -6,6 +6,12 @@ vim.opt.smartindent = true
 vim.opt.softtabstop = 2
 vim.opt.textwidth = 1337
 
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+vim.opt.scrolloff = 8
+vim.opt.inccommand = "split"
+vim.opt.confirm = true
+
 -- Persistent undo
 local undodir = vim.env.HOME .. "/.vim/undo"
 vim.fn.mkdir(undodir, "p")
@@ -39,10 +45,6 @@ vim.keymap.set("i", "˙", "<Esc>:tabprevious<CR>i", { silent = true })
 vim.keymap.set("i", "<C-t>", "<Esc>:tabnew<CR>", { silent = true })
 
 vim.opt.laststatus = 2
-
-vim.g.rustfmt_autosave = 1
-
-vim.opt.regexpengine = 0
 
 if vim.fn.filereadable(vim.env.HOME .. "/.nvimrc.local") == 1 then
   vim.cmd.source(vim.env.HOME .. "/.nvimrc.local")
