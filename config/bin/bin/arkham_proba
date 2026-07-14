@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# deck_proba.rb
+# arkham_proba
 
 require 'optparse'
 
@@ -37,7 +37,7 @@ end
 # Parse des arguments
 options = {}
 OptionParser.new do |opts|
-  opts.banner = "Usage: deck_proba.rb [options]"
+  opts.banner = "Usage: arkham_proba [options]"
   
   opts.on("-d", "--deck SIZE", Integer, "Taille du deck") do |v|
     options[:deck] = v

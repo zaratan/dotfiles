@@ -1,10 +1,13 @@
 #!/bin/zsh
 
-export CURRENT_G_BRANCH="`git branch --show-current`"
+DEFAULT_BRANCH="$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||')"
+DEFAULT_BRANCH="${DEFAULT_BRANCH:-main}"
 
-echo "Rebasing $CURRENT_G_BRANCH on main"
+CURRENT_G_BRANCH="$(git branch --show-current)"
 
-CURRENT_STATUS="`git status --short`"
+echo "Rebasing $CURRENT_G_BRANCH on $DEFAULT_BRANCH"
+
+CURRENT_STATUS="$(git status --short)"
 
 if [[ $CURRENT_STATUS != "" ]]; then
   echo "There's some uncommited changes. Do you want to auto-stash? [Y/n] "
@@ -20,16 +23,16 @@ if [[ $CURRENT_STATUS != "" ]]; then
   fi
 fi
 
-(
-  git checkout main &&
+if ! (
+  git checkout "$DEFAULT_BRANCH" &&
   git pull --rebase &&
-  git checkout $CURRENT_G_BRANCH &&
-  git rebase main
-) || (
-  git checkout $CURRENT_G_BRANCH &&
-  echo "Something went wrong, please check your output." &&
+  git checkout "$CURRENT_G_BRANCH" &&
+  git rebase "$DEFAULT_BRANCH"
+); then
+  git checkout "$CURRENT_G_BRANCH"
+  echo "Something went wrong, please check your output."
   exit 1
-)
+fi
 
 if [[ $AUTO_STASH == "y" ]]; then
   echo "You have stashed change. When the rebase process is done, run git stash pop."
