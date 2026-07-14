@@ -35,12 +35,12 @@ You still have to import your SSH/GPG keys and sign in to your apps yourself.
 ### Migrating from the old layout
 
 > [!WARNING]
-> Careful: pulling this version on a machine installed with the old layout (`*.symlink` files, `script/bootstrap`) breaks every existing symlink. `~/.zshrc`, `~/bin` or `~/.config/nvim` now point to files that no longer exist. The machine keeps running but any new shell starts unconfigured, and `install/setup` alone will refuse to fix it (Stow won't overwrite the dead links). Don't close your last working terminal before the migration succeeded.
+> Careful: pulling this version (main branch) on a machine installed with the old layout (master branch) breaks every existing symlink. `~/.zshrc`, `~/bin` or `~/.config/nvim` now point to files that no longer exist. The machine keeps running but any new shell starts unconfigured, and `install/setup` alone will refuse to fix it (Stow won't overwrite the dead links). Don't close your last working terminal before the migration succeeded.
 
-Run this once after pulling:
+To migrate do this once:
 
 ```sh
-cd ~/dotfiles && git pull && install/migrate-legacy
+cd ~/dotfiles && git pull && git checkout main && install/migrate-legacy
 ```
 
 It turns `~/.gitconfig.local` back into a real file, removes the dead legacy symlinks (only links pointing into the repo are touched), backs up any local file that would collide with a package as `*.pre-stow`, then runs `install/setup`.
