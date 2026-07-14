@@ -7,6 +7,8 @@ Brewfile.local
 
 # Claude memory is personal: never in the repo
 config/claude/.claude/memory/
+# Per-machine Claude permissions: never in the repo
+**/.claude/settings.local.json
 
 # Spell files are re-downloaded by nvim on demand
 config/nvim/.config/nvim/spell/

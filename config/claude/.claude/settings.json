@@ -5,7 +5,6 @@
       "Bash(find:*)",
       "Bash(bundle exec rspec:*)",
       "Bash(dev_oops lint:*)",
-      "Bash(bundle exec rails runner:*)",
       "Bash(git show:*)",
       "WebSearch",
       "WebFetch(domain:github.com)",
@@ -21,7 +20,6 @@
       "WebFetch(domain:support.google.com)",
       "mcp__github__get_pull_request_comments",
       "Bash(gh pr view:*)",
-      "Bash(gh api:*)",
       "WebFetch(domain:heroicons.com)",
       "WebFetch(domain:guides.rubyonrails.org)",
       "Bash(bundle exec rubocop:*)",
@@ -37,7 +35,6 @@
       "Bash(gh pr diff:*)",
       "Bash(bundle audit:*)",
       "Bash(bin/rails g:*)",
-      "Bash(bin/rails runner:*)",
       "WebFetch(domain:raw.githubusercontent.com)"
     ],
     "defaultMode": "plan"

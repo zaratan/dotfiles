@@ -8,7 +8,7 @@
   br = branch
   ll = branch --list
   ca = commit --amend
-  ci = commit -v -S
+  ci = commit -v
   co = checkout
   lg = log --graph --pretty=format:'%C(bold)–%Creset %C(red bold)%h%d%Creset | %C(green)%an%Creset | %C(magenta)%cr%Creset | %C(cyan)%s%Creset'
   lgp = log -p

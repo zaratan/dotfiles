@@ -15,6 +15,7 @@ brew 'fzf'
 
 # Core CLI
 brew 'bat'
+brew 'colordiff'
 brew 'curl'
 brew 'duf'
 brew 'dust'
@@ -86,7 +87,7 @@ brew 'vips'
 
 # Misc
 brew 'base64'
-brew 'gnupg'
+# gnupg comes with the gpg-suite cask (agent + pinentry included)
 brew 'openssl'
 brew 'readline'
 brew 'shpotify'

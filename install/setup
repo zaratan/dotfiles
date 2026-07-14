@@ -67,7 +67,9 @@ if [ ! -f "$HOME/.gitconfig.local" ]; then
   read -rp "   git name: " git_name
   read -rp "   git email: " git_email
   printf '[user]\n  name = %s\n  email = %s\n' "$git_name" "$git_email" > "$HOME/.gitconfig.local"
-  ewarn "add your GPG signing key to ~/.gitconfig.local later"
+  ewarn "commit.gpgsign is enabled: every 'git commit' will FAIL until you add your key:"
+  ewarn "  git config --file ~/.gitconfig.local user.signingkey <KEY_ID>"
+  ewarn "  (list your keys with: gpg --list-secret-keys --keyid-format long)"
 fi
 if [ ! -f "$HOME/.zshrc.local" ]; then
   run "Creating ~/.zshrc.local from template" \

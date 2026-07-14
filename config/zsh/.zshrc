@@ -1,4 +1,4 @@
-eval `gdircolors ~/.dircolors.256dark`
+command -v gdircolors >/dev/null && eval "$(gdircolors ~/.dircolors.256dark)"
 ZSH_DISABLE_COMPFIX=true
 export ZSH=$HOME/.oh-my-zsh
 ZSH_THEME="agnoster"
@@ -15,9 +15,11 @@ else
   export ZSH_TMUX_AUTOQUIT=false
 fi
 
-# for root
+# asdf completions must be in fpath before oh-my-zsh runs compinit
+fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
+
 source $ZSH/oh-my-zsh.sh
-#
+
 if [ -e "$HOME/.aliases" ]; then
   source "$HOME/.aliases"
 fi
@@ -35,11 +37,9 @@ fi
 export EDITOR='nvim'
 #z
 
-export PATH=./node_modules/.bin:$PATH
-
-eval "$(direnv hook zsh)"
-source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+command -v direnv >/dev/null && eval "$(direnv hook zsh)"
+[ -r /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] && \
+  source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=6'
 
 export LANG=fr_FR.UTF-8
@@ -59,7 +59,7 @@ export PATH="/opt/homebrew/opt/rustup/bin:$PATH"
 export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
 
 # pnpm
-export PNPM_HOME="/Users/zaratan/Library/pnpm"
+export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH" ;;
@@ -67,14 +67,17 @@ esac
 # pnpm end
 
 # Java
-export JAVA_HOME=$(/usr/libexec/java_home -v 25)
+if [ -z "${JAVA_HOME:-}" ] && [ -x /usr/libexec/java_home ]; then
+  _java_home="$(/usr/libexec/java_home -v 25 2>/dev/null)" && export JAVA_HOME="$_java_home"
+  unset _java_home
+fi
 # Java end
 
 export PATH="$HOME/.local/bin:$PATH"
 
 # asdf
 export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
-# append completions to fpath
-fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
-# initialise completions with ZSH's compinit
-autoload -Uz compinit && compinit
+
+# Must stay sourced last so it can hook everything defined above
+[ -r /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && \
+  source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
