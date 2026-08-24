@@ -46,7 +46,6 @@ brew 'pnpm'
 brew 'python'
 brew 'ruby'
 brew 'rustup'
-brew 'rust-analyzer'
 brew 'cargo-binstall'
 brew 'uv'
 brew 'yarn'
@@ -61,6 +60,13 @@ brew 'tree-sitter'
 brew 'tree-sitter-cli'
 brew 'rbspy'
 brew 'httpie'
+
+# Language servers
+brew 'rust-analyzer'
+brew 'tailwindcss-language-server'
+brew 'vtsls'
+# prisma-language-server: pnpm add -g @prisma/language-server (pas de formule brew)
+# ruby-lsp: installé par asdf/bundler
 
 # Databases
 brew 'postgresql@17'
