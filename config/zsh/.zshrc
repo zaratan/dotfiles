@@ -3,6 +3,10 @@ ZSH_DISABLE_COMPFIX=true
 export ZSH=$HOME/.oh-my-zsh
 ZSH_THEME="agnoster"
 
+# Avant oh-my-zsh : son plugin tmux démarre le serveur pendant le source,
+# et tmux dérive mode-keys/status-keys de $EDITOR à cet instant-là.
+export EDITOR='nvim'
+
 # prompt
 
 if [ "$TERM_PROGRAM" = "vscode" ]; then
@@ -34,7 +38,6 @@ if [ -e "$HOME/.zshrc.local" ]; then
   source "$HOME/.zshrc.local"
 fi
 
-export EDITOR='nvim'
 #z
 
 command -v direnv >/dev/null && eval "$(direnv hook zsh)"

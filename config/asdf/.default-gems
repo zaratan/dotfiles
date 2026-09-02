@@ -2,3 +2,7 @@ bundler
 pry
 gem-ctags
 json
+syntax_tree
+rubocop
+ruby-lsp
+htmlbeautifier

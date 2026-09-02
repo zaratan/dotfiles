@@ -13,7 +13,7 @@ alias v="vim"
 # Docker
 alias d="docker"
 alias dc="docker compose"
-alias docker_stop_all="docker ps | awk  '{print $1}' | grep -v CON | xargs -P 5 docker stop"
+alias docker_stop_all='docker ps -q | xargs -n 1 -P 5 docker stop'
 
 # Bundler
 alias b="bundle"
@@ -38,7 +38,6 @@ alias shame="rg -i '(TODO|FIXME|XXX)'"
 alias SHAME="rg -i '((TODO|FIXME|XXX) ){3}'"
 
 # git
-alias gdiff="git difftool -y -x 'colordiff -y -W $COLUMNS'"
 alias gpuf="echo 'Are you sure you want to force push this ? (Ctrl-c if not, sleeping 15 sec)' ;sleep 15; g push --force-with-lease"
 
 # partical
