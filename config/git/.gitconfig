@@ -57,8 +57,6 @@
 [commit]
   gpgsign = true
 
-# mise tient à jour un clone de pyenv avec libgit2, qui rejette toute
-# signature contenant '<' ou '>'. On lui donne une identité valable, sans
-# toucher à celle des vrais dépôts.
+# mise's pyenv clone goes through libgit2, which rejects '<' in user.name
 [includeIf "gitdir:~/Library/Caches/mise/"]
   path = ~/.gitconfig.mise

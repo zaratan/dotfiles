@@ -4,13 +4,13 @@ theme = iTerm2 Solarized Dark
 font-family = Monaco
 font-size = 12
 
-# macOS: Option produit les accents (é, è, à, ç, ô…).
-# Sans ça, les layouts U.S. / U.S. International activent
-# automatiquement Option-as-Alt et cassent la composition.
+# macOS: Option types accented characters (é, è, à, ç, ô…).
+# Without this, the U.S. / U.S. International layouts turn
+# Option-as-Alt on by themselves and break composition.
 macos-option-as-alt = false
 
-# Transmission explicite de Opt+flèches en CSI Alt (Kitty/iTerm le font
-# nativement). Utilisé par tmux pour le pane switch (bind -n M-…).
+# Send Opt+arrows as CSI Alt explicitly (Kitty/iTerm do it natively).
+# Used by tmux for pane switching (bind -n M-…).
 keybind = opt+up=text:\x1b[1;3A
 keybind = opt+down=text:\x1b[1;3B
 keybind = opt+right=text:\x1b[1;3C

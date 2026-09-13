@@ -1,10 +1,6 @@
--- Ruby : on suit le choix du projet plutôt que d'imposer le mien.
---   pas de Gemfile, ou Gemfile sans linter connu -> syntax_tree
---   rubocop et/ou syntax_tree déclarés           -> ceux-là, dans cet ordre
---   un autre linter déclaré                      -> rien d'automatique
--- On lit le Gemfile et pas le Gemfile.lock : le lock contient les dépendances
--- transitives (standard tire rubocop), ce qui ferait matcher rubocop sur un
--- projet qui a choisi autre chose.
+-- Ruby: follow the project. No Gemfile or no known linter -> syntax_tree;
+-- rubocop and/or syntax_tree -> those; another linter -> nothing automatic.
+-- Gemfile, not Gemfile.lock: standard pulls rubocop in transitively.
 local OTHER_RUBY_LINTERS = { "standard", "rufo", "rubyfmt", "prettier" }
 
 local gemfile_cache = {}
@@ -24,7 +20,7 @@ local function declared_gems(gemfile)
       local name = line:match("^%s*gem%s+['\"]([%w_.-]+)['\"]")
       if name then
         gems[name] = true
-        -- rubocop-rails, syntax_tree-haml... valent pour leur gem parente
+        -- rubocop-rails, syntax_tree-haml... count for their parent gem
         local parent = name:match("^([%w_]+)%-")
         if parent then
           gems[parent] = true
@@ -93,8 +89,7 @@ return {
           if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
             return
           end
-          -- Projet équipé d'un autre linter : on ne touche à rien, pas même via
-          -- le LSP — sans ça, lsp_format = "fallback" laisserait ruby-lsp formater.
+          -- Another linter: touch nothing, not even the lsp_format fallback
           if vim.bo[bufnr].filetype == "ruby" and #ruby_formatters(bufnr) == 0 then
             return
           end

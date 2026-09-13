@@ -21,20 +21,20 @@ def proba_au_moins_une(deck_size, hand_size, copies)
   1 - proba_zero
 end
 
-# Probabilité avec mulligan Arkham (sans remélange)
+# Probability with an Arkham mulligan (no reshuffle)
 def proba_avec_mulligan(deck_size, hand_size, copies)
   # Proba en main 1
   p_main1 = proba_au_moins_une(deck_size, hand_size, copies)
   
   # Proba en main 2 sachant qu'on n'a pas eu en main 1
-  # On pioche dans les (deck_size - hand_size) cartes restantes
+  # Draw from the remaining (deck_size - hand_size) cards
   p_main2_sachant_pas_main1 = proba_au_moins_une(deck_size - hand_size, hand_size, copies)
   
   # Proba totale : avoir en main 1 OU en main 2
   p_main1 + (1 - p_main1) * p_main2_sachant_pas_main1
 end
 
-# Parse des arguments
+# Argument parsing
 options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: arkham_proba [options]"
@@ -61,7 +61,7 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-# Valeurs par défaut pour Arkham Horror LCG
+# Defaults for Arkham Horror LCG
 options[:deck] ||= 30
 options[:main] ||= 5
 options[:copies] ||= 2

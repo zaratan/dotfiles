@@ -15,8 +15,8 @@ return {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = function()
-      -- Le thème d'origine met la section b (branche/diff) sur fond clair
-      -- (base0), illisible pour le vert/rouge du diff.
+      -- The stock theme puts section b (branch/diff) on a light background
+      -- (base0), which makes the diff green/red unreadable.
       local theme = require("lualine.themes.solarized-osaka")
       local colors = require("solarized-osaka.colors").setup({ transform = true })
       theme.normal.b = { bg = colors.base02, fg = colors.base0 }

@@ -2,8 +2,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     config = function()
-      -- lua_ls ne connaît pas l'API Neovim par défaut : sans ça, `vim` est
-      -- signalé comme global inconnu dans toute la config.
+      -- Without this, `vim` is reported as an undefined global
       vim.lsp.config("lua_ls", {
         settings = {
           Lua = {

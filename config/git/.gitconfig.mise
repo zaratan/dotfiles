@@ -1,5 +1,3 @@
-# Identité neutre pour les dépôts internes de mise (clone pyenv).
-# libgit2 refuse une signature contenant '<' ou '>', ce que user.name contient.
 [user]
   name = mise
   email = mise@localhost

@@ -1,19 +1,13 @@
-# Runtimes globaux. Les versions par projet viennent des fichiers locaux
-# (mise.toml, .tool-versions, .ruby-version, .nvmrc...).
 [tools]
-node = "24.18.0"
-ruby = "4.0.6"
-python = "3.14.6"
+node = "24"
+ruby = "4.0"
+python = "3"
 
-# Outils globaux : déclarés ici plutôt qu'installés à la main par
-# `pnpm add -g`, donc remis en place par un simple `mise install`.
-# `latest` sans lockfile : une machine neuve prendra la version du jour.
 bun = "latest"
 "npm:@prisma/language-server" = "latest"
 "npm:eslint_d" = "latest"
 "npm:prettier" = "latest"
 
 [settings]
-# Lire les fichiers de version propres à chaque langage dans les projets
-# (.ruby-version, .nvmrc, .python-version), pas seulement mise.toml.
+# Also read .ruby-version, .nvmrc, .python-version in projects
 idiomatic_version_file_enable_tools = ["ruby", "node", "python"]

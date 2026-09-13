@@ -67,7 +67,7 @@ brew 'rust-analyzer'
 brew 'tailwindcss-language-server'
 brew 'vtsls'
 # prisma-language-server: pnpm add -g @prisma/language-server (pas de formule brew)
-# ruby-lsp: installé par mise (.default-gems) ou bundler
+# ruby-lsp: installed by mise (.default-gems) or by bundler
 
 # Databases
 brew 'dbmate'
@@ -146,8 +146,7 @@ cask 'strange-eons'
 cask 'teensy-profiles-editor'
 
 # Apps: Mac App Store (mas)
-# Nécessite d'être connecté à l'App Store : mas ne réinstalle que des apps
-# déjà associées au compte.
+# Requires being signed in to the App Store
 mas "1Password for Safari", id: 1569813296
 mas "AdBlock Pro", id: 1018301773
 mas "Stark for Safari", id: 6444031666

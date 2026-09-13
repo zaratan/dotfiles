@@ -15,8 +15,8 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- mapleader / maplocalleader sont posés dans init.lua, avant tout require :
--- lazy.nvim exige qu'ils le soient avant son chargement.
+-- Make sure to setup `mapleader` and `maplocalleader` before
+-- loading lazy.nvim so that mappings are correct. Both are set in init.lua.
 
 -- Setup lazy.nvim
 require("lazy").setup({
