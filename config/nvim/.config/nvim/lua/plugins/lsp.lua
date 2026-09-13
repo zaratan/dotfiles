@@ -2,6 +2,19 @@ return {
   {
     "neovim/nvim-lspconfig",
     config = function()
+      -- lua_ls ne connaît pas l'API Neovim par défaut : sans ça, `vim` est
+      -- signalé comme global inconnu dans toute la config.
+      vim.lsp.config("lua_ls", {
+        settings = {
+          Lua = {
+            runtime = { version = "LuaJIT" },
+            workspace = { checkThirdParty = false, library = { vim.env.VIMRUNTIME } },
+            diagnostics = { globals = { "vim" } },
+          },
+        },
+      })
+
+      vim.lsp.enable("lua_ls")
       vim.lsp.enable("ruby_lsp")
       vim.lsp.enable("vtsls")
       vim.lsp.enable("rust_analyzer")

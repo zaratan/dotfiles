@@ -4,7 +4,6 @@ vim.opt.shiftwidth = 2
 vim.opt.showmatch = true
 vim.opt.smartindent = true
 vim.opt.softtabstop = 2
-vim.opt.textwidth = 1337
 
 vim.opt.ignorecase = true
 vim.opt.smartcase = true

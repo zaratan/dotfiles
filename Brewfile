@@ -4,7 +4,6 @@ tap 'zaratan/arkham'
 tap 'zaratan/bat-tools'
 
 # Shell & terminal
-brew 'zsh'
 brew 'zsh-autosuggestions'
 brew 'zsh-syntax-highlighting'
 brew 'tmux'
@@ -30,6 +29,7 @@ brew 'wget'
 
 # Git
 brew 'git'
+brew 'git-crypt'
 brew 'git-delta'
 brew 'git-lfs'
 brew 'gh'
@@ -62,6 +62,7 @@ brew 'rbspy'
 brew 'httpie'
 
 # Language servers
+brew 'lua-language-server'
 brew 'rust-analyzer'
 brew 'tailwindcss-language-server'
 brew 'vtsls'
@@ -69,6 +70,7 @@ brew 'vtsls'
 # ruby-lsp: installé par asdf/bundler
 
 # Databases
+brew 'dbmate'
 brew 'postgresql@17'
 brew 'redis'
 brew 'sqlite'
@@ -77,12 +79,15 @@ brew 'sqlite'
 brew 'azure-cli'
 brew 'railway'
 brew 'scalingo'
+brew 'vault'
 brew 'vercel-cli'
 
 # Network & transfer
 brew 'axel'
 brew 'magic-wormhole'
 brew 'mosh'
+brew 'rclone'
+brew 'restic'
 
 # Media & documents
 brew 'ffmpeg'
@@ -93,6 +98,7 @@ brew 'vips'
 
 # Misc
 brew 'base64'
+brew 'mas'  # CLI du Mac App Store
 # gnupg comes with the gpg-suite cask (agent + pinentry included)
 brew 'openssl'
 brew 'readline'
@@ -100,6 +106,7 @@ brew 'shpotify'
 brew 'chiro'
 
 # Apps: daily
+cask '1password'
 cask 'alfred'
 cask 'ghostty'
 cask 'obsidian'
@@ -138,5 +145,24 @@ cask 'steam'
 cask 'strange-eons'
 cask 'teensy-profiles-editor'
 
+# Apps: Mac App Store (mas)
+# Nécessite d'être connecté à l'App Store : mas ne réinstalle que des apps
+# déjà associées au compte.
+mas "1Password for Safari", id: 1569813296
+mas "AdBlock Pro", id: 1018301773
+mas "Stark for Safari", id: 6444031666
+mas "Translate for Safari", id: 1445040281
+mas "WhatsApp", id: 310633997
+mas "Microsoft Excel", id: 462058435
+mas "Microsoft Outlook", id: 985367838
+mas "Microsoft PowerPoint", id: 462062816
+mas "Microsoft Word", id: 462054704
+mas "Keynote", id: 409183694
+mas "Numbers", id: 409203825
+mas "Pages", id: 409201541
+mas "The Unarchiver", id: 425424353
+mas "TapTab", id: 1659363738
+
 # Fonts
 cask 'font-geist-mono'
+cask 'font-meslo-lg-nerd-font'

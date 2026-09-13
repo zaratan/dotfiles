@@ -30,7 +30,7 @@ install/setup          # add --macos to also apply system defaults
 
 On a blank Mac, `git clone` triggers the Command Line Tools install. `setup` handles everything else: Homebrew, packages from the `Brewfile`, symlinks, language runtimes via asdf, oh-my-zsh, tmux plugins and Claude Code (official installer). It is idempotent so you can re-run it anytime: it only does what's missing.
 
-You still have to import your SSH/GPG keys and sign in to your apps yourself.
+You still have to import your SSH/GPG keys and sign in to your apps yourself. Signing in to the App Store is worth doing early: the `mas` entries only reinstall apps already tied to that account.
 
 ### Migrating from the old layout
 
@@ -55,6 +55,7 @@ install/
   setup            # the bootstrap script
   migrate-legacy   # one-shot migration from the pre-Stow layout
   link             # optional convenience symlinks (~/iCloud, ~/Steam)
+  brew-drift       # what the Brewfile and the machine disagree on
   macos-defaults.sh
   templates/       # *.example templates for local files
 ```
@@ -81,7 +82,7 @@ This repo is meant to be forked: everything personal sits in the local files abo
 
 ## Maintenance
 
-- `brew bundle dump --file=-` and compare with the `Brewfile` to spot drift.
+- `install/brew-drift` lists what the `Brewfile` and the machine disagree on, both ways. Dependencies pulled in by other formulae are left out, so the list stays readable.
 - `asdf plugin update --all && asdf install` after bumping `.tool-versions`.
 - Neovim plugins update through lazy.nvim (`:Lazy`); the lockfile stays local on purpose.
 

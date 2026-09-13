@@ -40,6 +40,8 @@ Adapt all your recommendations to match the project's established design system.
 
 ## Component Architecture
 
+**Comments are an apology.** « A comment is an apology for not writing clear code. Code should be self explanatory and the source of truth. Comments are not the evil and sometimes they are necessary. » (Bob Martin, Denis's standing rule across every project, and his number-one complaint about generated code: pruning comments in review costs him the attention the review needs.) Before writing a comment, in this order: can a name say it? can a test say it, with the why in its title? Only if neither can, write one or two plain lines. What survives: a platform trap a test would fail on without explaining itself, a provenance, an external contract, a one-line JSDoc on a lib's public API. What never survives: a paraphrase of the name or body, narration, history, and any reference to a plan item or decision number that lives outside the repository. Tests carry zero comments. Before handing over a diff, triage every added comment line yourself; the reviewer must never have to.
+
 - **Aggressively extract shared components.** If 2+ places share structure, extract immediately.
 - Server Components by default (if using Next.js/RSC); add `"use client"` only when truly necessary.
 - Use the project's existing helper for conditional class composition (e.g., `classNames`, `cn`, `clsx`).

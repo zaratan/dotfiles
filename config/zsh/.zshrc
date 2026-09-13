@@ -1,3 +1,8 @@
+# `path` sans doublons : les exports ci-dessous sont en prefixe:$PATH et
+# s'empilaient à chaque évaluation du fichier (login -> tmux -> pane).
+# zsh garde la première occurrence, donc l'ordre de priorité est préservé.
+typeset -U path PATH
+
 command -v gdircolors >/dev/null && eval "$(gdircolors ~/.dircolors.256dark)"
 ZSH_DISABLE_COMPFIX=true
 export ZSH=$HOME/.oh-my-zsh
@@ -9,15 +14,10 @@ export EDITOR='nvim'
 
 # prompt
 
-if [ "$TERM_PROGRAM" = "vscode" ]; then
-  plugins=(vscode git brew bundler docker gem gh npm macos rails z yarn docker-compose)
-  export RPS1='($(date -u "+%m/%d %H:%M:%S"))'
-else
-  plugins=(vscode git brew bundler docker gem gh tmux npm macos rails z yarn docker-compose)
-  export RPS1='($(date -u "+%m/%d %H:%M:%S"))'
-  export ZSH_TMUX_AUTOSTART=true
-  export ZSH_TMUX_AUTOQUIT=false
-fi
+plugins=(git brew bundler docker gem gh tmux npm macos rails z yarn docker-compose)
+export RPS1='($(date -u "+%m/%d %H:%M:%S"))'
+export ZSH_TMUX_AUTOSTART=true
+export ZSH_TMUX_AUTOQUIT=false
 
 # asdf completions must be in fpath before oh-my-zsh runs compinit
 fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
@@ -31,12 +31,9 @@ fi
 # User configuration
 #
 
-export PATH="$HOME/bin:$HOME/.bin:/opt/homebrew/sbin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+export PATH="$HOME/bin:/opt/homebrew/sbin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
 
-if [ -e "$HOME/.zshrc.local" ]; then
-  source "$HOME/.zshrc.local"
-fi
 
 #z
 
@@ -46,14 +43,28 @@ command -v direnv >/dev/null && eval "$(direnv hook zsh)"
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=6'
 
 export LANG=fr_FR.UTF-8
-export LC_ALL=fr_FR.UTF-8
+# Pas de LC_ALL : il écrase toutes les catégories. LANG suffit pour la
+# collation. LC_NUMERIC reste en C, sinon awk/bc/time sortent "3,50"
+# et tout script qui parse un nombre casse. Le unset est nécessaire : un
+# shell imbriqué hérite sinon du LC_ALL posé par une session plus ancienne.
+unset LC_ALL
+export LC_NUMERIC=C
 
 export PATH="$HOME/.cargo/bin:$PATH"
 
 [ -L ~/.fzf ] && source ~/.fzf
 
 # Kubectl
-(( $+commands[kubectl] )) && source <(kubectl completion zsh)
+if (( $+commands[kubectl] )); then
+  # ~110 ms à générer : on met en cache, régénéré si le binaire change
+  _kubectl_comp="${ZSH_CACHE_DIR:-$HOME/.cache}/kubectl-completion.zsh"
+  if [[ ! -s $_kubectl_comp || $commands[kubectl] -nt $_kubectl_comp ]]; then
+    mkdir -p "${_kubectl_comp:h}"
+    kubectl completion zsh > "$_kubectl_comp"
+  fi
+  source "$_kubectl_comp"
+  unset _kubectl_comp
+fi
 
 # BAT
 export BAT_THEME="Solarized (dark)"
@@ -63,10 +74,7 @@ export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
 
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH" ;;
-esac
+export PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH"
 # pnpm end
 
 # Java
@@ -80,6 +88,12 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # asdf
 export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+
+# En fin de course : ce qui est défini ici doit gagner sur tous les
+# export PATH ci-dessus (sinon les shims asdf & co passent devant).
+if [ -e "$HOME/.zshrc.local" ]; then
+  source "$HOME/.zshrc.local"
+fi
 
 # Must stay sourced last so it can hook everything defined above
 [ -r /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && \

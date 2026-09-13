@@ -4,9 +4,7 @@ alias mkdir='mkdir -p'
 alias ...='../..'
 alias ls='ls --color=auto'
 alias l='ls'
-alias ll='ls -al'
-alias lh='ls -Alh'
-alias vimo='vim -O'
+alias ll='ls -alh'
 alias e="vim"
 alias v="vim"
 
@@ -42,8 +40,6 @@ alias gpuf="echo 'Are you sure you want to force push this ? (Ctrl-c if not, sle
 
 # partical
 alias mf="mdfind -onlyin ./ -name"
-
-alias staging_go="ssh -t rm-st-dk-02 sudo sg_docker_exec_app bash"
 
 # Pipe my public key to my clipboard.
 alias pubkey="more ~/.ssh/zaratan.pub | pbcopy | echo '=> Public key copied to pasteboard.'"

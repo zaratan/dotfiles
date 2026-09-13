@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+#
+# Compare the Brewfile with what is actually installed, both ways.
+# Read-only: it never installs, uninstalls or edits anything.
+set -euo pipefail
+
+DOTFILES="$(cd "$(dirname "$0")/.." && pwd)"
+BREWFILE="${1:-$DOTFILES/Brewfile}"
+WORK="$(mktemp -d)"
+trap 'rm -rf "$WORK"' EXIT
+
+GREEN=$'\033[32m' YELLOW=$'\033[33m' BLUE=$'\033[34m' RESET=$'\033[0m'
+einfo() { printf ' %s*%s %s\n' "$GREEN" "$RESET" "$*"; }
+ehead() { printf '\n %s*%s %s%s%s\n' "$BLUE" "$RESET" "$BLUE" "$*" "$RESET"; }
+
+command -v brew >/dev/null || { printf 'brew not found\n' >&2; exit 1; }
+[ -f "$BREWFILE" ] || { printf 'Brewfile not found: %s\n' "$BREWFILE" >&2; exit 1; }
+
+# --- declared ----------------------------------------------------------------
+# A tap prefix (zaratan/arkham/foo) names the same thing as the bare name,
+# so only the last segment is compared.
+decl() {
+  grep "^$1 " "$BREWFILE" 2>/dev/null \
+    | sed "s/^$1 //; s/#.*//; s/[\"']//g; s/,.*//; s|.*/||; s/ *$//" | sort -u || true
+}
+decl brew > "$WORK/f_decl"
+decl cask > "$WORK/c_decl"
+# App Store apps are matched on their id: names collide (two "Numbers" exist)
+# and change with localisation.
+grep "^mas " "$BREWFILE" 2>/dev/null | sed -n 's/.*id: *\([0-9][0-9]*\).*/\1/p' | sort -u > "$WORK/m_decl" || true
+
+# --- installed ---------------------------------------------------------------
+# `leaves` = installed on request and required by nothing else: that is what
+# belongs in a Brewfile, unlike dependencies pulled in along the way.
+brew list --formula -1 | sed 's|.*/||' | sort -u > "$WORK/f_all"
+brew leaves --installed-on-request | sed 's|.*/||' | sort -u > "$WORK/f_leaf"
+brew list --cask -1 | sed 's|.*/||' | sort -u > "$WORK/c_all"
+: > "$WORK/m_all"
+: > "$WORK/m_named"
+if command -v mas >/dev/null; then
+  mas list 2>/dev/null | sed -n 's/^ *\([0-9][0-9]*\)  *\(.*[^ ]\)  *([^)]*)$/\1 \2/p' | sort -u > "$WORK/m_named" || true
+  cut -d' ' -f1 "$WORK/m_named" | sort -u > "$WORK/m_all"
+fi
+
+# An alias (openssl -> openssl@3) is not drift: resolve before comparing.
+resolve() {
+  while read -r name; do
+    [ -n "$name" ] || continue
+    brew info --json=v2 "$name" 2>/dev/null \
+      | python3 -c 'import sys,json
+d = json.load(sys.stdin)
+print(d["formulae"][0]["name"] if d["formulae"] else "")' 2>/dev/null || printf '%s\n' "$name"
+  done
+}
+
+show() {
+  local title="$1" file="$2" count
+  count="$(grep -c . "$file" 2>/dev/null || true)"
+  ehead "$title ($count)"
+  if [ "${count:-0}" -eq 0 ]; then einfo "nothing"; return; fi
+  sed 's/^/   /' "$file"
+}
+
+# App Store ids mean nothing on their own: print the name next to them.
+show_mas() {
+  local title="$1" ids="$2" count
+  count="$(grep -c . "$ids" 2>/dev/null || true)"
+  ehead "$title ($count)"
+  if [ "${count:-0}" -eq 0 ]; then einfo "nothing"; return; fi
+  while read -r id; do
+    [ -n "$id" ] || continue
+    printf '   %-12s %s\n' "$id" "$(grep "^$id " "$WORK/m_named" | cut -d' ' -f2- || true)"
+  done < "$ids"
+}
+
+comm -23 "$WORK/f_decl" "$WORK/f_all" | resolve | sort -u > "$WORK/r_decl"
+comm -23 "$WORK/r_decl" "$WORK/f_all" > "$WORK/a_formula"
+comm -23 "$WORK/c_decl" "$WORK/c_all" > "$WORK/a_cask"
+comm -23 "$WORK/m_decl" "$WORK/m_all" > "$WORK/a_mas"
+comm -13 "$WORK/f_decl" "$WORK/f_leaf" > "$WORK/b_formula"
+comm -13 "$WORK/c_decl" "$WORK/c_all"  > "$WORK/b_cask"
+comm -13 "$WORK/m_decl" "$WORK/m_all"  > "$WORK/b_mas"
+
+printf ' %s*%s Brewfile: %s\n' "$GREEN" "$RESET" "$BREWFILE"
+show     "Declared but not installed - formulae" "$WORK/a_formula"
+show     "Declared but not installed - casks"    "$WORK/a_cask"
+show_mas "Declared but not installed - App Store" "$WORK/a_mas"
+show     "Installed but not declared - formulae" "$WORK/b_formula"
+show     "Installed but not declared - casks"    "$WORK/b_cask"
+show_mas "Installed but not declared - App Store" "$WORK/b_mas"
+printf '\n'
+printf ' %s*%s Formulae pulled in as dependencies are not listed.\n' "$YELLOW" "$RESET"
