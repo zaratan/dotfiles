@@ -19,8 +19,19 @@ export RPS1='($(date -u "+%m/%d %H:%M:%S"))'
 export ZSH_TMUX_AUTOSTART=true
 export ZSH_TMUX_AUTOQUIT=false
 
-# asdf completions must be in fpath before oh-my-zsh runs compinit
-fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
+# mise completions must be in fpath before oh-my-zsh runs compinit.
+# mise n'est pas encore dans le PATH ici (construit plus bas), d'où le
+# chemin explicite. Le fichier est régénéré si le binaire change.
+_mise_bin="$HOME/.local/bin/mise"
+_mise_comp="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/completions"
+if [[ -x $_mise_bin ]]; then
+  if [[ ! -s $_mise_comp/_mise || $_mise_bin -nt $_mise_comp/_mise ]]; then
+    mkdir -p "$_mise_comp"
+    "$_mise_bin" completion zsh > "$_mise_comp/_mise"
+  fi
+  fpath=("$_mise_comp" $fpath)
+fi
+unset _mise_bin _mise_comp
 
 source $ZSH/oh-my-zsh.sh
 
@@ -86,11 +97,12 @@ fi
 
 export PATH="$HOME/.local/bin:$PATH"
 
-# asdf
-export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+# mise gère node/ruby/python et les outils globaux. Son hook recalcule le
+# PATH à chaque prompt : plus de shims à régénérer après un gem install.
+eval "$(mise activate zsh)"
 
 # En fin de course : ce qui est défini ici doit gagner sur tous les
-# export PATH ci-dessus (sinon les shims asdf & co passent devant).
+# export PATH ci-dessus (sinon les runtimes de mise passent devant).
 if [ -e "$HOME/.zshrc.local" ]; then
   source "$HOME/.zshrc.local"
 fi

@@ -5,7 +5,7 @@
 set -euo pipefail
 
 DOTFILES="$(cd "$(dirname "$0")/.." && pwd)"
-PACKAGES=(zsh git ruby tmux nvim ghostty claude bin asdf karabiner)
+PACKAGES=(zsh git ruby tmux nvim ghostty claude bin mise karabiner)
 TMPDIR="${TMPDIR:-/tmp}"
 LOG="${TMPDIR%/}/dotfiles-setup.log"
 : > "$LOG"
@@ -77,18 +77,19 @@ if [ ! -f "$HOME/.zshrc.local" ]; then
   ewarn "edit ~/.zshrc.local (DEFAULT_USER, SSH_KEY_PATH)"
 fi
 
-# 5. Language runtimes via asdf (versions come from config/asdf/.tool-versions)
-asdf_plugins() {
-  local plugin
-  for plugin in nodejs ruby python; do
-    asdf plugin list 2>/dev/null | grep -qx "$plugin" || asdf plugin add "$plugin"
-  done
-  asdf plugin update --all
-}
-run "Setting up asdf plugins" asdf_plugins
-run "Installing language runtimes (this can take a while)" asdf install
+# 5. mise (official installer, not brew: the brew build is bigger and its
+# hook-env — which runs on every prompt — measured ~50% slower)
+if ! command -v mise >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/mise" ]; then
+  run "Installing mise" sh -c 'curl -fsSL https://mise.run | sh'
+fi
 
-# 6. oh-my-zsh (after stow: KEEP_ZSHRC protects our symlink)
+# 6. Language runtimes and global tools via mise
+# (versions come from config/mise/.config/mise/config.toml)
+# The pyenv clone mise keeps for Python needs a git identity libgit2 accepts:
+# see the includeIf block in config/git/.gitconfig.
+run "Installing language runtimes and tools" mise install
+
+# 7. oh-my-zsh (after stow: KEEP_ZSHRC protects our symlink)
 install_omz() {
   RUNZSH=no KEEP_ZSHRC=yes \
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -97,7 +98,7 @@ if [ ! -d "$HOME/.oh-my-zsh" ]; then
   run "Installing oh-my-zsh" install_omz
 fi
 
-# 7. tmux plugin manager + plugins
+# 8. tmux plugin manager + plugins
 if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
   run "Installing tpm" \
     git clone --depth 1 https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
@@ -115,12 +116,12 @@ tmux_plugins() {
 }
 run "Installing tmux plugins" tmux_plugins
 
-# 8. Claude Code (official installer, not brew)
+# 9. Claude Code (official installer, not brew)
 if ! command -v claude >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/claude" ]; then
   run "Installing Claude Code" bash -c 'curl -fsSL https://claude.ai/install.sh | bash'
 fi
 
-# 9. macOS defaults (opt-in)
+# 10. macOS defaults (opt-in)
 if [ "${1:-}" = "--macos" ]; then
   run "Applying macOS defaults" "$DOTFILES/install/macos-defaults.sh"
 fi

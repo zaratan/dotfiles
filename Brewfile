@@ -36,7 +36,7 @@ brew 'gh'
 brew 'tig'
 
 # Dev: languages & version managers
-brew 'asdf'
+# mise: installed through the official installer (see install/setup)
 brew 'go'
 brew 'lua'
 brew 'luajit'
@@ -67,7 +67,7 @@ brew 'rust-analyzer'
 brew 'tailwindcss-language-server'
 brew 'vtsls'
 # prisma-language-server: pnpm add -g @prisma/language-server (pas de formule brew)
-# ruby-lsp: installé par asdf/bundler
+# ruby-lsp: installé par mise (.default-gems) ou bundler
 
 # Databases
 brew 'dbmate'

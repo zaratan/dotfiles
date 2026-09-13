@@ -1,6 +1,6 @@
 # dotfiles
 
-These are my dotfiles: zsh (oh-my-zsh), Neovim, tmux, Ghostty, asdf and Karabiner.
+These are my dotfiles: zsh (oh-my-zsh), Neovim, tmux, Ghostty, mise and Karabiner.
 
 Ever been bothered by spending a full day reinstalling a Mac by hand? There you go: one script installs everything, and [GNU Stow](https://www.gnu.org/software/stow/) keeps every config symlinked to this repo.
 
@@ -28,7 +28,7 @@ cd ~/dotfiles
 install/setup          # add --macos to also apply system defaults
 ```
 
-On a blank Mac, `git clone` triggers the Command Line Tools install. `setup` handles everything else: Homebrew, packages from the `Brewfile`, symlinks, language runtimes via asdf, oh-my-zsh, tmux plugins and Claude Code (official installer). It is idempotent so you can re-run it anytime: it only does what's missing.
+On a blank Mac, `git clone` triggers the Command Line Tools install. `setup` handles everything else: Homebrew, packages from the `Brewfile`, symlinks, language runtimes via mise, oh-my-zsh, tmux plugins and Claude Code (official installer). It is idempotent so you can re-run it anytime: it only does what's missing.
 
 You still have to import your SSH/GPG keys and sign in to your apps yourself. Signing in to the App Store is worth doing early: the `mas` entries only reinstall apps already tied to that account.
 
@@ -50,7 +50,7 @@ It turns `~/.gitconfig.local` back into a real file, removes the dead legacy sym
 ```
 Brewfile           # everything installed through Homebrew
 config/            # one Stow package per topic
-  zsh/ git/ ruby/ tmux/ nvim/ ghostty/ claude/ bin/ asdf/ karabiner/
+  zsh/ git/ ruby/ tmux/ nvim/ ghostty/ claude/ bin/ mise/ karabiner/
 install/
   setup            # the bootstrap script
   migrate-legacy   # one-shot migration from the pre-Stow layout
@@ -78,12 +78,12 @@ This repo is meant to be forked: everything personal sits in the local files abo
 
 1. Fork and clone, then run `install/setup`. It prompts for your identity.
 2. Adjust the `Brewfile` (or keep your extras in `Brewfile.local`).
-3. Edit `config/asdf/.tool-versions` for your language versions.
+3. Edit `config/mise/.config/mise/config.toml` for your language versions and global tools.
 
 ## Maintenance
 
 - `install/brew-drift` lists what the `Brewfile` and the machine disagree on, both ways. Dependencies pulled in by other formulae are left out, so the list stays readable.
-- `asdf plugin update --all && asdf install` after bumping `.tool-versions`.
+- `mise install` after bumping a version in `config.toml`; `mise outdated` shows what has moved on.
 - Neovim plugins update through lazy.nvim (`:Lazy`); the lockfile stays local on purpose.
 
 ## License

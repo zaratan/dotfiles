@@ -64,9 +64,7 @@ adopt() {
     ewarn "${target/#$HOME/~} differed from the repo — kept as ${target/#$HOME/~}.pre-stow"
   fi
 }
-adopt "$HOME/.tool-versions"                    "$DOTFILES/config/asdf/.tool-versions"
-adopt "$HOME/.asdfrc"                           "$DOTFILES/config/asdf/.asdfrc"
-adopt "$HOME/.default-gems"                     "$DOTFILES/config/asdf/.default-gems"
+adopt "$HOME/.default-gems"                     "$DOTFILES/config/mise/.default-gems"
 adopt "$HOME/.config/karabiner/karabiner.json"  "$DOTFILES/config/karabiner/.config/karabiner/karabiner.json"
 
 # 4. Hand over to the regular setup.
