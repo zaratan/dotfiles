@@ -1,0 +1,36 @@
+#!/bin/zsh
+#
+# Update everything this repo installs. Run it by hand, whenever.
+# No `set -e`: one source failing must not skip the others.
+set -uo pipefail
+
+GREEN=$'\033[32m' RED=$'\033[31m' BLUE=$'\033[34m' RESET=$'\033[0m'
+FAILED=()
+
+step() {
+  local label="$1"; shift
+  printf '\n %s*%s %s%s%s\n' "$BLUE" "$RESET" "$BLUE" "$label" "$RESET"
+  "$@" || FAILED+=("$label")
+}
+
+have() { command -v "$1" >/dev/null 2>&1 }
+
+brew_all() { brew update && brew upgrade && brew cleanup }
+mise_all() { mise self-update -y && mise upgrade }
+nvim_all() { nvim --headless "+Lazy! sync" +qa }
+tmux_all() { "$HOME/.tmux/plugins/tpm/bin/update_plugins" all }
+omz_all()  { zsh "$HOME/.oh-my-zsh/tools/upgrade.sh" }
+
+have brew && step "Homebrew"       brew_all
+have mise && step "mise"           mise_all
+have nvim && step "Neovim plugins" nvim_all
+[[ -x $HOME/.tmux/plugins/tpm/bin/update_plugins ]] && step "tmux plugins" tmux_all
+[[ -f $HOME/.oh-my-zsh/tools/upgrade.sh ]]          && step "oh-my-zsh"    omz_all
+
+printf '\n'
+if (( ${#FAILED[@]} == 0 )); then
+  printf ' %s*%s everything up to date\n' "$GREEN" "$RESET"
+else
+  printf ' %s*%s failed: %s\n' "$RED" "$RESET" "${FAILED[*]}"
+  exit 1
+fi

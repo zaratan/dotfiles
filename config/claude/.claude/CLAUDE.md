@@ -11,13 +11,12 @@ Pour toute tâche de développement non-triviale, suivre ce processus :
 
 ### Pendant l'implémentation
 
-3. **Déléguer les tâches de dev non-triviales** au **clean-ts-developer** (pour du TS/Next.js) ou au **rails-craftsman** (pour du Ruby/Rails)
-4. **S'arrêter à la fin de chaque sous-phase** pour permettre un test manuel par l'utilisateur
+3. **S'arrêter à la fin de chaque sous-phase** pour permettre un test manuel par l'utilisateur
 
 ### Après l'implémentation
 
-5. **Mettre à jour la documentation** pertinente (doc de migration, CLAUDE.md projet, etc.)
-6. **Lancer des reviews post-implémentation** — adapter selon la tâche :
+4. **Mettre à jour la documentation** pertinente (doc de migration, CLAUDE.md projet, etc.)
+5. **Lancer des reviews post-implémentation** — adapter selon la tâche :
    - **lead-engineer-reviewer** : toujours, sur toute tâche non-triviale
    - **ui-ux-designer** : si la tâche touche à de l'UI (composants, styles, layout, accessibilité)
    - **tech-architect** : si la tâche est complexe (changement d'architecture, migration, nouvelle infra)

@@ -82,9 +82,10 @@ This repo is meant to be forked: everything personal sits in the local files abo
 
 ## Maintenance
 
+- `dotfiles-update` (in `~/bin`) updates the lot: Homebrew, mise, Neovim plugins, tmux plugins and oh-my-zsh. Each source is independent, so one failure does not skip the rest.
 - `install/brew-drift` lists what the `Brewfile` and the machine disagree on, both ways. Dependencies pulled in by other formulae are left out, so the list stays readable.
 - `mise install` after bumping a version in `config.toml`; `mise outdated` shows what has moved on.
-- Neovim plugins update through lazy.nvim (`:Lazy`); the lockfile stays local on purpose.
+- Neovim plugins can also be updated on their own through lazy.nvim (`:Lazy`); the lockfile stays local on purpose.
 
 ## License
 

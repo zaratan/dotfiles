@@ -1,4 +1,5 @@
 {
+  "cleanupPeriodDays": 99999,
   "permissions": {
     "allow": [
       "Bash(grep:*)",
@@ -48,7 +49,25 @@
     "typescript-lsp@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
-    "ruby-lsp@claude-plugins-official": true
+    "ruby-lsp@claude-plugins-official": true,
+    "attention-span@attention-span": true,
+    "token-optimizer@alexgreensh-token-optimizer": true
+  },
+  "extraKnownMarketplaces": {
+    "attention-span": {
+      "source": {
+        "source": "github",
+        "repo": "alexgreensh/attention-span"
+      },
+      "autoUpdate": true
+    },
+    "alexgreensh-token-optimizer": {
+      "source": {
+        "source": "github",
+        "repo": "alexgreensh/token-optimizer"
+      },
+      "autoUpdate": true
+    }
   },
   "language": "Français",
   "tui": "fullscreen",
