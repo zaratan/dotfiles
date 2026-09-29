@@ -12,7 +12,11 @@ export EDITOR='nvim'
 
 plugins=(git brew bundler docker gem gh tmux npm macos rails z yarn docker-compose)
 export RPS1='($(date -u "+%m/%d %H:%M:%S"))'
-export ZSH_TMUX_AUTOSTART=true
+# Not inside a Herdr pane: Herdr would see tmux as the pane process
+# instead of the agent running behind it.
+if [[ -z $HERDR_ENV ]]; then
+  export ZSH_TMUX_AUTOSTART=true
+fi
 export ZSH_TMUX_AUTOQUIT=false
 
 # mise completions must be in fpath before oh-my-zsh runs compinit

@@ -43,6 +43,13 @@ vim.keymap.set("i", "¬", "<Esc>:tabnext<CR>i", { silent = true })
 vim.keymap.set("i", "˙", "<Esc>:tabprevious<CR>i", { silent = true })
 vim.keymap.set("i", "<C-t>", "<Esc>:tabnew<CR>", { silent = true })
 
+-- Splits nvim puis panes herdr, sans rupture
+for key, direction in pairs({ ["<C-h>"] = "left", ["<C-j>"] = "down", ["<C-k>"] = "up", ["<C-l>"] = "right" }) do
+  vim.keymap.set("n", key, function()
+    require("herdr_nav").navigate(direction)
+  end, { silent = true, desc = "Aller au split / pane " .. direction })
+end
+
 vim.opt.laststatus = 2
 
 if vim.fn.filereadable(vim.env.HOME .. "/.nvimrc.local") == 1 then
