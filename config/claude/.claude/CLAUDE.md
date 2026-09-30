@@ -21,6 +21,27 @@ Pour toute tâche de développement non-triviale, suivre ce processus :
    - **ui-ux-designer** : si la tâche touche à de l'UI (composants, styles, layout, accessibilité)
    - **tech-architect** : si la tâche est complexe (changement d'architecture, migration, nouvelle infra)
 
+## Autonomie et écriture
+
+**Ne jamais écrire dans l'historique git sans demande explicite** : pas de `git add`,
+`git commit`, `git push`, pas de PR, pas de message envoyé à un tiers. Cela vaut même
+quand le travail est terminé, mineur ou évident. Quand c'est prêt, le dire et
+attendre ; en cas de doute, ne rien faire et demander. Décider quand et comment
+l'historique se construit appartient à l'utilisateur.
+
+**Ne pas dépasser la demande.** Ce qui est demandé se fait entièrement, sans redemander
+à chaque fichier. Ce qui est repéré en chemin sans être demandé — un autre bug, un
+nettoyage, une doc à retoucher, un « tant que j'y suis » — se signale et ne se fait
+pas. Le critère est « a-t-il demandé ça ? », pas « est-ce évident ? » : un changement
+évident reste une décision qui appartient à l'utilisateur, d'autant plus sur un projet
+où le contenu l'engage vis-à-vis d'un client.
+
+**Mesurer avant d'affirmer.** Produire le chiffre avant d'énoncer la cause — combien de
+fichiers, de signes, de millimètres — même quand l'explication paraît évidente. Quand
+une hypothèse est éliminée, le dire. Quand la cause reste introuvable, l'admettre :
+« je n'ai pas isolé la cause, voici ce que j'ai éliminé » vaut mieux qu'un coupable
+plausible.
+
 ## Commentaires de code
 
 **Zéro commentaire est la norme.** Un commentaire est un aveu : « A comment is an apology for not writing clear code » (Bob Martin). Il n'est ni exercé ni testé, et chaque commentaire à couper en revue est de l'attention prise à ce qui compte.
@@ -38,3 +59,7 @@ Pour toute tâche de développement non-triviale, suivre ce processus :
 **Tests : zéro commentaire.** Le nom du test est le commentaire.
 
 **Le tri se fait avant de rendre, jamais en revue.** Sur chaque ligne de commentaire ajoutée du diff (`git diff` filtré sur `//`, `/*`, `*`, `#`, `--`), appliquer nom → test → commentaire. Mesurer sur le diff, pas sur le fichier : repère autour de 7 % de lignes de commentaire sur les lignes ajoutées, un premier jet tourne à 14 %, et le tri coupe presque toujours la phrase qui reformule le nom en gardant celle qui porte une décision non redérivable.
+
+Le repère de 7 % vaut pour une bibliothèque ou du code partagé. Dans du code applicatif
+qui ne sortira pas du projet, viser **1 à 2 %** : la justification va dans la
+documentation du dépôt, pas dans le code.

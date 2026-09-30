@@ -1,0 +1,16 @@
+{
+  "issues_repo": "owner/repo",
+  "project": { "owner": "owner", "title": "Nom du projet", "number": null },
+  "issues": [
+    {
+      "key": "protection-vide",
+      "title": "PROTECTION vide imprime « NON »",
+      "labels": ["bug"],
+      "points": 2,
+      "priority": "P1",
+      "verified": false,
+      "subrepo": null,
+      "body": "**Constat.** `protectionCode` (`src/workbook.ts:186`) renvoie « NON » pour tout ce qui ne contient pas « oui », y compris une cellule vide.\n\n**Pourquoi c'est grave.** La valeur la plus lourde de sens de la fiche, imprimée à tort.\n\n**Piste.** Cellule vide → pastille retirée + anomalie « bloquant » dans le contrôle."
+    }
+  ]
+}
