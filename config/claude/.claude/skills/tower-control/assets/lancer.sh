@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Crée un worktree herdr par grappe, l'amorce, lie la mémoire et y démarre un agent Claude.
-# Configuration lue dans <dépôt des issues>/.claude/tower-control/config.sh — voir les exemples en bas.
+# Configuration lue dans <dépôt des issues>/.claude/tower-control/ : config.sh (partagé), puis
+# lot-<login GitHub>.sh (les grappes de la personne qui lance) — voir les exemples en bas.
 # Dépôt unique : une grappe = "<branche>". Méta-dépôt : une grappe = "<dépôt> <branche>",
 # et chaque dépôt est décrit par REPO_PATH / REPO_BASE / REPO_BOOTSTRAP / REPO_CHECK.
 set -euo pipefail
@@ -12,9 +13,21 @@ test -f "$CONFIG" || { echo "config absente : $CONFIG" >&2; exit 2; }
 # shellcheck source=/dev/null
 source "$CONFIG"
 
+GH_LOGIN=$(gh api user -q .login) && test -n "$GH_LOGIN" || { echo "login GitHub introuvable : gh auth status" >&2; exit 2; }
+LOT="$REPO/.claude/tower-control/lot-$GH_LOGIN.sh"
+if [ -f "$LOT" ]; then
+  # Sans ce unset, un lot écrit élément par élément hériterait des grappes restées dans config.sh.
+  unset GRAPPES
+  declare -A GRAPPES=()
+  # shellcheck source=/dev/null
+  source "$LOT"
+elif declare -p GRAPPES >/dev/null 2>&1; then
+  echo "attention : pas de $LOT, grappes lues dans $CONFIG — à deux, ce sont peut-être celles de l'autre" >&2
+fi
+
 test "${HERDR_ENV:-}" = 1 || { echo "pas dans herdr" >&2; exit 2; }
 : "${WORKTREES_DIR:?}" "${MODEL:=claude-opus-5-5}" "${BOOTSTRAP_TIMEOUT:=900000}"
-declare -p GRAPPES >/dev/null 2>&1 || { echo "GRAPPES manquant dans $CONFIG" >&2; exit 2; }
+declare -p GRAPPES >/dev/null 2>&1 && [ ${#GRAPPES[@]} -gt 0 ] || { echo "GRAPPES manquant : l'écrire dans $LOT" >&2; exit 2; }
 declare -p REPO_PATH >/dev/null 2>&1 || declare -A REPO_PATH=()
 declare -p REPO_BASE >/dev/null 2>&1 || declare -A REPO_BASE=()
 declare -p REPO_BOOTSTRAP >/dev/null 2>&1 || declare -A REPO_BOOTSTRAP=()
@@ -91,6 +104,9 @@ done
 #   WORKTREES_DIR="$HOME/Projects/monprojet-wt"
 #   BASE_BRANCH="main"
 #   BOOTSTRAP='pnpm install --frozen-lockfile'
+#
+# et son .claude/tower-control/lot-<login GitHub>.sh :
+#
 #   declare -A GRAPPES=([p0-controle]="p0/4-couleur" [p0-photos]="p0/5-credit")
 #
 # Méta-dépôt (les issues ici, le code dans des sous-dépôts, chacun avec sa branche et son amorçage) :
@@ -102,4 +118,9 @@ done
 #   declare -A REPO_BASE=([app]="develop" [infra]="main")
 #   declare -A REPO_BOOTSTRAP=([app]='pnpm install --frozen-lockfile' [infra]='true')
 #   declare -A REPO_CHECK=([app]='test -d node_modules')
+#
+# et son lot-<login GitHub>.sh, qui peut corriger un chemin de poste élément par élément
+# (un `declare -A REPO_PATH=(…)` y effacerait les autres sous-dépôts) :
+#
 #   declare -A GRAPPES=([irn]="app p0/2-echelle" [keys]="infra p1/62-cles")
+#   REPO_PATH[app]="$HOME/code/app"

@@ -23,6 +23,11 @@ précédentes, et la raison d'être de ce skill est de s'améliorer à chaque lo
 scope `project`, un board GitHub Projects avec les statuts Backlog → À faire →
 En cours → Bloqué → Review → Fait, et le workflow « item closed → Fait » actif.
 
+**Relever le login GitHub** une fois (`gh api user -q .login`) : il nomme le fichier
+de lot, filtre le board et signe le journal. Vérifier qu'il peut être assigné sur
+`ISSUES_REPO` (`gh api "repos/$ISSUES_REPO/assignees/<login>" --silent`, 404 sinon) —
+dans un méta-dépôt privé, la seconde personne n'est pas toujours collaboratrice.
+
 **Lire `.claude/tower-control/config.sh`** du dépôt qui porte les issues, écrit par
 `backlog-setup`. Il dit où sont les issues (`ISSUES_REPO`, `PROJECT_NUMBER`) et,
 dans le cas d'un **méta-dépôt**, décrit chaque sous-dépôt : chemin (`REPO_PATH`),
@@ -54,8 +59,48 @@ branche de base (`REPO_BASE`), amorçage (`REPO_BOOTSTRAP`) et contrôle d'amor�
   prime ». Toute commande de build ou de test se lance dans le worktree
   (`pnpm -C wt/<grappe> …`) ; la consigne de l'issue le rappelle avec le chemin.
 
-**Le lot est la colonne « À faire » du board.** C'est l'utilisateur qui trie ; la tour
-ne rediscute pas la sélection, elle lit chaque issue retenue et passe au groupement.
+**Les grappes sont dans `lot-<login>.sh`**, à côté de `config.sh`. `config.sh` porte
+les faits du projet et se partage ; le fichier de lot porte `GRAPPES`, c'est la tour
+qui l'écrit au groupement, et git l'ignore (`.claude/tower-control/lot-*.sh` dans le
+`.gitignore` du dépôt des issues ; si la ligne manque, la proposer). Il peut aussi corriger un chemin de poste, élément par
+élément (`REPO_PATH[app]=…`) ; un `declare -A REPO_PATH=(…)` y effacerait les autres
+sous-dépôts. Au groupement, ne remplacer que la ligne `GRAPPES` : les autres lignes
+du fichier sont propres au poste et durent d'un lot à l'autre. Si `config.sh` contient encore des `GRAPPES` (dépôt d'avant ce
+découpage), le lanceur s'en sert faute de fichier de lot et prévient : proposer à
+l'utilisateur de les déplacer, parce qu'à deux ce sont celles du premier qui a écrit.
+
+**Le lot est ce qui est assigné au login courant dans la colonne « À faire ».** C'est
+l'utilisateur qui trie ; la tour ne rediscute pas la sélection, elle lit chaque issue
+retenue et passe au groupement. Lire le board avec une limite explicite
+(`gh project item-list … --limit 500 --format json` ; sans elle la lecture s'arrête à
+30 items, sans erreur) et avec `(.assignees // [])` : la clé est absente quand
+personne n'est assigné.
+
+- **assignée au login courant** : dans le lot ;
+- **assignée à quelqu'un d'autre** : ignorée. La tour ne la groupe pas, ne la déplace
+  pas sur le board, ne la ferme pas — dans toutes les colonnes et pendant tout le
+  cycle ;
+- **sans assigné** : la lister à l'utilisateur et attendre son accord avant
+  `gh issue edit <N> --repo "$ISSUES_REPO" --add-assignee @me`. La répartition entre
+  deux personnes n'est pas une décision de la tour. Même traitement pour une issue
+  sans assigné déjà « En cours » ou en « Review » : un board d'avant l'assignation,
+  ou un lot en vol ;
+- **co-assignée dès la lecture** : la signaler, ne pas la lancer sans réponse.
+
+L'assignation n'est pas un verrou : GitHub accepte plusieurs assignés, et deux tours
+qui lisent le board en même temps s'assignent toutes les deux. Relire aussitôt
+(`gh issue view <N> --repo "$ISSUES_REPO" --json assignees`) et vérifier que le
+login y figure, seul. S'il n'y est pas, l'assignation n'a pas pris : ne pas lancer.
+Si quelqu'un d'autre y figure, se retirer (`--remove-assignee @me`), ne pas lancer,
+et le dire. Si les
+deux tours se retirent, l'issue redevient libre et sera reproposée.
+
+**Regarder ce que font les autres**, pour information : les issues « En cours » et
+« Review » assignées à d'autres, et les PR ouvertes d'autres auteurs dans chaque
+dépôt de code (`gh pr list --state open --limit 200 --json
+number,author,headRefName,files` lancé depuis ce dépôt, en écartant celles dont
+`.author.login` est le login courant). Un fichier commun avec une grappe se dit dans le point à
+l'utilisateur ; ça ne bloque pas le lancement, ça se règle à la PR.
 
 **Grouper les issues par fichiers touchés, pas par thème.** Deux issues qui
 modifient le même fichier vont dans le même worktree, l'une après l'autre ; sinon le
@@ -186,9 +231,16 @@ parler à l'utilisateur.
   fichier en dernier, l'une après l'autre).
 - Une fois tout mergé : `herdr workspace close` des sous-espaces créés par la tour,
   `git worktree remove`, suppression des liens de mémoire.
+- **Libérer ce que l'utilisateur abandonne** : une issue encore assignée au login
+  courant qui sort du lot sans suite reste invisible pour l'autre tour. Proposer
+  `--remove-assignee @me` ; une issue en Review reste à son auteur jusqu'au merge.
 - **Écrire le journal du lot dans le dépôt**, `.claude/tower-control/journal.md` :
   issues traitées, décisions prises par l'utilisateur, prémisses corrigées, ce qui
-  reste à faire. C'est du projet, ça reste dans le projet.
+  reste à faire. C'est du projet, ça reste dans le projet. Le journal est commun :
+  chaque lot y est une section ajoutée en fin de fichier, titrée avec sa date et le
+  login. Deux clôtures en parallèle conflictent à cet endroit sans la ligne
+  `.claude/tower-control/journal.md merge=union` du `.gitattributes` ; si elle
+  manque, la proposer.
 - **Remonter dans `references/retours.md` du skill** ce qui vaut pour tout projet :
   ce qui a coincé et la règle qui en sort, ce qui a bien marché, les ordres de
   grandeur — sans nom de projet, sans numéro d'issue. Puis retoucher `SKILL.md` et

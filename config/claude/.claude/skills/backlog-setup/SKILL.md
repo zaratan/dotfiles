@@ -48,8 +48,13 @@ méta**, `<méta>/wt`, ajouté à son `.gitignore`, pour que les agents hériten
 indexé par le nom de chaque sous-dépôt : `REPO_PATH`
 (chemin), `REPO_BASE` (branche de base — `develop` sur un projet qui ne déploie pas
 depuis `main`), `REPO_BOOTSTRAP` (ce qu'un worktree neuf doit lancer), `REPO_CHECK`
-(ce qui prouve que l'amorçage a marché). Les grappes du premier lot s'écrivent
-`"<dépôt> <branche>"`. Le lanceur de `tower-control` lit tout ça ; sans ces
+(ce qui prouve que l'amorçage a marché). `config.sh` se partage entre toutes les
+personnes qui lancent une tour : les grappes du premier lot vont à côté, dans
+`lot-<login GitHub>.sh`, et s'écrivent pour un méta-dépôt `"<dépôt> <branche>"`.
+Deux lignes vont avec, dans le dépôt des issues : `.claude/tower-control/lot-*.sh`
+dans son `.gitignore`, et `.claude/tower-control/journal.md merge=union` dans son
+`.gitattributes`, pour que deux lots clos en parallèle ne conflictent pas.
+Le lanceur de `tower-control` lit tout ça ; sans ces
 tableaux il suppose un dépôt unique qui part de `main`. Le modèle complet est en
 commentaire à la fin de `tower-control/assets/lancer.sh`.
 
@@ -122,6 +127,7 @@ Avant le premier lot, sortir les règles de leur cachette :
   les worktrees, donc rien de structurel n'y reste.
 
 Puis préparer le relais à `tower-control` : `.claude/tower-control/config.sh`
-(dépôt d'issues, projet, dossier des worktrees, amorçage, grappes), la section
+(dépôt d'issues, projet, dossier des worktrees, amorçage), `lot-<login>.sh` (grappes), la section
 « Projet » de la consigne commune, et le journal du dépôt. Grouper les premières
-issues par fichiers touchés, pas par thème. Faire committer avant de lancer.
+issues par fichiers touchés, pas par thème. Faire committer avant de lancer — le
+fichier de lot, lui, est ignoré par git.

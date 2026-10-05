@@ -44,7 +44,7 @@ clôture, et c'est de là qu'on remonte ici ce qui vaut ailleurs.
 - Ordres de grandeur : 6 minutes d'agent par issue de 2-3 points, 10 à 14 pour
   3-5 points ; trois agents, une soirée, neuf issues mergées, relectures comprises.
 
-- Le lot = la colonne « À faire » du board, triée par l'utilisateur : la tour ne
+- Le lot = les issues de « À faire » assignées au login courant, triées par l'utilisateur : la tour ne
   re-trie pas, elle groupe et ordonne. Sept issues, dix-neuf points, trois worktrees,
   une soirée ; 2 à 3 questions d'agent par lot, toutes avec recommandation.
 - Une table de formulations soumise par l'agent **dans un fichier** puis validée par
