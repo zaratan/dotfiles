@@ -31,16 +31,27 @@ board ?** Trois cas rencontrés :
   issues et le board vont **dans le méta-dépôt** — le client a souvent son propre
   outil de tickets, fonctionnels et peu rédigés, qui n'est pas le backlog technique.
   Chaque issue nomme alors le sous-dépôt concerné (label `dépôt: <nom>` et préfixe
-  dans le titre). Une PR d'un sous-dépôt ne ferme une issue du méta-dépôt que par
-  `Closes <owner>/<meta>#N`, et seulement si l'auteur du merge a les droits sur les
-  deux ; sinon, c'est la tour qui ferme l'issue quand elle constate le merge.
+  dans le titre). Demander si le client connaît ce méta-dépôt ; en général non, et
+  alors **rien dans le sous-dépôt ne le cite** (pas de `Closes <owner>/<meta>#N`,
+  pas de numéro d'issue dans le code, les runbooks, les commits ou les PR) : c'est
+  la tour qui ferme l'issue quand elle constate le merge. Écrire cette règle dans
+  la consigne projet de `tower-control`.
 - **Un board existant.** L'utilisateur a déjà un projet GitHub : on y rattache, on
   n'en crée pas un second. Vérifier que ses statuts couvrent Bloqué et Review, et
   proposer de les ajouter sinon.
 
 La réponse s'écrit dans `.claude/tower-control/config.sh` du dépôt qui porte les
-issues (`ISSUES_REPO`, `PROJECT_NUMBER`, et pour un méta-dépôt la liste des
-sous-dépôts), pour que `tower-control` la lise sans la redemander.
+issues, pour que `tower-control` la lise sans la redemander : `ISSUES_REPO`,
+`PROJECT_OWNER`, `PROJECT_NUMBER`, `WORKTREES_DIR` (pour un méta-dépôt : **sous le
+méta**, `<méta>/wt`, ajouté à son `.gitignore`, pour que les agents héritent de son
+`CLAUDE.md` et voient ses `docs/`), et pour un méta-dépôt un tableau par propriété,
+indexé par le nom de chaque sous-dépôt : `REPO_PATH`
+(chemin), `REPO_BASE` (branche de base — `develop` sur un projet qui ne déploie pas
+depuis `main`), `REPO_BOOTSTRAP` (ce qu'un worktree neuf doit lancer), `REPO_CHECK`
+(ce qui prouve que l'amorçage a marché). Les grappes du premier lot s'écrivent
+`"<dépôt> <branche>"`. Le lanceur de `tower-control` lit tout ça ; sans ces
+tableaux il suppose un dépôt unique qui part de `main`. Le modèle complet est en
+commentaire à la fin de `tower-control/assets/lancer.sh`.
 
 ## 1. Auditer
 

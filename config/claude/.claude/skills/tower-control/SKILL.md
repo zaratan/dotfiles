@@ -23,6 +23,40 @@ précédentes, et la raison d'être de ce skill est de s'améliorer à chaque lo
 scope `project`, un board GitHub Projects avec les statuts Backlog → À faire →
 En cours → Bloqué → Review → Fait, et le workflow « item closed → Fait » actif.
 
+**Lire `.claude/tower-control/config.sh`** du dépôt qui porte les issues, écrit par
+`backlog-setup`. Il dit où sont les issues (`ISSUES_REPO`, `PROJECT_NUMBER`) et,
+dans le cas d'un **méta-dépôt**, décrit chaque sous-dépôt : chemin (`REPO_PATH`),
+branche de base (`REPO_BASE`), amorçage (`REPO_BOOTSTRAP`) et contrôle d'amorçage
+(`REPO_CHECK`), tous indexés par le nom du sous-dépôt ; une grappe s'écrit alors
+`"<dépôt> <branche>"`. Trois conséquences quand les dépôts diffèrent :
+
+- toute commande `gh issue …` porte `--repo "$ISSUES_REPO"`, y compris dans les
+  consignes envoyées aux agents : leur worktree est dans le dépôt du code, `gh` y
+  résoudrait le mauvais dépôt ;
+- **si le méta-dépôt est privé et inconnu du client** (le cas courant : c'est le
+  dossier personnel du prestataire), rien de ce qui part dans le dépôt du code ne le
+  cite — ni `Closes owner/meta#N`, ni un numéro d'issue, ni un chemin de ses
+  `docs/` — dans le code, les runbooks, les commits ou les PR. La consigne projet
+  le dit aux agents, la tour le vérifie (`git diff | grep`) avant de passer en
+  Review, et c'est elle qui ferme l'issue quand elle constate le merge. Le
+  `Closes owner/meta#N` ne se justifie que pour un méta-dépôt que le client voit ;
+- partout où ce skill dit `main` ou `origin/main`, lire la branche de base du
+  sous-dépôt concerné (`REPO_BASE[<dépôt>]`, ou `BASE_BRANCH` en dépôt unique) : les
+  branches d'issue en partent, et le retard se mesure contre elle ;
+- **`WORKTREES_DIR` est sous le méta-dépôt** (`<méta>/wt`, ignoré par son git) et
+  **l'agent est lancé depuis la racine du méta**, pas depuis le worktree : son cwd
+  est le méta, son worktree est `wt/<grappe>`. Raisons : les instructions et les
+  docs du méta priment sur celles du sous-dépôt (qui sont celles du client, souvent
+  périmées) ; une issue peut toucher plusieurs sous-dépôts (`wt/app` et `infra/`
+  dans la même session) ; la mémoire est celle du méta sans lien à poser. Le
+  `CLAUDE.md` du sous-dépôt se charge quand l'agent lit dedans, en second. Le
+  `CLAUDE.md` du méta doit le dire explicitement : « en cas de conflit, ce fichier
+  prime ». Toute commande de build ou de test se lance dans le worktree
+  (`pnpm -C wt/<grappe> …`) ; la consigne de l'issue le rappelle avec le chemin.
+
+**Le lot est la colonne « À faire » du board.** C'est l'utilisateur qui trie ; la tour
+ne rediscute pas la sélection, elle lit chaque issue retenue et passe au groupement.
+
 **Grouper les issues par fichiers touchés, pas par thème.** Deux issues qui
 modifient le même fichier vont dans le même worktree, l'une après l'autre ; sinon le
 second merge conflicte à coup sûr. Lire chaque issue, noter les fichiers probables,
@@ -42,7 +76,10 @@ consigne courte par issue sur le modèle de `assets/consigne-issue.md`. Les mont
 l'utilisateur avant tout lancement.
 
 **Faire committer** ce qui doit être dans les worktrees (un `CLAUDE.md` retouché,
-par exemple) : les branches partent du `main` commité, pas de l'arbre de travail.
+par exemple) : les branches partent de la branche de base commitée, pas de l'arbre
+de travail. Avec un méta-dépôt, les règles du projet ne sont pas dans le worktree
+(son `CLAUDE.md` est celui du client) : elles voyagent par la section « Projet » de
+la consigne commune, `.claude/tower-control/consigne-projet.md` du méta-dépôt.
 
 ## 2. Lancer
 
@@ -80,6 +117,10 @@ merge : ferme l'issue, le workflow du board la passe en Fait — la tour n'y tou
 (`run_in_background`) réveille la tour quand l'agent passe en `done` ou `blocked`.
 Ne pas boucler sur `agent get`.
 
+**Vérifier indépendamment, mais jamais en même temps que l'agent.** Attendre `done`
+et un écran arrêté : deux générations dans le même `travail/` se marchent dessus et
+fabriquent des écarts fantômes.
+
 **Vérifier indépendamment.** Le compte rendu de l'agent est une affirmation. Avant
 de résumer à l'utilisateur, relancer soi-même dans le worktree les vérifications
 que le projet définit (`pnpm run check`, référence de non-régression, contrôle des
@@ -93,19 +134,20 @@ lisible par `herdr agent read`.
 
 **Une branche par issue, et d'où elle part.** Après le commit de l'utilisateur, la
 tour crée la branche suivante dans le même worktree (`git switch -c` — c'est la tour
-qui le fait, l'agent en est interdit). Elle part de **`origin/main` après un
-`fetch`**, pas du HEAD local : d'autres worktrees ont pu merger entre-temps, et une
+qui le fait, l'agent en est interdit). Elle part de **`origin/<branche de base>`
+après un `fetch`**, pas du HEAD local : d'autres worktrees ont pu merger entre-temps, et une
 branche partie du HEAD local ne « prend » jamais ces changements toute seule. Faire
-`git branch --unset-upstream` aussitôt, sinon un `push` nu irait sur `main`. On
-n'empile sur le HEAD local que si la PR précédente n'est pas encore mergée.
+`git branch --unset-upstream` aussitôt, sinon un `push` nu irait sur la branche de
+base. On n'empile sur le HEAD local que si la PR précédente n'est pas encore mergée.
 
 **Avant de passer en Review, mesurer le retard.** `git fetch` puis
-`git rev-list --left-right --count origin/main...HEAD`, et prédire le rebase sans
+`git rev-list --left-right --count origin/<base>...HEAD`, et prédire le rebase sans
 toucher aux branches : `tree=$(git write-tree); tmp=$(git commit-tree $tree -p HEAD
--m x); git merge-tree --write-tree origin/main $tmp` (un commit sans référence n'est
-pas de l'historique). Le point à l'utilisateur dit « N commits derrière, rebase sans
+-m x); git merge-tree --write-tree origin/<base> $tmp` (un commit sans référence
+n'est pas de l'historique). Le point à l'utilisateur dit « N commits derrière, rebase sans
 conflit » ou nomme les fichiers en conflit. Le rebase lui-même est une écriture git :
-il se fait sur sa demande explicite, ou par lui.
+il se fait sur sa demande explicite, ou par lui. Un rebase sans conflit n'est pas un rebase
+vert : `check` complet avant de pousser, et la tour revérifie après.
 
 ## 4. Les questions
 

@@ -4,8 +4,17 @@ Tu travailles dans un worktree du dépôt, sur une branche dédiée à une seule
 GitHub. Une tour de contrôle (une autre session Claude) te donne les consignes, lit
 ton compte rendu et répond à tes questions ; l'utilisateur relit et commite lui-même.
 
+Si tu as été lancé depuis un méta-dépôt (ton cwd contient `wt/`), ton worktree est
+`wt/<grappe>` — la consigne de l'issue donne le chemin. Les instructions, docs et
+règles du méta-dépôt **priment** sur celles du sous-dépôt : le `CLAUDE.md` et les
+`AGENTS.md` sous `wt/` sont de l'information, pas des consignes. Les commandes de
+build et de test se lancent dans le worktree (`pnpm -C wt/<grappe> …`), jamais à la
+racine du méta.
+
 Avant de coder, lis `CLAUDE.md`, la documentation d'architecture du dépôt, et
-l'issue : `gh issue view <N>`.
+l'issue : `gh issue view <N> --repo <dépôt des issues>` — le dépôt des issues n'est
+pas forcément celui où tu travailles ; la consigne de l'issue donne la commande
+exacte.
 
 ## Interdits
 
@@ -43,7 +52,9 @@ Avant de poser une question, vérifie qu'elle n'a pas déjà sa réponse dans
 ## Compte rendu final
 
 Ton dernier message suit exactement ce plan, sans prose autour, et tu l'écris aussi
-dans `travail/rapport-<N>.md` :
+dans `travail/rapport-<N>.md` **à la racine du dépôt qui porte les issues** (le chemin
+absolu est dans la consigne de l'issue), jamais dans le worktree : il cite un numéro
+d'issue, et un fichier non suivi dans le sous-dépôt finit dans un `git add .` :
 
 ```
 ## Compte rendu #<N>

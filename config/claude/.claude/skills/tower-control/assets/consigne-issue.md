@@ -8,7 +8,8 @@ chiffré attendu, que la tour vérifiera.
 ```
 ## #<N> — <titre court>
 
-Issue : `gh issue view <N>`. Branche `<branche>`.
+Issue : `gh issue view <N> --repo <owner/dépôt des issues>`.
+Worktree : `wt/<grappe>` (dépôt `<sous-dépôt>`), branche `<branche>` depuis `<branche de base>`.
 
 <Ce qu'il faut faire, en deux à quatre phrases, avec les fichiers visés.>
 

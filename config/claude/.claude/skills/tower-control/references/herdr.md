@@ -14,12 +14,27 @@ printf '%s\n' "$HERDR_WORKSPACE_ID" "$HERDR_PANE_ID"
 ## Worktree = sous-espace
 
 ```bash
-herdr worktree create --workspace "$HERDR_WORKSPACE_ID" --branch <branche> --base main \
+herdr worktree create --workspace "$HERDR_WORKSPACE_ID" \        # dépôt unique
+  --branch <branche> --base <branche de base> \
+  --path <chemin-absolu> --label <libellé> --no-focus
+herdr worktree create --cwd <sous-dépôt> \                       # méta-dépôt : jamais avec --workspace
+  --branch <branche> --base <branche de base> \
   --path <chemin-absolu> --label <libellé> --no-focus
 ```
 
 Crée le worktree git **et** un workspace herdr lié au workspace source (il apparaît
-sous lui dans la barre latérale). Le JSON de retour porte le workspace et le pane
+sous lui dans la barre latérale). `--cwd` désigne le dépôt d'où part le worktree :
+indispensable quand la session herdr est ouverte dans un méta-dépôt et que le code
+vit dans un sous-dépôt. **`--workspace` et `--cwd` s'excluent** (refusé par herdr,
+constaté sur un lot) : le lanceur passe l'un ou l'autre. **Vérifié le 30 sept.
+2026 : un worktree créé par `--cwd` est rangé sous le workspace de son dépôt git**,
+que herdr crée au besoin (`tercioapp/develop`), pas sous le workspace du méta-dépôt
+d'où la tour travaille ; `workspace create` n'a pas de `--parent`. Le rangement suit
+le dépôt, pas le chemin. Accepté tel quel (le cwd de l'agent, lui, est bien le méta).
+Amélioration à proposer en PR à herdr : `--workspace <parent> --cwd <dépôt>` pour
+rattacher un worktree d'un autre dépôt sous un workspace donné. `--base` prend
+une référence quelconque (`develop`, `origin/develop`), pas seulement `main`. Le
+dossier parent de `--path` doit exister (le lanceur fait `mkdir -p`). Le JSON de retour porte le workspace et le pane
 racine ; `workspace create` renvoie `.result.workspace`, `.result.tab`,
 `.result.root_pane` — le lanceur lit `.result.root_pane.pane_id // .result.root_pane`
 et affiche le JSON brut si la clé manque. `--trust-repository` n'est pas une option
@@ -54,7 +69,9 @@ herdr agent start <nom> --kind claude --pane <pane> --timeout 60000 -- \
 ```
 
 Le pane doit être à un prompt shell interactif. `start` ne rend la main qu'une fois
-Claude détecté et prêt. Le nom suit `[a-z][a-z0-9_-]{0,31}` et doit être unique.
+Claude détecté et prêt. Le cwd de Claude est celui du shell au moment du `start` :
+le lanceur fait `herdr pane run <pane> "cd '<méta>'"` avant, en mode méta-dépôt,
+pour que l'agent démarre à la racine du méta et non dans le worktree. Le nom suit `[a-z][a-z0-9_-]{0,31}` et doit être unique.
 
 ```bash
 herdr agent prompt <nom> "<texte>"                             # envoie et rend la main aussitôt
@@ -81,6 +98,15 @@ décider, répondre par `send-keys` ou `prompt`, puis seulement envoyer la suite
 `agent read` lit le terminal, pas la conversation : un compte rendu long peut être
 tronqué. D'où le repli « écris-le aussi dans un fichier » dans la consigne commune.
 
+## Fermer un sous-espace
+
+```bash
+herdr workspace close <workspace_id>        # positionnel, pas --workspace
+```
+
+`git worktree remove <chemin>` ensuite ; le dossier `~/.claude/projects/<clé>` garde les
+transcriptions de l'agent, seul le lien `memory` se retire.
+
 ## Attendre depuis la tour sans bloquer
 
 `herdr agent wait` bloque le shell. Depuis Claude Code, le lancer avec
@@ -104,5 +130,12 @@ Un `wait` par agent, en parallèle.
 - **Branche créée depuis `origin/main`** (`git switch -c x origin/main`) : git la fait
   suivre `origin/main`, et un `git push` sans argument pousserait sur `main`. Faire
   `git branch --unset-upstream` aussitôt. Empiler sur le HEAD local n'a pas ce piège.
+- **`agent wait` peut rendre la main trop tôt** : un état `idle` ou `done` a été observé
+  alors que l'agent enchaînait encore des commandes. Après un `wait`, lire l'écran
+  (`agent read --source visible`) et ne vérifier dans le worktree que si la dernière
+  ligne est un compte rendu, pas une commande en cours.
+- **`agent read --lines N` est refusé quand l'agent est `blocked`** ; utiliser
+  `--source visible`. L'aperçu d'une question `AskUserQuestion` n'y figure pas : demander
+  à l'agent d'écrire son contenu dans un fichier avant de reposer la question.
 - Ne jamais `workspace close --group` pour contourner `workspace_group_close_required`.
 - Ne jamais `herdr server stop` depuis une session active.
