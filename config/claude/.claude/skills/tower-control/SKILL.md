@@ -111,6 +111,12 @@ ne suit plus et la machine chauffe.
 **Ordonner chaque grappe** du plus simple au plus discutable, et mettre en dernier
 ce qui finira « Bloqué » sur une décision externe.
 
+**Vérifier que le défaut peut encore arriver.** Pour chaque issue, écrire en une
+phrase le scénario daté qui le déclenche dans l'état actuel du projet. Si on n'y
+arrive pas, le dire à l'utilisateur avant de lancer, « jeter » en première option :
+une issue codée et revue a déjà été jetée pour cette raison. Confronter aussi la piste
+de l'issue à la doc du dépôt avant de la recopier dans une consigne.
+
 **Trancher avant de lancer** ce que les issues laissent ouvert (« à trancher »). Un
 agent bloqué sur une décision produit est un agent qui attend ; la tour prend la
 décision avec l'utilisateur en amont et l'écrit dans la consigne.
@@ -172,10 +178,21 @@ que le projet définit (`pnpm run check`, référence de non-régression, contr�
 données) et comparer aux chiffres annoncés. Un écart entre les deux est la première
 chose à dire.
 
-**Résumer court** : ce qui est fait, les chiffres vérifiés, les décisions que
-l'agent a prises seul (pour que l'utilisateur puisse les contredire avant la PR),
-ce qui reste ouvert. Le compte rendu complet est dans `travail/rapport-<N>.md` ou
-lisible par `herdr agent read`.
+**Résumer court** : ce qui est fait, les chiffres vérifiés, ce qui reste ouvert. Le
+compte rendu complet est dans `travail/rapport-<N>.md` ou lisible par
+`herdr agent read`. **Les décisions que l'agent a prises seul ne vont pas dans le
+résumé : elles se posent en questions directes** (AskUserQuestion, une à la fois,
+avec le texte avant et après), avant de dire « prêt à commiter ». Un utilisateur qui
+traite plusieurs sujets fusionne sans relire ce qu'un résumé lui signale en prose.
+
+**Chaque « hors périmètre repéré » finit quelque part** : traité par le même agent
+(retouche, ou bloc « reliquats » dans la consigne suivante de la grappe qui touche le
+même fichier) ou ouvert en issue. Jamais seulement listé.
+
+**Quand la branche est en retard et partage des fichiers avec ce qui a été fusionné**,
+ne pas se contenter de `merge-tree` : jouer la fusion dans un worktree jetable
+(`git worktree add --detach` sur un `commit-tree` du résultat), install, build,
+typecheck, tests, puis le retirer. Un rebase sans conflit a déjà cassé `tsc` deux fois.
 
 **Une branche par issue, et d'où elle part.** Après le commit de l'utilisateur, la
 tour crée la branche suivante dans le même worktree (`git switch -c` — c'est la tour
