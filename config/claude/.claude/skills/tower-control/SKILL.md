@@ -117,6 +117,10 @@ arrive pas, le dire à l'utilisateur avant de lancer, « jeter » en première o
 une issue codée et revue a déjà été jetée pour cette raison. Confronter aussi la piste
 de l'issue à la doc du dépôt avant de la recopier dans une consigne.
 
+**Si plusieurs agents mesurent sur la même machine**, poser un verrou commun avant de
+lancer (`lockf`, une commande par verrou, règle écrite dans un `MESURES.md` du dossier
+des worktrees, seuil d'espace disque avant tout balayage) ; voir `references/retours.md`.
+
 **Trancher avant de lancer** ce que les issues laissent ouvert (« à trancher »). Un
 agent bloqué sur une décision produit est un agent qui attend ; la tour prend la
 décision avec l'utilisateur en amont et l'écrit dans la consigne.
@@ -167,6 +171,9 @@ merge : ferme l'issue, le workflow du board la passe en Fait — la tour n'y tou
 **Attendre sans surveiller** : `herdr agent wait <nom>` lancé en arrière-plan
 (`run_in_background`) réveille la tour quand l'agent passe en `done` ou `blocked`.
 Ne pas boucler sur `agent get`.
+Quand l'agent lance des mesures longues en arrière-plan, `wait` rend « done » trop tôt :
+demander que le compte rendu ne soit écrit qu'à la toute fin, et attendre ce fichier
+(`until [ -f … ]; do sleep 120; done`) avant `agent wait`.
 
 **Vérifier indépendamment, mais jamais en même temps que l'agent.** Attendre `done`
 et un écran arrêté : deux générations dans le même `travail/` se marchent dessus et

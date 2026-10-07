@@ -89,8 +89,13 @@ for name in "${!GRAPPES[@]}"; do
   # Méta-dépôt : claude démarre à la racine du méta, pas dans le worktree, pour que ses instructions
   # et ses docs priment et qu'une issue puisse toucher plusieurs sous-dépôts.
   if [ -n "$r" ]; then herdr pane run "$pane" "cd '$REPO'" >/dev/null; fi
-  herdr agent start "$name" --kind claude --pane "$pane" --timeout 60000 -- \
-    --model "$MODEL" --permission-mode auto --disallowedTools "$DENY" >/dev/null
+  # Juste après l'amorçage, le prompt n'est pas toujours détecté (agent_pane_busy) : on réessaie.
+  for attempt in 1 2 3 4 5; do
+    if herdr agent start "$name" --kind claude --pane "$pane" --timeout 60000 -- \
+        --model "$MODEL" --permission-mode auto --disallowedTools "$DENY" >/dev/null; then break; fi
+    [ "$attempt" = 5 ] && { echo "agent $name : démarrage refusé cinq fois" >&2; exit 1; }
+    sleep 3
+  done
   echo "   agent $name prêt"
 
   terminal=$(herdr pane split --pane "$pane" --direction right --cwd "$path" --no-focus | jq -r '.result.pane.pane_id')

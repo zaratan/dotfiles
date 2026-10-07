@@ -178,3 +178,43 @@ La tour a dit « je ne peux pas lire la PR, `gh` ne voit que GitHub » pour une 
 - **Des specs qui démarrent l'application entière à chaque test, dans le projet parallèle, tombent en délai sous charge** et jamais seuls. Trois fichiers, quatre fois dans le lot. Consigner les mesures sur l'issue des tests fragiles ; ne pas les attribuer au hasard.
 - **Les réponses de l'utilisateur à vingt faits se portent en une seule retouche** sur la dernière branche de documentation, numérotées, avec « porté, fichier:ligne » exigé en retour : 22 réponses rangées en un passage de dix minutes.
 - Ordres de grandeur : 16 issues à faire (48 points) plus 2 jetées, 4 worktrees, deux demi-journées ; 7 issues de documentation en 5 heures sur deux agents ; une factorisation de 48 fichiers en 40 minutes d'agent, e2e compris ; ~45 questions directes à l'utilisateur sur la journée, aucune laissée dans un résumé après la correction.
+
+## Lot de mesure sur un projet de traitement vidéo (4 au 6 octobre 2026)
+
+- **Deux agents qui mesurent sur la même machine se faussent mutuellement.** Règle : un verrou commun
+  (`lockf <fichier> <commande>`, une commande par verrou, jamais tout un balayage), écrit dans un
+  `MESURES.md` du dossier des worktrees, avec la liste de ce qui est lourd ; chronométrer à l'intérieur
+  du verrou ; `pgrep` avant tout temps publié. La tour s'y plie aussi pour ses vérifications. Coût : les
+  séries alternent et durent plus ; prévenir les agents de ne rien écourter.
+- **Une consigne « au-delà de N pistes, ne les liste pas » n'empêche pas la commande d'écrire N extraits.**
+  88 Go et un disque plein en une heure. Règle : avant un balayage qui peut exploser, exiger un seuil
+  d'espace libre avant chaque traitement, supprimer les sorties volumineuses au-delà d'un seuil, et
+  demander une issue pour une option « sans sorties lourdes » si elle manque.
+- **Un réglage validé sur la vidéo de référence doit passer sur d'autres vidéos avant d'être proposé.**
+  Trois candidats sur quatre, bons sur la vidéo calme et au banc, sortaient des centaines à des milliers
+  de pistes ailleurs. Le banc tourne sur une seule vidéo : il ne voit pas ce défaut. Règle : la
+  comparaison des candidats inclut dès le départ toutes les vidéos disponibles sans défaut connu.
+- **Remesurer le constat d'une issue avant d'en écrire le plan quand une autre issue mergée entre-temps
+  touche la même chaîne.** Deux constats sur sept étaient périmés : l'un avait changé de nature, l'autre
+  avait disparu (issue fermée sans code).
+- **Les verdicts à l'œil dépendent des conditions de visionnage.** Une piste jugée fausse à vitesse normale
+  était réelle, vue zoomée à vitesse ×0,5. Règle : demander à l'utilisateur comment il a regardé, et
+  consigner le verdict avec le temps de la piste, pas son numéro, qui change à chaque réglage.
+- **Un test qui dépend du désaccord entre deux décodeurs n'est pas portable** (ffprobe 9 sur Mac, ffmpeg 6
+  sur le runner). Règle : injecter l'écart par un patch de la fonction maison, et garder un test qui
+  accepte les deux comportements mesurés. Plus généralement, tout test fondé sur une vidéo fabriquée
+  est « à confirmer au premier passage en CI » dans le compte rendu.
+- **Un fichier passé en Git LFS par l'utilisateur hors de la branche casse la CI de `main`** si la tâche
+  ne récupère pas les objets. La tour lit la CI de `main` après chaque push, pas seulement celle des PR.
+- **La machine portable se met en veille pendant les mesures longues**, même avec `caffeinate -i` : temps
+  réels invalides, temps CPU seul fiable. Le dire dans MESURES.md.
+- **`herdr agent wait` rend « done » alors qu'un balayage en arrière-plan continue** : attendre
+  l'apparition du fichier de compte rendu (boucle `until [ -f … ]`) avant `agent wait`, et demander à
+  l'agent de n'écrire le fichier qu'à la toute fin.
+- **La résolution d'un rebase à plusieurs fichiers** (cinq, tous additifs des deux côtés) : la tour peut
+  résoudre les fichiers et rejouer les tests, puis laisser `git add` et `git rebase --continue` à
+  l'utilisateur. Dire aussi qu'un test de référence échouera par construction si les défauts ont changé,
+  et préparer ses nouvelles valeurs avant le rebase.
+- Ordres de grandeur : 7 issues, 43 points, 3 worktrees, deux jours et demi ; une issue de 8 points en
+  cinq sous-phases avec balayages = 5 h de bancs et une dizaine de consignes ; 4 retouches après
+  vérification de la tour ; 0 compte rendu faux sur ses chiffres ; une quinzaine d'issues créées en chemin.
