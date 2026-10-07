@@ -129,3 +129,4 @@ done
 #
 #   declare -A GRAPPES=([irn]="app p0/2-echelle" [keys]="infra p1/62-cles")
 #   REPO_PATH[app]="$HOME/code/app"
+#   REPO_BASE[app]="origin/develop"   # branches depuis le distant ; git fetch avant de lancer

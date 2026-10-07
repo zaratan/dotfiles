@@ -63,7 +63,9 @@ branche de base (`REPO_BASE`), amorçage (`REPO_BOOTSTRAP`) et contrôle d'amor�
 les faits du projet et se partage ; le fichier de lot porte `GRAPPES`, c'est la tour
 qui l'écrit au groupement, et git l'ignore (`.claude/tower-control/lot-*.sh` dans le
 `.gitignore` du dépôt des issues ; si la ligne manque, la proposer). Il peut aussi corriger un chemin de poste, élément par
-élément (`REPO_PATH[app]=…`) ; un `declare -A REPO_PATH=(…)` y effacerait les autres
+élément (`REPO_PATH[app]=…`), ou faire partir les branches de `origin/<base>` plutôt que
+de la branche locale (`REPO_BASE[app]="origin/develop"`, avec un `git fetch` avant de
+lancer : la tour ne met pas à jour le `develop` local du client) ; un `declare -A REPO_PATH=(…)` y effacerait les autres
 sous-dépôts. Au groupement, ne remplacer que la ligne `GRAPPES` : les autres lignes
 du fichier sont propres au poste et durent d'un lot à l'autre. Si `config.sh` contient encore des `GRAPPES` (dépôt d'avant ce
 découpage), le lanceur s'en sert faute de fichier de lot et prévient : proposer à
@@ -111,6 +113,17 @@ ne suit plus et la machine chauffe.
 **Ordonner chaque grappe** du plus simple au plus discutable, et mettre en dernier
 ce qui finira « Bloqué » sur une décision externe.
 
+**Relire chaque issue contre le code avant de grouper**, par des agents en lecture seule
+(`Explore`, trois à cinq issues chacun, en parallèle) : reproductible encore ? fichiers
+touchés ? choix laissés ouverts, avec recommandation ? doc du dépôt contredite ? Attendu
+chiffré mesuré maintenant ? Le résultat va dans `lot-<n>/decisions.md` du dépôt des issues
+(prémisses corrigées, groupement, décisions de l'utilisateur) : c'est de là que les
+consignes se rédigent. Sur vingt issues, huit prémisses fausses ont été trouvées ainsi.
+
+**Une issue qui change l'outillage de tous les worktrees** (pile de dev par worktree,
+amorçage, scripts de test) **se lance seule, d'abord** ; les grappes partent du `develop`
+qui la contient.
+
 **Vérifier que le défaut peut encore arriver.** Pour chaque issue, écrire en une
 phrase le scénario daté qui le déclenche dans l'état actuel du projet. Si on n'y
 arrive pas, le dire à l'utilisateur avant de lancer, « jeter » en première option :
@@ -152,7 +165,13 @@ Trois choses que le lanceur fait et qu'il ne faut pas retirer :
 - **Mode `auto`** : sans lui, chaque commande Bash non listée bloque l'agent et
   quelqu'un doit répondre.
 
-Passer les issues lancées en « En cours » sur le board.
+Envoyer à chaque agent **la consigne commune et la consigne de l'issue en un seul
+`agent prompt`** (les deux fichiers concaténés) : en deux envois, l'agent répond à la
+première par « quelle issue ? » et la seconde reste derrière sa question.
+
+Passer les issues lancées en « En cours » sur le board
+(`gh project item-edit <n> --owner <o> --url <issue> --field Status --value "En cours"` :
+la forme par URL et nom de champ évite les identifiants de nœuds).
 
 ## 3. Le cycle, issue par issue
 
@@ -179,6 +198,11 @@ demander que le compte rendu ne soit écrit qu'à la toute fin, et attendre ce f
 et un écran arrêté : deux générations dans le même `travail/` se marchent dessus et
 fabriquent des écarts fantômes.
 
+**Mesurer la sortie de succès de chaque commande de vérification avant de l'écrire
+dans une consigne** (« doit être muet » était faux pour un script qui imprime une ligne
+de succès : trois agents sur trois l'ont signalé). Dans un worktree à ports dérivés, les
+tests de base passent par le wrapper du projet, pas par le CLI brut.
+
 **Vérifier indépendamment.** Le compte rendu de l'agent est une affirmation. Avant
 de résumer à l'utilisateur, relancer soi-même dans le worktree les vérifications
 que le projet définit (`pnpm run check`, référence de non-régression, contrôle des
@@ -192,9 +216,14 @@ résumé : elles se posent en questions directes** (AskUserQuestion, une à la f
 avec le texte avant et après), avant de dire « prêt à commiter ». Un utilisateur qui
 traite plusieurs sujets fusionne sans relire ce qu'un résumé lui signale en prose.
 
-**Chaque « hors périmètre repéré » finit quelque part** : traité par le même agent
-(retouche, ou bloc « reliquats » dans la consigne suivante de la grappe qui touche le
-même fichier) ou ouvert en issue. Jamais seulement listé.
+**Chaque « hors périmètre repéré » finit quelque part, avant le résumé** : écrire la
+table point → destination, avec trois destinations possibles : traité (retouche par le
+même agent si le fichier est dans sa branche, ou bloc « reliquats » dans la consigne
+suivante de la même grappe), attaché à une issue existante (commentaire avec
+fichier:ligne), ou nouvelle issue. Jamais seulement listé. **Une issue créée en chemin
+va dans la colonne Backlog, explicitement** (`item-add` laisse le statut vide) : c'est
+l'utilisateur qui trie. `gh issue create` n'a pas de `--json` : prendre le numéro sur
+l'URL imprimée.
 
 **Quand la branche est en retard et partage des fichiers avec ce qui a été fusionné**,
 ne pas se contenter de `merge-tree` : jouer la fusion dans un worktree jetable
@@ -243,7 +272,12 @@ Règles :
 - Ranger la réponse : décision produit → docs du dépôt (questions ouvertes, écarts),
   règle de travail → CLAUDE.md, seulement ce qui reste flou → mémoire.
 - L'utilisateur ne répond pas dans les panes ; s'il l'a fait, vérifier l'état de
-  l'agent avant d'envoyer quoi que ce soit, pour ne pas répondre deux fois.
+  l'agent avant d'envoyer quoi que ce soit, pour ne pas répondre deux fois. Un texte tapé
+  sans être envoyé reste dans la zone de saisie : `send-keys enter` ne le soumet pas (il
+  ne sert qu'aux dialogues), le prochain `agent prompt` l'envoie concaténé. Le lire comme
+  la réponse de l'utilisateur et la consigner.
+- Un agent qui pilote le navigateur a besoin que le site de sa pile (`localhost:<port
+  dérivé>`) soit autorisé dans l'extension : le prévoir dans la consigne.
 
 Un agent qui tourne en rond se voit au `agent read` : l'interrompre
 (`agent send-keys <nom> esc`), reformuler, et ne pas dépasser deux relances sans en

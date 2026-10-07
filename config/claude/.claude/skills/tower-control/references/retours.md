@@ -218,3 +218,55 @@ La tour a dit « je ne peux pas lire la PR, `gh` ne voit que GitHub » pour une 
 - Ordres de grandeur : 7 issues, 43 points, 3 worktrees, deux jours et demi ; une issue de 8 points en
   cinq sous-phases avec balayages = 5 h de bancs et une dizaine de consignes ; 4 retouches après
   vérification de la tour ; 0 compte rendu faux sur ses chiffres ; une quinzaine d'issues créées en chemin.
+
+## Lot sur un méta-dépôt, pile par worktree (7 octobre 2026)
+
+- **Relire chaque issue par des agents en lecture seule avant le lot.** Quatre agents `Explore`
+  (4 à 7 minutes, 70 à 160 k tokens chacun) ont confronté 20 issues au code : toutes
+  reproductibles, mais 8 prémisses fausses (un compte, une ligne, un fichier qui n'existe pas,
+  une piste à l'envers, une doc qui dit l'inverse). Chaque prémisse fausse non vue aurait coûté
+  une question d'agent. Le gabarit : reproductible ? fichiers touchés ? choix ouverts avec
+  recommandation ? doc contredite ? Attendu chiffré mesuré maintenant ? Le résultat va dans un
+  fichier de décisions du lot, pas dans la tête de la tour.
+- **Une issue qui change l'outillage de tous les worktrees se lance seule, d'abord.** Une pile de
+  dev par worktree (ports dérivés du chemin) a rendu possibles quatre agents qui testent en base
+  en parallèle ; l'utilisateur l'a vu avant la tour. Règle : si une issue du lot conditionne le
+  travail des autres, elle part seule, les grappes attendent son merge.
+- **Envoyer la consigne commune et la consigne de l'issue en un seul prompt.** Deux prompts
+  séparés : un agent a répondu à la commune par « quelle issue ? » avant que la seconde arrive,
+  et la seconde est restée dans sa zone de saisie derrière la question. Concaténer les deux
+  fichiers.
+- **`send-keys enter` ne soumet pas un texte tapé dans la zone de saisie** ; il ne sert qu'aux
+  dialogues (`AskUserQuestion`). Un texte que l'utilisateur a tapé dans le pane sans l'envoyer y
+  reste : le lire comme sa réponse, le consigner, et savoir que le prochain `agent prompt` l'envoie
+  concaténé.
+- **Chaque point « hors périmètre » reçoit sa destination avant le résumé**, dans une table
+  point → traité (retouche si le fichier est dans la branche) / attaché (commentaire avec
+  fichier:ligne sur l'issue existante) / nouvelle issue. L'utilisateur l'a redemandé au troisième
+  compte rendu du lot, comme au lot précédent : c'est la règle la plus souvent oubliée.
+- **Une issue créée en chemin va dans la colonne Backlog, explicitement** : `gh project
+  item-add` laisse le statut vide ou au défaut du board, et l'utilisateur trie lui-même.
+  `gh project item-edit <n> --owner <o> --url <issue> --field Status --value Backlog`. La forme
+  par URL et nom de champ évite les identifiants de nœuds et le `jq` sur `item-list`, qui casse
+  dès qu'un corps d'issue contient un caractère de contrôle.
+- **`gh issue create` n'a pas de `--json`** : il imprime l'URL, le numéro se prend par
+  `grep -o '[0-9]*$'`. Un repli silencieux a créé une issue au corps « voir ci-dessus ».
+- **Mesurer la sortie de succès d'une commande de vérification avant d'écrire « doit être muet »** :
+  un script qui imprime une ligne de succès a fait signaler un écart par trois agents sur trois.
+- **Dans un worktree à ports dérivés, les tests de base passent par le wrapper du projet**, pas
+  par le CLI brut, qui lit les ports par défaut et échoue sans message utile.
+- **Les branches empilées deviennent des ancêtres purs après le merge** : une branche créée sur le
+  commit de la PR précédente, une fois cette PR mergée, est « N derrière, 0 devant » ; le rebase
+  est un déplacement, et seuls les fichiers touchés par d'autres PR mergées entre-temps peuvent
+  conflicter. Le dire tel quel dans le point à l'utilisateur.
+- **Clone d'un dépôt externe refusé par le classificateur de permissions** (intégration de code
+  non vérifié) : ne pas contourner ; écrire la commande dans un script du dossier de travail et
+  demander à l'utilisateur de le lancer (`! bash travail/clone-x.sh`), parce qu'un terminal qui
+  replie les messages en résumé avale une commande donnée en prose.
+- **Un agent qui pilote le navigateur a besoin que le site de sa pile soit autorisé dans
+  l'extension** (`localhost:<port dérivé>`) : le dire dans la consigne, ou vérifier que
+  l'utilisateur autorise tous les sites.
+- Ordres de grandeur : 20 issues (63 points) + 10 ouvertes en chemin ; première issue d'outillage
+  35 minutes d'agent + 5 de retouche ; ensuite 4 worktrees, 3 à 15 minutes par issue de 2-3
+  points, 4 retouches sur 5 comptes rendus (toutes des reliquats du même fichier), 0 compte rendu
+  faux sur ses chiffres, ~12 questions directes à l'utilisateur sur la demi-journée.
