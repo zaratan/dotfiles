@@ -20,6 +20,8 @@ Worktree : `wt/<grappe>` (dépôt `<sous-dépôt>`), branche `<branche>` depuis 
 
 Attendu : <résultat vérifiable — commande à lancer et chiffres avant/après,
 cas nominatifs qui doivent apparaître>.
+Mesuré le <date> par <commande>, sur <commit> : <les chiffres de départ, remesurés
+par la tour, jamais recopiés d'une doc ou du lot précédent>.
 ```
 
 Ce qui rend une consigne bonne : l'« Attendu » est ce que la tour relancera

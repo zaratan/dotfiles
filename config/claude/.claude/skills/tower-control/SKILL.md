@@ -23,6 +23,10 @@ précédentes, et la raison d'être de ce skill est de s'améliorer à chaque lo
 scope `project`, un board GitHub Projects avec les statuts Backlog → À faire →
 En cours → Bloqué → Review → Fait, et le workflow « item closed → Fait » actif.
 
+**Relever les alias du poste** (`type df du grep sed`) : une commande écrite dans une
+consigne ou lancée par la tour tombe sur `duf`, `dust`, `ugrep` ; écrire `/bin/df`,
+`/usr/bin/grep` quand c'est le cas.
+
 **Relever le login GitHub** une fois (`gh api user -q .login`) : il nomme le fichier
 de lot, filtre le board et signe le journal. Vérifier qu'il peut être assigné sur
 `ISSUES_REPO` (`gh api "repos/$ISSUES_REPO/assignees/<login>" --silent`, 404 sinon) —
@@ -110,6 +114,10 @@ second merge conflicte à coup sûr. Lire chaque issue, noter les fichiers proba
 former des grappes. Trois ou quatre worktrees est un bon nombre : au-delà, la tour
 ne suit plus et la machine chauffe.
 
+**Contrôler la couverture** : chaque issue du lot est dans exactement une grappe (`comm` entre la
+liste « À faire » assignée et la somme des grappes) ; une issue décidée et jamais lancée a été
+retrouvée en fin de lot par la colonne du board.
+
 **Ordonner chaque grappe** du plus simple au plus discutable, et mettre en dernier
 ce qui finira « Bloqué » sur une décision externe.
 
@@ -124,6 +132,11 @@ consignes se rédigent. Sur vingt issues, huit prémisses fausses ont été trou
 amorçage, scripts de test) **se lance seule, d'abord** ; les grappes partent du `develop`
 qui la contient.
 
+**Mesurer chaque chiffre de la consigne avec la commande qui servira à vérifier**, même
+s'il vient de la doc du dépôt : une doc de mesures est périmée dès qu'une issue mergée
+touche la même chaîne, et une consigne écrite dessus coûte une issue sans objet ou une
+question d'agent.
+
 **Vérifier que le défaut peut encore arriver.** Pour chaque issue, écrire en une
 phrase le scénario daté qui le déclenche dans l'état actuel du projet. Si on n'y
 arrive pas, le dire à l'utilisateur avant de lancer, « jeter » en première option :
@@ -133,6 +146,15 @@ de l'issue à la doc du dépôt avant de la recopier dans une consigne.
 **Si plusieurs agents mesurent sur la même machine**, poser un verrou commun avant de
 lancer (`lockf`, une commande par verrou, règle écrite dans un `MESURES.md` du dossier
 des worktrees, seuil d'espace disque avant tout balayage) ; voir `references/retours.md`.
+Une série de mesures lancée par la tour elle-même se dimensionne au besoin (à quoi sert
+chaque ligne, qui attend le verrou pendant ce temps) et se dit à l'utilisateur avec son
+coût : un balayage exhaustif a bloqué trois agents une matinée pour un tableau que sept
+lignes déjà mesurées suffisaient à remplir.
+
+**Si une issue redistribue du code tiers** (binaire, paquet, image), la consigne demande
+de vérifier d'abord les licences réellement embarquées (chaînes des bibliothèques, pas le
+fichier de licences du paquet, qui peut mentir) et de s'arrêter si elles changent celle du
+livrable : c'est une décision de l'utilisateur, et la tour revérifie elle-même.
 
 **Trancher avant de lancer** ce que les issues laissent ouvert (« à trancher »). Un
 agent bloqué sur une décision produit est un agent qui attend ; la tour prend la
@@ -182,10 +204,17 @@ tour  : attend en arrière-plan, lit le compte rendu, VÉRIFIE ELLE-MÊME,
         résume à l'utilisateur                            board : En cours → Review
 user  : ouvre le sous-espace herdr, relit le diff, commite, ouvre la PR (Closes #N)
 tour  : vérifie le lien PR → issue par `gh pr view <PR> --json closingIssuesReferences`,
-        jamais par une regex sur le corps (GitHub accepte « Closes: #N », « fixes #N »…)
+        jamais par une regex sur le corps (GitHub accepte « Closes: #N », « fixes #N »…) ;
+        si le lien manque au merge, c'est la tour qui ferme l'issue, avec un commentaire
 tour  : crée la branche suivante depuis ce HEAD, envoie la consigne suivante
 merge : ferme l'issue, le workflow du board la passe en Fait — la tour n'y touche pas
 ```
+
+**Lire la CI soi-même** : celle de chaque PR jusqu'au bout (boucler tant qu'une tâche est
+« pending » ; `gh pr checks --watch` rend la main au premier résultat) et celle de la
+branche de base après chaque merge. Une tâche annulée par son délai n'est pas un test qui
+échoue : lire l'étape avant de relancer, et proposer la cause et le correctif avec la
+relance.
 
 **Attendre sans surveiller** : `herdr agent wait <nom>` lancé en arrière-plan
 (`run_in_background`) réveille la tour quand l'agent passe en `done` ou `blocked`.
@@ -226,9 +255,14 @@ l'utilisateur qui trie. `gh issue create` n'a pas de `--json` : prendre le numé
 l'URL imprimée.
 
 **Quand la branche est en retard et partage des fichiers avec ce qui a été fusionné**,
-ne pas se contenter de `merge-tree` : jouer la fusion dans un worktree jetable
-(`git worktree add --detach` sur un `commit-tree` du résultat), install, build,
-typecheck, tests, puis le retirer. Un rebase sans conflit a déjà cassé `tsc` deux fois.
+ne pas se contenter de `merge-tree` : jouer la fusion dans un worktree jetable, puis
+install, build, typecheck, tests, et le retirer. Branche commitée : `merge-tree
+--write-tree` + `commit-tree` + `git worktree add --detach`. Travail non commité :
+`git worktree add --detach` sur `origin/<base>`, `git diff HEAD` appliqué par
+`git apply --3way`, copie des fichiers non suivis — **jamais `git add -N` ni `git reset`**
+dans le worktree de l'agent, ce sont des écritures d'index et l'arbre obtenu est faux. Un
+rebase sans conflit a déjà cassé `tsc` deux fois, et un `merge-tree` propre a caché un
+conflit sémantique (un test qui compte des fichiers qu'une autre branche ajoute).
 
 **Une branche par issue, et d'où elle part.** Après le commit de l'utilisateur, la
 tour crée la branche suivante dans le même worktree (`git switch -c` — c'est la tour
@@ -271,11 +305,11 @@ Règles :
   moins qu'une décision prise à la place de l'utilisateur.
 - Ranger la réponse : décision produit → docs du dépôt (questions ouvertes, écarts),
   règle de travail → CLAUDE.md, seulement ce qui reste flou → mémoire.
-- L'utilisateur ne répond pas dans les panes ; s'il l'a fait, vérifier l'état de
-  l'agent avant d'envoyer quoi que ce soit, pour ne pas répondre deux fois. Un texte tapé
-  sans être envoyé reste dans la zone de saisie : `send-keys enter` ne le soumet pas (il
-  ne sert qu'aux dialogues), le prochain `agent prompt` l'envoie concaténé. Le lire comme
-  la réponse de l'utilisateur et la consigner.
+- L'utilisateur ne répond pas dans les panes, et **un texte non envoyé dans la zone de
+  saisie d'un agent n'est jamais de lui** : c'est une suggestion automatique de Claude
+  Code (« Compte rendu lu, je commite. », « aligne aussi … »). Ne pas l'interpréter, ne pas
+  le consigner, ne pas poser de question dessus ; `agent prompt` le remplace. `send-keys
+  enter` ne sert qu'aux dialogues (`AskUserQuestion`).
 - Un agent qui pilote le navigateur a besoin que le site de sa pile (`localhost:<port
   dérivé>`) soit autorisé dans l'extension : le prévoir dans la consigne.
 
@@ -288,7 +322,8 @@ parler à l'utilisateur.
 - Proposer l'ordre de merge qui minimise les conflits (les grappes qui partagent un
   fichier en dernier, l'une après l'autre).
 - Une fois tout mergé : `herdr workspace close` des sous-espaces créés par la tour,
-  `git worktree remove`, suppression des liens de mémoire.
+  `git worktree remove` (jamais `--force` ; avant chacun, la PR de la branche est mergée et
+  `git status --short` du worktree est vide), suppression des liens de mémoire.
 - **Libérer ce que l'utilisateur abandonne** : une issue encore assignée au login
   courant qui sort du lot sans suite reste invisible pour l'autre tour. Proposer
   `--remove-assignee @me` ; une issue en Review reste à son auteur jusqu'au merge.

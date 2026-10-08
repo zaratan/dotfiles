@@ -130,6 +130,9 @@ Un `wait` par agent, en parallèle.
 - **Branche créée depuis `origin/main`** (`git switch -c x origin/main`) : git la fait
   suivre `origin/main`, et un `git push` sans argument pousserait sur `main`. Faire
   `git branch --unset-upstream` aussitôt. Empiler sur le HEAD local n'a pas ce piège.
+- **`agent start` juste après l'amorçage répond parfois `agent_pane_busy`** alors que le
+  prompt est affiché (2 fois sur 4 sur un lot) : réessayer, cinq fois à 3 s d'écart suffisent
+  (le lanceur le fait).
 - **`agent wait` peut rendre la main trop tôt** : un état `idle` ou `done` a été observé
   alors que l'agent enchaînait encore des commandes. Après un `wait`, lire l'écran
   (`agent read --source visible`) et ne vérifier dans le worktree que si la dernière

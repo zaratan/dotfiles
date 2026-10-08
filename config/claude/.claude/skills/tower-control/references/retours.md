@@ -237,9 +237,9 @@ La tour a dit « je ne peux pas lire la PR, `gh` ne voit que GitHub » pour une 
   et la seconde est restée dans sa zone de saisie derrière la question. Concaténer les deux
   fichiers.
 - **`send-keys enter` ne soumet pas un texte tapé dans la zone de saisie** ; il ne sert qu'aux
-  dialogues (`AskUserQuestion`). Un texte que l'utilisateur a tapé dans le pane sans l'envoyer y
-  reste : le lire comme sa réponse, le consigner, et savoir que le prochain `agent prompt` l'envoie
-  concaténé.
+  dialogues (`AskUserQuestion`). Un texte visible dans la zone de saisie d'un agent idle est une
+  suggestion automatique de Claude Code, jamais l'utilisateur (confirmé par lui le 8 octobre
+  2026, après qu'une tour lui a posé la question deux fois) : l'ignorer, `agent prompt` le remplace.
 - **Chaque point « hors périmètre » reçoit sa destination avant le résumé**, dans une table
   point → traité (retouche si le fichier est dans la branche) / attaché (commentaire avec
   fichier:ligne sur l'issue existante) / nouvelle issue. L'utilisateur l'a redemandé au troisième
@@ -270,3 +270,116 @@ La tour a dit « je ne peux pas lire la PR, `gh` ne voit que GitHub » pour une 
   35 minutes d'agent + 5 de retouche ; ensuite 4 worktrees, 3 à 15 minutes par issue de 2-3
   points, 4 retouches sur 5 comptes rendus (toutes des reliquats du même fichier), 0 compte rendu
   faux sur ses chiffres, ~12 questions directes à l'utilisateur sur la demi-journée.
+- **Un agent a lancé le formateur sur des dossiers entiers** : 62 fichiers modifiés au lieu de 35, un
+  diff qui mélange reformatage et correctif. L'agent ne peut pas restaurer (`checkout` interdit) ; il a
+  sauvé un patch, la tour a fait `git checkout -- .` (les fichiers non suivis restent) et l'a relancé
+  « sans formateur sur les fichiers existants ». Règle pour la consigne commune : `lint:fix` et le
+  formateur ne se lancent que sur les fichiers touchés par l'issue, jamais sur un dossier.
+- **`git rm --cached` n'était pas dans la liste des outils interdits** : un agent l'a lancé pour supprimer un
+  composant mort, l'index a été écrit. Ajoutés au `DENY` du lanceur : `git rm`, `git mv`, `git restore`,
+  `git clean`, `git update-index`. La liste doit couvrir tout ce qui écrit l'index ou l'arbre, pas seulement
+  l'historique.
+- **Une issue décidée mais jamais placée dans une grappe** a été découverte à la fin du lot, en relisant la
+  colonne « À faire » du board. Règle : après le groupement, vérifier que chaque issue du lot figure dans
+  exactement une grappe (`comm` entre la liste du lot et la somme des grappes), et relire la colonne
+  « À faire » à chaque clôture de worktree.
+- **Clôture : 24 issues (66 points) en une journée, 23 PR, 5 worktrees** (une issue d'outillage seule
+  d'abord, puis quatre grappes, puis un cinquième worktree pour une issue ajoutée en fin de lot).
+  13 retouches sur 24 comptes rendus, toutes sur des reliquats que l'agent avait lui-même listés : le
+  bloc « hors périmètre » est la source principale des retouches, le lire avant le résumé. 0 compte
+  rendu faux sur ses chiffres. 5 prémisses de consignes fausses malgré la relecture par agents : une
+  relecture ne remplace pas la mesure de chaque chiffre et de chaque mot d'une décision.
+- **Vérifier seulement quand `agent wait` rend `done`, pas `blocked`** : un typecheck lancé pendant que
+  l'agent était à mi-chemin a rendu 30/33, fantôme disparu une fois l'agent fini.
+- **À la clôture, les piles Docker des worktrees survivent à `git worktree remove`** (les agents laissent
+  leur pile montée) : lister par nom de projet, `supabase stop --project-id` + `docker compose -p down`,
+  puis la commande de ménage des volumes du projet.
+- **L'utilisateur lit mieux un script qu'une commande en prose** quand son terminal replie les messages :
+  écrire les commandes de fusion ou de clonage dans `travail/*.sh` et donner `! bash travail/x.sh`.
+
+## Lot sur un projet de traitement vidéo, dépôt unique, neuf issues (7 et 8 octobre 2026)
+
+- **Les chiffres d'une doc du dépôt sont aussi périssables qu'une mémoire.** Deux consignes ont recopié des
+  mesures de la doc de profilage (surcoût d'une passe, nombre de pistes d'une vidéo) périmées par le lot
+  précédent : une issue entière s'est révélée sans objet une fois remesurée par l'agent. Règle : avant d'écrire
+  un chiffre dans un « Attendu », le remesurer avec la commande qui servira à vérifier, même s'il vient de la doc
+  — surtout si une issue mergée depuis touche la même chaîne.
+- **Un balayage de mesure proposé par la tour se dimensionne au besoin, pas à l'exhaustivité.** 26 vidéos × 2
+  réglages ont occupé le verrou commun une matinée et fait attendre trois agents ; 7 vidéos déjà mesurées
+  suffisaient au tableau visé. Avant de lancer une série longue : à quoi sert chaque ligne, qui attend le verrou
+  pendant ce temps, et le dire à l'utilisateur avec le coût.
+- **`merge-tree` sans conflit n'est pas une fusion propre, et la répétition se fait par `git apply`.** Deux
+  fois : un conflit textuel additif (même fichier de tests enrichi par deux branches) puis un conflit sémantique
+  (un test de la branche A comptait les fichiers d'un dossier, la branche B en ajoute un). Méthode qui tient :
+  `git worktree add --detach` sur `origin/<base>`, `git diff HEAD` de la branche appliqué par `git apply --3way`,
+  copie des fichiers non suivis, `check` complet, puis retrait du worktree. **Jamais `git add -N` ni
+  `git reset`** pour faire entrer des fichiers non suivis dans un `write-tree` : c'est une écriture d'index
+  interdite, et l'arbre obtenu était faux (les fichiers manquaient, 41 tests de moins sans que rien ne le dise).
+  Quand la branche est déjà commitée, `git merge-tree --write-tree` + `commit-tree` + worktree jetable suffit.
+- **La tour peut résoudre un rebase en cours pour l'utilisateur** : lire les hunks, garder les deux côtés quand
+  c'est additif, réordonner quand l'un des blocs est une méthode (les `if` d'un `__post_init__` doivent
+  précéder la méthode ajoutée), isoler un test d'une option nouvelle (`--zoom none`) plutôt que changer son
+  attendu ; vérifier avec lint, types, tests, mais **ne pas formater un fichier que le commit suivant du rebase
+  corrige** ; laisser `git add` et `rebase --continue` à l'utilisateur, avec les commandes écrites.
+- **Les décisions de licence sont à l'utilisateur, et l'agent doit s'arrêter dessus.** Une roue PyPI livrait un
+  FFmpeg GPL alors que son fichier de licences annonçait LGPL : consigne « vérifie d'abord ; GPL → arrête-toi »,
+  vérification refaite par la tour (`strings` sur la dylib), décision de l'utilisateur (binaire GPL v3, code MIT),
+  puis NOTICE par bibliothèque. Un agent qui aurait continué aurait publié sans le savoir.
+- **Une annulation de CI par délai n'est pas un échec de test** : lire l'étape annulée avant de relancer. Ici
+  `apt-get install` sur un miroir lent (10 min contre 25 s d'habitude) ; la réponse était de sortir d'apt (binaire
+  statique épinglé par sha256 et mis en cache), pas de relancer. L'utilisateur a refusé la relance avant que la
+  tour ne la propose : proposer la cause et le correctif en même temps que la relance.
+- **Le lanceur** : `herdr agent start` juste après l'amorçage répond parfois `agent_pane_busy` alors que le prompt
+  est là (2 fois sur 4) ; cinq essais à 3 s d'écart suffisent. `herdr agent wait` rend « done » pendant des
+  mesures lancées en arrière-plan : attendre le fichier de compte rendu, et dire à l'agent de ne pas attendre la
+  fin d'un balayage de la tour quand le verrou alterne (il perdait une heure).
+- **Le poste a des alias** (`df` → `duf`, `du` → `dust`, `grep` → `ugrep`) : dans les consignes et les commandes
+  de la tour, `/bin/df`, `/usr/bin/du`, `/usr/bin/grep`. `gh pr checks --watch` rend la main dès le premier
+  résultat : boucler sur « pending ».
+- **Un merge sans `Closes #N` laisse l'issue ouverte** : vérifier `closingIssuesReferences` à l'ouverture de
+  chaque PR, et fermer soi-même avec un commentaire quand le lien manque et que le merge est constaté.
+- **Ne jamais retirer un worktree sans avoir vu la PR mergée et un `git status` vide.** Sur un « PR merged »
+  de l'utilisateur qui désignait une autre PR, la tour a fermé le dernier worktree avec `--force` : la
+  retouche non commitée y a été perdue, refaite à la main grâce au diff gardé en contexte. Règle : avant
+  `workspace close` / `worktree remove`, vérifier `gh pr list --head <branche>` (mergée) **et**
+  `git -C <worktree> status --short` vide ; jamais `--force` ; et garder le diff de toute retouche dans le
+  compte rendu, pas seulement son résumé.
+- Ordres de grandeur : 9 issues (27 points), 4 worktrees, une journée et demie ; 6 à 50 min d'agent par issue ;
+  2 plans relus avant code ; 7 retouches après vérification ; 0 compte rendu faux ; 5 prémisses de tour fausses ;
+  ~40 questions directes, dont une dizaine de « décisions prises seul » transformées en questions.
+
+## Lot d'une seule issue, piloté en direct par l'utilisateur (8 octobre 2026)
+
+- **Une issue « gabarit modifié » n'est pas une issue, c'est une conversation.** Première passe
+  28 minutes, puis 8 retouches en 2 h 30, chacune née d'une décision de l'utilisateur en regardant le
+  rendu (alignement, arrondi, justification, plancher de police, partage de hauteur). Règle : quand
+  l'issue touche à la maquette, prévoir des allers-retours courts plutôt qu'une consigne exhaustive,
+  et **rendre les fiches en image** (PPTX → PDF → PNG recadré sur la zone) à chaque passe : c'est
+  l'image qui a déclenché 4 des 8 retouches, pas le compte rendu.
+- **Un fichier annoncé « synchronisé » peut ne pas l'être** : copie de sauvegarde identique à
+  l'original, iCloud « à jour », aucun verrou — le fichier n'avait pas été enregistré. Mesurer (md5,
+  horodatage, `brctl status`) et le dire, avant toute consigne.
+- **Mesurer la géométrie dans le XML produit, pas seulement regarder le PDF** : un script de 20 lignes
+  (nom, x, y, w, h en mm par forme) a servi à chaque passe, et c'est lui qui a vu le rayon d'arrondi
+  (`adj` en fraction du plus petit côté) et le texte centré qui débordait vers le haut.
+- **Le texte visible dans la zone de saisie d'un agent idle n'est jamais l'utilisateur** : suggestion
+  automatique. Confirmé par lui après deux questions inutiles. SKILL.md corrigé.
+- **La CI a cassé sur un test qui lisait le gabarit au chargement du module**, hors `skipIf`, alors que
+  le test voisin faisait bien. Règle pour la consigne commune d'un projet à données hors git : tout
+  test qui lit le dossier partagé le fait sous `skipIf` et dans le test, avec la preuve
+  `mv external_doc external_doc.off && bun test` avant Review.
+- **Un « au passage » de l'utilisateur sur une PR ouverte** : issue créée pour la traçabilité, traitée
+  sur la même branche, `Closes #N` ajouté au corps de la PR par l'utilisateur. Deux issues fermées par
+  une PR, le board a suivi.
+- Ordres de grandeur : 1 issue de 5 points + 1 de 1 point, 1 worktree, 3 h ; 22 décisions, 9 comptes
+  rendus, 0 chiffre faux dans les comptes rendus, 1 prémisse fausse de la tour (le gabarit absent).
+- (suite, lot 4 du même jour) **L'agent bloque sur une approbation de copie hors du dossier de
+  travail** quand une donnée vit derrière un lien symbolique iCloud : lecture légitime, écriture dans
+  son scratchpad. La tour répond `send-keys enter` après avoir lu le dialogue ; prévoir dans la consigne
+  commune que les photos se copient dans le scratchpad avant mesure, pour que l'agent n'attende pas.
+- **Un « Attendu » qui range une anomalie dans le mauvais compteur** (tableur vs photos) se voit au
+  premier compte rendu : lire la sortie de `controler` avant d'écrire le chiffre, les deux totaux sont
+  séparés.
+- **Une branche peut réaliser une issue voisine sans le savoir** (source unique des recadrages = la
+  piste 1 d'une issue ouverte). Avant Review, relire les « décisions prises seul » contre les issues
+  ouvertes du même fichier ; ici, un `Closes` de plus sur la PR et une issue de moins.

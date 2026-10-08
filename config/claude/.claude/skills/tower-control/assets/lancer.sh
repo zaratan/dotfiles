@@ -50,7 +50,7 @@ done
 # La mémoire suit le dépôt des issues : c'est lui qui porte les notes du projet.
 MEMORY="$HOME/.claude/projects/$(echo "$REPO" | tr '/' '-')/memory"
 mkdir -p "$WORKTREES_DIR"
-DENY="Bash(git add*) Bash(git commit*) Bash(git push*) Bash(git stash*) Bash(git switch*) Bash(git checkout*) Bash(git reset*) Bash(git rebase*) Bash(git merge*) Bash(rm -rf*)"
+DENY="Bash(git add*) Bash(git commit*) Bash(git push*) Bash(git stash*) Bash(git switch*) Bash(git checkout*) Bash(git reset*) Bash(git rebase*) Bash(git merge*) Bash(git rm*) Bash(git mv*) Bash(git restore*) Bash(git clean*) Bash(git update-index*) Bash(rm -rf*)"
 
 wanted() { [ ${#ONLY[@]} -eq 0 ] && return 0; local g; for g in "${ONLY[@]}"; do [ "$g" = "$1" ] && return 0; done; return 1; }
 for name in "${!GRAPPES[@]}"; do

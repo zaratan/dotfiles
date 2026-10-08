@@ -45,11 +45,17 @@ Avant de poser une question, vérifie qu'elle n'a pas déjà sa réponse dans
 - L'issue est petite : pas de revue de plan. Une revue `lead-engineer-reviewer`
   après implémentation, et tu appliques ce qui est justifié.
 - Mets à jour la documentation du dépôt si le comportement visible change.
+- Le formateur et `lint:fix` ne se lancent que sur les fichiers que tu as touchés, jamais
+  sur un dossier : un reformatage de masse noie le correctif dans la relecture.
 - Avant de rendre, les vérifications du projet passent (voir « Projet »). Si une
   référence de non-régression signale des écarts, ne les corrige pas et ne refige
   rien : explique-les dans le compte rendu.
 
 ## Compte rendu final
+
+Tu l'écris quand plus rien ne tourne (aucune mesure ni revue en arrière-plan) : la tour
+attend ce fichier, pas ton état. Si la tour mesure en même temps que toi sous le verrou
+commun, n'attends pas la fin de sa série : le verrou alterne, lance tes commandes.
 
 Ton dernier message suit exactement ce plan, sans prose autour, et tu l'écris aussi
 dans `travail/rapport-<N>.md` **à la racine du dépôt qui porte les issues** (le chemin
@@ -62,6 +68,7 @@ d'issue, et un fichier non suivi dans le sous-dépôt finit dans un `git add .` 
 **Fichiers** — liste.
 **Tests ajoutés** — noms.
 **Vérifications** — chaque vérification du projet : vert/rouge, chiffres avant/après.
+**Diff** — pour une retouche courte (moins de 30 lignes), le diff lui-même.
 **Décisions prises seul** — chacune en une ligne, pour que l'utilisateur puisse les contredire.
 **Questions ouvertes** — ce qui attend une décision.
 **Hors périmètre repéré** — ce que tu n'as pas fait exprès.
