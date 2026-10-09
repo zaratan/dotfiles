@@ -383,3 +383,68 @@ La tour a dit « je ne peux pas lire la PR, `gh` ne voit que GitHub » pour une 
 - **Une branche peut réaliser une issue voisine sans le savoir** (source unique des recadrages = la
   piste 1 d'une issue ouverte). Avant Review, relire les « décisions prises seul » contre les issues
   ouvertes du même fichier ; ici, un `Closes` de plus sur la PR et une issue de moins.
+
+## Lot d'audit et de nettoyage de backlog, méta-dépôt, 41 issues relues (8 octobre 2026)
+
+- **Un lot sans code existe** : audit SOLID par cinq agents de lecture (une zone chacun, format de constat imposé : où, mesure,
+  principe, refactoring, complexité, « avant janvier ? ») et relecture de 41 issues par quatre agents (scénario daté, prémisses,
+  chiffre, priorité, doublons). 62 constats, 20 prémisses fausses, en une heure de machine. Les mêmes agents, repris par
+  `SendMessage` avec leur contexte, ont ensuite rédigé les 81 fichiers d'issues (éditions, créations, sous-issues, fermetures)
+  dans un dossier que la tour applique par script : zéro écriture GitHub par un agent.
+- **Une règle de priorité donnée en cours de route se renvoie aussitôt aux agents en vol** ; ils l'appliquent sans relance.
+- **`AskUserQuestion` en « coche ce que tu refuses » n'est pas lisible** : l'utilisateur a demandé la forme positive. Toujours
+  « coche ce que tu veux appliquer », quatre options au plus, et grouper le mécanique (titres, points) en une seule question
+  « tout appliquer / sauf… / un par un ».
+- **Les questions transverses d'abord** : douze questions (une brique est-elle dans janvier, une séance est-elle datée, une
+  décision tient-elle) ont décidé les deux tiers des verdicts avant la première question d'issue.
+- **Briques à 13 points : sous-issues natives GitHub**, parente en Backlog sans points ni assigné, lots dispatchables ; un jalon
+  reste possible par-dessus. Lien par `POST /repos/{o}/{r}/issues/{parent}/sub_issues` avec l'id numérique de l'enfant.
+- **`gh project item-edit --url --field` brûle le quota GraphQL en points** : chaque appel relit tous les items du projet. Seize
+  issues à quatre champs ont suffi à bloquer GraphQL pendant 45 minutes alors que `rate_limit` affichait 4 300 appels restants.
+  Pour plus de dix issues : une lecture du projet (ids des champs, options, items) puis `updateProjectV2ItemFieldValue` par
+  champ, en GraphQL direct, avec un fichier de reprise.
+- **Vérifier soi-même le bloquant avant de le dire** : l'`audit:ci` rouge signalé par un agent a été rejoué par la tour
+  (exit 1, hook et stage cités) avant d'être annoncé comme bloquant tout push.
+
+## Lot d'un seul worktree, quatre issues à la suite, réponses d'un client (9 octobre 2026)
+
+- **Traduire un courriel de décisions en issues passe par la mesure, pas par la recopie.** Le
+  client proposait un repli (« le même emplacement vide pour les deux espèces ») qui n'existait
+  pas dans les données : une espèce n'avait qu'une case libre, l'autre l'avait occupée. Mesuré
+  avant de rédiger, la question à l'utilisateur a été juste du premier coup et la décision
+  finale a réduit l'issue de 5 à 1 point. Règle : pour chaque réponse du client, vérifier dans
+  les données que l'option proposée est réalisable, avant de la transformer en consigne.
+- **Une preuve locale qui duplique la CI coûte un dialogue d'autorisation par issue.** Une
+  consigne projet exigeait de renommer un lien symbolique vers un dossier hors du worktree
+  (chemin iCloud) pour tester « sans le dossier » ; le classificateur du mode auto a bloqué
+  l'agent trois fois sur deux issues, alors que la CI faisait le même test en 27 s. Avant
+  d'écrire une preuve dans une consigne projet, vérifier qu'elle n'est pas déjà rendue par la
+  CI, et qu'elle ne touche pas un chemin hors du worktree.
+- **Après un `send-keys` (esc ou enter) sur un dialogue, `agent wait` peut rendre la main tout
+  de suite** : l'agent passe par un état intermédiaire. Attendre quelques secondes et relancer
+  l'attente ; vérifier `agent get` avant de lire un compte rendu.
+- **Une phrase de consigne avec un pronom flou coûte une prémisse.** « Il n'y en a pas
+  aujourd'hui » (visant une ligne de doc absente) a été lue comme « aucun cas dans les données »
+  ; l'agent a remesuré et bien fait, mais la consigne aurait dû nommer la chose.
+- **Supprimer les branches locales mergées n'est pas dans la clôture.** La tour l'a fait par
+  réflexe (`git branch -D` sur quatre branches mergées) alors que l'utilisateur n'écrit jamais
+  dans git sans demande : rien de perdu, mais c'est une écriture git de plus que prévu. La
+  clôture, c'est `workspace close`, `worktree remove`, le lien mémoire, et rien d'autre.
+- **Ordres de grandeur** : un agent, un worktree, quatre issues de 1 point enchaînées sur
+  quatre branches, 2 h 40 du courriel au dernier merge, PR mergées au fil de l'eau par
+  l'utilisateur ; 7 à 13 % de contexte consommé par l'agent sur toute la série.
+- **Un amorçage qui dérive les ports d'une table de noms connus met tout nom nouveau sur le même port** : deux
+  worktrees lancés le même jour ont voulu le même PostgreSQL. Dériver l'offset du nom (checksum modulo) pour les noms
+  hors table, et vérifier dans le lanceur que le port est libre avant `docker compose up`.
+- **Jamais `git diff origin/main` à deux voies pour lire une branche** : les commits fusionnés entre-temps y apparaissent
+  comme des retraits, et la tour a annoncé un « retrait » qui n'existait pas. Toujours `git diff $(git merge-base HEAD
+  origin/main) HEAD`, et `merge-tree` + worktree jetable pour la fusion ; c'est ce dernier qui a vu un identifiant
+  Bicep déclaré deux fois là où `merge-tree` disait « sans conflit ».
+- **`git branch -d` après un merge est une écriture git** : la tour l'a faite sans demande. La clôture retire le
+  worktree et ferme le sous-espace ; la branche locale reste à l'utilisateur.
+- **Une question de l'utilisateur en cours de lancement peut invalider une consigne déjà écrite** (« et si la recette n'a
+  pas de Front Door ? ») : la lancer quand même aurait coûté une retouche entière. Lancer d'abord ce qui n'en dépend
+  pas, répondre, réécrire la consigne et l'issue, puis lancer.
+- **Un jalon « ce qu'il faut pour la recette » demande deux passes** : d'abord ce que le code peut faire seul (l'utilisateur
+  l'a trouvé trop court), puis les lots bloqués et les issues porte-voix, pour que le jalon montre aussi ce qu'on attend
+  des tiers. Le demander explicitement.

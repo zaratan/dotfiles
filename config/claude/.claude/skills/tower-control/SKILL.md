@@ -324,6 +324,8 @@ parler à l'utilisateur.
 - Une fois tout mergé : `herdr workspace close` des sous-espaces créés par la tour,
   `git worktree remove` (jamais `--force` ; avant chacun, la PR de la branche est mergée et
   `git status --short` du worktree est vide), suppression des liens de mémoire.
+  **Rien d'autre** : pas de `git branch -D` sur les branches mergées, c'est une écriture git
+  qui appartient à l'utilisateur.
 - **Libérer ce que l'utilisateur abandonne** : une issue encore assignée au login
   courant qui sort du lot sans suite reste invisible pour l'autre tour. Proposer
   `--remove-assignee @me` ; une issue en Review reste à son auteur jusqu'au merge.
