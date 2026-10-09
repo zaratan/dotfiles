@@ -158,7 +158,23 @@ livrable : c'est une décision de l'utilisateur, et la tour revérifie elle-mêm
 
 **Trancher avant de lancer** ce que les issues laissent ouvert (« à trancher »). Un
 agent bloqué sur une décision produit est un agent qui attend ; la tour prend la
-décision avec l'utilisateur en amont et l'écrit dans la consigne.
+décision avec l'utilisateur en amont et l'écrit dans la consigne. Poser d'abord les
+**questions transverses** (une brique est-elle dans l'échéance, une séance est-elle datée,
+une décision tient-elle encore) : sur un lot, douze d'entre elles ont décidé les deux tiers
+des verdicts avant la première question d'issue. Les poser avec `AskUserQuestion` en forme
+**positive** (« coche ce que tu veux appliquer »), quatre options au plus ; « coche ce que tu
+refuses » n'est pas lisible. Une question de l'utilisateur arrivée après l'écriture d'une
+consigne peut l'invalider (« et si la recette n'a pas de Front Door ? ») : lancer d'abord ce
+qui n'en dépend pas, répondre, réécrire la consigne et l'issue, puis lancer.
+
+**Un lot peut ne pas contenir de code** : un audit du dépôt ou une relecture complète du
+backlog se dispatche de la même façon, à des agents de lecture seule (une zone ou un groupe
+d'issues chacun, format de constat imposé, chiffre mesuré par ligne), repris ensuite par
+`SendMessage` pour rédiger les textes d'issues dans un dossier ; la tour les applique par
+script après relecture de l'utilisateur, et aucun agent n'écrit sur GitHub. Les issues
+« méta » (une brique à 13 points) deviennent des parentes GitHub avec des sous-issues
+natives (`POST /repos/{o}/{r}/issues/{parent}/sub_issues`, id numérique de l'enfant) : la
+parente reste en Backlog sans points ni assigné, la tour ne dispatche que les sous-issues.
 
 **Préparer les consignes** : `assets/consigne-commune.md` (règles, interdits,
 forme du compte rendu), complétée par la section propre au projet, plus une
@@ -187,13 +203,22 @@ Trois choses que le lanceur fait et qu'il ne faut pas retirer :
 - **Mode `auto`** : sans lui, chaque commande Bash non listée bloque l'agent et
   quelqu'un doit répondre.
 
+L'amorçage d'un worktree qui dérive ses ports d'une table de noms de grappes met tout nom
+nouveau sur le même port : deux worktrees ont voulu le même PostgreSQL. Dériver l'offset du
+nom (checksum modulo) pour les noms hors table, et lire la sortie du pane quand l'amorçage
+échoue avant de chercher ailleurs.
+
 Envoyer à chaque agent **la consigne commune et la consigne de l'issue en un seul
 `agent prompt`** (les deux fichiers concaténés) : en deux envois, l'agent répond à la
 première par « quelle issue ? » et la seconde reste derrière sa question.
 
 Passer les issues lancées en « En cours » sur le board
 (`gh project item-edit <n> --owner <o> --url <issue> --field Status --value "En cours"` :
-la forme par URL et nom de champ évite les identifiants de nœuds).
+la forme par URL et nom de champ évite les identifiants de nœuds). **Pour plus d'une dizaine
+de champs, `assets/board-field.py`** : la forme par URL relit tous les items du projet à
+chaque appel et épuise le quota GraphQL en points (seize issues à quatre champs ont bloqué
+GraphQL quarante-cinq minutes alors que `rate_limit` affichait 4 300 appels restants) ; le
+script lit le projet une fois puis pose un champ par mutation.
 
 ## 3. Le cycle, issue par issue
 
@@ -272,7 +297,10 @@ branche partie du HEAD local ne « prend » jamais ces changements toute seule. 
 `git branch --unset-upstream` aussitôt, sinon un `push` nu irait sur la branche de
 base. On n'empile sur le HEAD local que si la PR précédente n'est pas encore mergée.
 
-**Avant de passer en Review, mesurer le retard.** `git fetch` puis
+**Avant de passer en Review, mesurer le retard.** Jamais `git diff origin/<base>` à deux
+voies pour lire une branche : ce qui a été fusionné entre-temps y apparaît comme un retrait,
+et la tour a annoncé un retrait qui n'existait pas ; lire `git diff $(git merge-base HEAD
+origin/<base>) HEAD`. Puis `git fetch` et
 `git rev-list --left-right --count origin/<base>...HEAD`, et prédire le rebase sans
 toucher aux branches : `tree=$(git write-tree); tmp=$(git commit-tree $tree -p HEAD
 -m x); git merge-tree --write-tree origin/<base> $tmp` (un commit sans référence
