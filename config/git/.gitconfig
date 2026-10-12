@@ -60,3 +60,5 @@
 # mise's pyenv clone goes through libgit2, which rejects '<' in user.name
 [includeIf "gitdir:~/Library/Caches/mise/"]
   path = ~/.gitconfig.mise
+[includeIf "gitdir:~/.cache/mise/"]
+  path = ~/.gitconfig.mise

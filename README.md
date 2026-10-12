@@ -86,6 +86,11 @@ This repo is meant to be forked: everything personal sits in the local files abo
 - `install/brew-drift` lists what the `Brewfile` and the machine disagree on, both ways. Dependencies pulled in by other formulae are left out, so the list stays readable.
 - `mise install` after bumping a version in `config.toml`; `mise outdated` shows what has moved on.
 - Neovim plugins can also be updated on their own through lazy.nvim (`:Lazy`); the lockfile stays local on purpose.
+- The herdr hook in `config/claude/.claude/settings.json` calls its script through `$HOME`, so the same file works on every machine. Careful: never run `herdr integration install claude` on your real home, it doesn't recognize that form and adds a second `SessionStart` entry. The script itself isn't in the repo, so on a new machine (and after a herdr update that ships a new version of it) extract it from a throwaway home:
+
+  ```sh
+  tmp=$(mktemp -d) && mkdir $tmp/.claude && HOME=$tmp herdr integration install claude && mkdir -p ~/.claude/hooks && cp $tmp/.claude/hooks/herdr-agent-state.sh ~/.claude/hooks/
+  ```
 
 ## License
 

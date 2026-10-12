@@ -60,6 +60,8 @@ fi
 mkdir -p "$HOME/.config/karabiner" "$HOME/.config/herdr" "$HOME/.claude"
 run "Linking dotfiles with stow" \
   stow --dir="$DOTFILES/config" --target="$HOME" --restow "${PACKAGES[@]}"
+run "Letting git pull autostash (apps write to linked files)" \
+  git -C "$DOTFILES" config rebase.autoStash true
 
 # 4. Per-machine local files (never committed)
 if [ ! -f "$HOME/.gitconfig.local" ]; then

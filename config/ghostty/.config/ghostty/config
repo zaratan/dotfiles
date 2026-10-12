@@ -18,3 +18,6 @@ keybind = opt+left=text:\x1b[1;3D
 
 # Pas de prompt "Quit Ghostty?" / "Close terminal?" en sortie
 confirm-close-surface = false
+
+# Install the xterm-ghostty terminfo on ssh hosts that lack it
+shell-integration-features = ssh-terminfo
