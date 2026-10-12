@@ -448,3 +448,68 @@ La tour a dit « je ne peux pas lire la PR, `gh` ne voit que GitHub » pour une 
 - **Un jalon « ce qu'il faut pour la recette » demande deux passes** : d'abord ce que le code peut faire seul (l'utilisateur
   l'a trouvé trop court), puis les lots bloqués et les issues porte-voix, pour que le jalon montre aussi ce qu'on attend
   des tiers. Le demander explicitement.
+
+## Lot de planification par interview, dépôt unique, 34 issues créées (9 octobre 2026)
+
+- **Interviewer l'utilisateur avant d'auditer.** Quatre tours de `AskUserQuestion` (qui, séance type,
+  avancement, bilan, erreurs, langue, aide, complétion, fichiers, docs) ont produit la trame de décisions
+  dont chaque issue découle ; les agents de lecture l'ont reçue comme contrainte (« chaque issue doit
+  découler d'une décision qui y figure, sinon pose la question »). 38 questions d'agents sont remontées,
+  toutes tranchées en quatre tours avant la première création ; aucune n'a été prise par la tour.
+- **Mesurer l'état de départ avant l'interview** (une exécution complète sous `script`, `--help`, dossier
+  produit) : les questions se posent sur des chiffres (« rien pendant 22 s puis 5 lignes »), pas sur des
+  impressions, et les agents reçoivent les mêmes mesures sans les refaire.
+- **Les questions transverses des agents se recoupent et se contredisent** (« entrée fautive : refuser ou
+  sauter ? » posée par deux zones avec deux recommandations opposées) : les poser en premier, une fois, et
+  renvoyer la décision aux quatre agents d'un coup.
+- **`gh project item-add` rend l'id de l'item : s'en servir.** Le listing du projet est en retard de
+  plusieurs minutes après des ajouts (6, 19, puis 27 items visibles sur 34), et `board-field.py`, qui
+  relit le projet, tombe en `KeyError`. Poser les champs avec l'id rendu par `item-add`, sans relire.
+- **Un workflow de board peut poser « À faire » à l'ajout** : Backlog se pose explicitement, toujours.
+- **Les agents citent les autres issues sous deux formes** (nom de fichier et préfixe court `zone-nn`) :
+  le remplacement par numéro après création couvre les deux, par expression régulière, puis vérifie qu'il
+  n'en reste aucune.
+- **Une décision prise en cours de route en crée d'autres** : « piste = sortie, passage = confirmé » a fait
+  apparaître une issue que personne ne portait (le bandeau de l'image) ; après l'alignement, demander à
+  chaque agent « quelle décision n'est portée par aucune issue ? ».
+- **Ordres de grandeur** : 4 agents de lecture, 7 min chacun en parallèle, 120–170 k tokens chacun ;
+  34 textes d'issues de 500 mots en moyenne ; 2 h 30 de l'interview aux issues créées.
+- **Une vérité terrain donnée en passant par l'utilisateur contredit la doc** : « tout est chauve-souris sauf la
+  lente » renversait un passage confirmé que CLAUDE.md et deux docs tenaient pour acquis, et dont le test de
+  référence se réclame. Avant de consigner, relire la doc sur le point précis et poser la contradiction en une
+  question ; puis mettre à jour doc, CLAUDE.md, issues liées et questions ouvertes dans le même mouvement.
+
+## Lot d'un worktree, quatre issues enchaînées sur un socle transverse (10 octobre 2026)
+
+- **Lancer d'abord, seul, ce qui change les chaînes ou les noms partout** (langue, noms de fichiers produits),
+  et faire passer avant lui les petites issues qui réécrivent les mêmes textes : on traduit une fois des textes
+  définitifs. Quatre issues, zéro conflit.
+- **Poser les décisions d'agent en question à cases « valide tel quel »** : une case non cochée n'est pas un
+  refus, c'est souvent un oubli. Reposer la question pour cette case seule, avec « je l'avais oubliée » en
+  option ; deux cas sur deux dans ce lot, un oubli et un vrai changement.
+- **Une question de l'utilisateur sur un fichier vu dans le worktree** (« on va commiter du binaire ? ») vaut
+  décision à transmettre tout de suite : `agent prompt` pendant que l'agent travaille est lu à son tour suivant,
+  sans l'interrompre.
+- **Le `worktree remove` sans `--force` échoue sur des fichiers non suivis** (restes `.coverage.*` de
+  pytest-xdist) : les signaler à l'agent dès qu'ils apparaissent, pour qu'ils ne finissent ni dans un commit ni
+  dans un retrait forcé.
+
+## Lot 5 de batdetect (10 octobre 2026) : planifier une réécriture dans un autre langage
+
+- **Une contrainte de publication change l'ordre.** L'utilisateur a annoncé en cours de route « rien avant la
+  0.2.0 ». Du coup, l'ergonomie faite dans l'ancien langage n'a plus de valeur : personne ne la verrait. Et le
+  raccord temporaire entre les deux langages devient du travail jeté. Poser la question de la prochaine
+  publication avant d'ordonner une migration.
+- **Enregistrer une fois la référence de l'ancienne version** (sorties, détections, tirages aléatoires, sommes
+  des fichiers d'entrée), dans une issue dédiée lancée en premier. Elle supprime toute exécution croisée,
+  survit à la suppression de l'ancien code et permet de vérifier chaque module seul.
+- **Les chiffres repris de la doc ou d'un rapport sont faux une fois sur trois.** Ici : nombres de lignes, de
+  tests, numéros de ligne, et une piste déjà faite. Une relecture factuelle, avec chaque affirmation mesurée,
+  en a trouvé 18 sur 14 textes, plus 5 à la seconde passe. Elle passe avant toute création par script.
+- **Quatre relecteurs aux angles distincts** (architecture, langage cible, exactitude, utilisateur final) ont
+  trouvé des choses différentes, avec peu de recouvrement. Une seconde passe confiée au même relecteur, qui
+  garde son contexte, suffit pour vérifier les corrections.
+- **Le script de création doit être idempotent jusqu'aux commentaires** : les corps sont réécrits à
+  l'identique, mais un commentaire se reposte à chaque relance. Il faut noter ceux déjà postés.
+- **Le compteur `open_issues` de l'API des jalons est en retard** après une création en lot (13 au lieu de 21) :
+  recompter avec `gh issue list --milestone`.

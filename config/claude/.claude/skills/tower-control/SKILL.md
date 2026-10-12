@@ -171,7 +171,12 @@ qui n'en dépend pas, répondre, réécrire la consigne et l'issue, puis lancer.
 backlog se dispatche de la même façon, à des agents de lecture seule (une zone ou un groupe
 d'issues chacun, format de constat imposé, chiffre mesuré par ligne), repris ensuite par
 `SendMessage` pour rédiger les textes d'issues dans un dossier ; la tour les applique par
-script après relecture de l'utilisateur, et aucun agent n'écrit sur GitHub. Les issues
+script après relecture de l'utilisateur, et aucun agent n'écrit sur GitHub. À la création, poser Statut
+et Points avec l'id que `gh project item-add` rend : le listing du projet est en retard de plusieurs
+minutes après des ajouts, et un workflow du board peut poser « À faire » par défaut. Quand le lot naît
+d'un besoin utilisateur plutôt que d'un backlog, **interviewer d'abord** (`AskUserQuestion`, quatre
+questions par tour, état mesuré de la commande en main), et donner la trame de décisions aux agents
+comme contrainte. Les issues
 « méta » (une brique à 13 points) deviennent des parentes GitHub avec des sous-issues
 natives (`POST /repos/{o}/{r}/issues/{parent}/sub_issues`, id numérique de l'enfant) : la
 parente reste en Backlog sans points ni assigné, la tour ne dispatche que les sous-issues.
