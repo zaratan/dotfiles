@@ -18,14 +18,12 @@ have() { command -v "$1" >/dev/null 2>&1 }
 brew_all() { brew update && brew upgrade && brew cleanup }
 mise_all() { mise self-update -y && mise upgrade }
 nvim_all() { nvim --headless "+Lazy! sync" +qa }
-tmux_all() { "$HOME/.tmux/plugins/tpm/bin/update_plugins" all }
 omz_all()  { zsh "$HOME/.oh-my-zsh/tools/upgrade.sh" }
 
 have brew && step "Homebrew"       brew_all
 have mise && step "mise"           mise_all
 have nvim && step "Neovim plugins" nvim_all
-[[ -x $HOME/.tmux/plugins/tpm/bin/update_plugins ]] && step "tmux plugins" tmux_all
-[[ -f $HOME/.oh-my-zsh/tools/upgrade.sh ]]          && step "oh-my-zsh"    omz_all
+[[ -f $HOME/.oh-my-zsh/tools/upgrade.sh ]] && step "oh-my-zsh" omz_all
 
 printf '\n'
 if (( ${#FAILED[@]} == 0 )); then

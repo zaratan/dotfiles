@@ -1,0 +1,81 @@
+onboarding = false
+
+[theme]
+name = "solarized"
+auto_switch = false
+
+# Solarized has no palette for Herdr's own chrome, so give the sidebar a
+# body of its own instead of letting it float on the pane background.
+[theme.custom]
+sidebar_bg = "#00212b"     # one notch below base03: sinks the sidebar
+active_row_bg = "#073642"  # base02, instead of the loud blue slab
+selection_bg = "#073642"
+
+[keys]
+prefix = "ctrl+a"
+
+# tmux muscle memory, mapped onto workspaces ("spaces"), not tabs.
+# prefix+c is new_workspace, so new_tab moves off it to prefix+t.
+# The three arrow variants mirror .tmux.conf.
+new_workspace = ["prefix+shift+n", "prefix+c"]
+new_tab = "prefix+t"
+
+# Worktrees created outside [worktrees].directory (e.g. under ~/Projects/tercio
+# so the umbrella Claude can see them) are adopted through this picker.
+open_worktree = "prefix+shift+o"
+previous_workspace = ["ctrl+left", "ctrl+shift+left", "alt+shift+left"]
+next_workspace = ["ctrl+right", "ctrl+shift+right", "alt+shift+right"]
+
+# .tmux.conf bound | to split-window -h (side by side) and _ to -v
+# (stacked). Herdr calls the side-by-side one "vertical".
+split_vertical = ["prefix+v", "prefix+|"]
+split_horizontal = ["prefix+minus", "prefix+_"]
+
+# alt+arrows are deliberately NOT listed here: they go through the vim-aware
+# custom commands below. A builtin binding wins over a [[keys.command]] on the
+# same key and silently disables it, so the two must not overlap.
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+
+# Keep these last: in TOML, any bare key after an [[array.of.tables]] would
+# belong to that table, not to [keys].
+[[keys.command]]
+key = "alt+left"
+type = "shell"
+command = "~/.config/herdr/herdr-vim-nav left"
+
+[[keys.command]]
+key = "alt+down"
+type = "shell"
+command = "~/.config/herdr/herdr-vim-nav down"
+
+[[keys.command]]
+key = "alt+up"
+type = "shell"
+command = "~/.config/herdr/herdr-vim-nav up"
+
+[[keys.command]]
+key = "alt+right"
+type = "shell"
+command = "~/.config/herdr/herdr-vim-nav right"
+
+[ui]
+accent = "#2aa198"  # solarized cyan, softer than base blue
+
+# Frame a lone pane too, and label panes with the agent running in them.
+pane_borders = "always"
+show_agent_labels_on_pane_borders = true
+
+# The tab row stays even with a single tab: it is the only place Herdr can
+# show a clock, and the zsh RPS1 does not exist in agent or editor panes.
+hide_tab_bar_when_single_tab = false
+tab_bar_position = "bottom"
+tab_bar_right = [{ type = "datetime", format = "%a %d-%h %H:%M" }]
+
+[ui.toast]
+# "terminal" is a dead end here: Ghostty 1.3.1 on macOS 26 never surfaces
+# the OSC 9. "system" falls back to osascript (Script Editor icon, no
+# click-to-activate) because terminal-notifier is denied permission.
+delivery = "system"

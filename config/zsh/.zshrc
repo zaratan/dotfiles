@@ -5,19 +5,12 @@ ZSH_DISABLE_COMPFIX=true
 export ZSH=$HOME/.oh-my-zsh
 ZSH_THEME="agnoster"
 
-# Before oh-my-zsh: its tmux plugin reads $EDITOR when starting the server
 export EDITOR='nvim'
 
 # prompt
 
-plugins=(git brew bundler docker gem gh tmux npm macos rails z yarn docker-compose)
+plugins=(git brew bundler docker gem gh npm macos rails z yarn docker-compose)
 export RPS1='($(date -u "+%m/%d %H:%M:%S"))'
-# Not inside a Herdr pane: Herdr would see tmux as the pane process
-# instead of the agent running behind it.
-if [[ -z $HERDR_ENV ]]; then
-  export ZSH_TMUX_AUTOSTART=true
-fi
-export ZSH_TMUX_AUTOQUIT=false
 
 # mise completions must be in fpath before oh-my-zsh runs compinit
 _mise_bin="$HOME/.local/bin/mise"

@@ -5,7 +5,7 @@
 set -euo pipefail
 
 DOTFILES="$(cd "$(dirname "$0")/.." && pwd)"
-PACKAGES=(zsh git ruby tmux nvim ghostty claude bin mise karabiner)
+PACKAGES=(zsh git ruby tmux herdr nvim ghostty claude bin mise karabiner)
 TMPDIR="${TMPDIR:-/tmp}"
 LOG="${TMPDIR%/}/dotfiles-setup.log"
 : > "$LOG"
@@ -57,7 +57,7 @@ fi
 
 # 3. Symlinks. The mkdir calls keep stow from folding these directories into
 #    the repo (apps write runtime state there, which must never reach git).
-mkdir -p "$HOME/.config/karabiner" "$HOME/.claude"
+mkdir -p "$HOME/.config/karabiner" "$HOME/.config/herdr" "$HOME/.claude"
 run "Linking dotfiles with stow" \
   stow --dir="$DOTFILES/config" --target="$HOME" --restow "${PACKAGES[@]}"
 
@@ -98,30 +98,12 @@ if [ ! -d "$HOME/.oh-my-zsh" ]; then
   run "Installing oh-my-zsh" install_omz
 fi
 
-# 8. tmux plugin manager + plugins
-if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
-  run "Installing tpm" \
-    git clone --depth 1 https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
-fi
-tmux_plugins() {
-  # install_plugins asks the tmux server: one must run, with the conf sourced.
-  if ! tmux has-session 2>/dev/null; then
-    tmux new-session -d -s _tpm_setup
-    trap 'tmux kill-session -t _tpm_setup 2>/dev/null || true' EXIT
-  else
-    # Server may predate tpm installation: re-source the conf.
-    tmux source-file "$HOME/.tmux.conf"
-  fi
-  "$HOME/.tmux/plugins/tpm/bin/install_plugins"
-}
-run "Installing tmux plugins" tmux_plugins
-
-# 9. Claude Code (official installer, not brew)
+# 8. Claude Code (official installer, not brew)
 if ! command -v claude >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/claude" ]; then
   run "Installing Claude Code" bash -c 'curl -fsSL https://claude.ai/install.sh | bash'
 fi
 
-# 10. macOS defaults (opt-in)
+# 9. macOS defaults (opt-in)
 if [ "${1:-}" = "--macos" ]; then
   run "Applying macOS defaults" "$DOTFILES/install/macos-defaults.sh"
 fi

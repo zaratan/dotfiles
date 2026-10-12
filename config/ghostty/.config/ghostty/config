@@ -10,7 +10,7 @@ font-size = 12
 macos-option-as-alt = false
 
 # Send Opt+arrows as CSI Alt explicitly (Kitty/iTerm do it natively).
-# Used by tmux for pane switching (bind -n M-…).
+# Used by herdr for vim-aware pane switching (see herdr-vim-nav).
 keybind = opt+up=text:\x1b[1;3A
 keybind = opt+down=text:\x1b[1;3B
 keybind = opt+right=text:\x1b[1;3C

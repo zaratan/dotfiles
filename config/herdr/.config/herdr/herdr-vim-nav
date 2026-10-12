@@ -1,0 +1,26 @@
+#!/bin/sh
+# alt+arrow, vim-aware: reproduces the is_vim / if-shell trick from
+# .tmux.conf. Inside vim, hand the matching ctrl+key to the editor;
+# anywhere else, move to the neighbouring Herdr pane.
+set -eu
+
+dir=$1
+case $dir in
+left) key=ctrl+h ;;
+down) key=ctrl+j ;;
+up) key=ctrl+k ;;
+right) key=ctrl+l ;;
+*) echo "usage: herdr-vim-nav left|down|up|right" >&2; exit 2 ;;
+esac
+
+herdr=${HERDR_BIN_PATH:-herdr}
+pane=${HERDR_ACTIVE_PANE_ID:?no focused pane}
+
+# Match argv0, not name: name is the process title an app picks for itself
+# (Claude Code reports "2.1.274" there), argv0 is the real binary.
+if "$herdr" pane process-info --pane "$pane" |
+   grep -qE '"argv0":"g?\.?(view|l?n?vim?x?)(diff)?(-wrapped)?"'; then
+  exec "$herdr" pane send-keys "$pane" "$key"
+fi
+
+exec "$herdr" pane focus --direction "$dir" --pane "$pane"

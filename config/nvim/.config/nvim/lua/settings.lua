@@ -35,7 +35,7 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- Tab navigation (magic compatibility with tmux)
+-- ¬ and ˙ are what Opt+L and Opt+H type with macos-option-as-alt = false
 vim.keymap.set("n", "¬", ":tabnext<CR>", { silent = true })
 vim.keymap.set("n", "˙", ":tabprevious<CR>", { silent = true })
 vim.keymap.set("n", "<C-t>", ":tabnew<CR>", { silent = true })
