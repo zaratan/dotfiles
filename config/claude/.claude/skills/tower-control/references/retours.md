@@ -513,3 +513,38 @@ La tour a dit « je ne peux pas lire la PR, `gh` ne voit que GitHub » pour une 
   l'identique, mais un commentaire se reposte à chaque relance. Il faut noter ceux déjà postés.
 - **Le compteur `open_issues` de l'API des jalons est en retard** après une création en lot (13 au lieu de 21) :
   recompter avec `gh issue list --milestone`.
+
+## Lot 6 de batdetect (10 au 12 octobre 2026) : réécriture en Rust, jusqu'à quatre agents
+
+- **Une attente par agent.** Une seule attente en arrière-plan partagée entre agents a laissé passer la fin de
+  l'un d'eux : l'utilisateur a dû demander « on fait quoi de #111 ? ». Lancer une attente dédiée à chaque agent,
+  avec le compte rendu comme signal de fin, puis l'écran arrêté trois minutes de suite.
+- **Le verrou de mesure doit couvrir la compilation.** `MESURES.md` classait `cargo build` et `clippy` comme
+  légers. Les compilations froides d'un agent (dossier `target` neuf) ont donc tourné hors du verrou pendant
+  les chronométrages d'un autre, et l'utilisateur l'a vu avant la tour. Toute compilation chronométrée ou
+  partie de zéro passe sous le verrou, et le `pgrep` d'avant mesure cherche aussi `rustc|cargo|clippy-driver`.
+- **Recommander sur chaque choix d'agent.** L'utilisateur l'a demandé explicitement : une question par choix,
+  avec la recommandation de la tour et sa raison, en forme positive (« coche ce que tu acceptes »). Les
+  réponses ont presque toujours suivi la recommandation, et un « je déconseille » explicite a été demandé.
+- **Chercher si un écart a déjà été jugé avant de le renvoyer à la personne qui juge.** La tour a envoyé à la
+  naturaliste huit pistes déjà jugées deux jours plus tôt (les divergences du prototype, écrites dans une issue
+  parente). C'est l'agent suivant qui a fait le rapprochement. Avant de poser un écart, chercher sa vidéo et son
+  temps dans les issues parentes et les rapports d'exploration.
+- **Vérifier ce qu'une issue produit avant d'y attacher un reliquat.** La tour a annoncé qu'une issue
+  fournirait des extraits vidéo alors qu'elle ne sort que des tableaux. Relire le « À faire » de l'issue cible
+  avant d'écrire « quand X le permettra ».
+- **Les agents corrigent les consignes.** Cinq erreurs de la tour (une API FFmpeg, une option d'encodeur, un
+  refus oublié, un fait sur OpenCV) ont été trouvées par les agents parce que la consigne commune leur demande
+  de signaler une prémisse fausse au lieu de l'appliquer. Garder cette clause.
+- **Un temps de CI se mesure par étape avant d'être expliqué.** « La CI Rust est plus longue que la Python » :
+  la ventilation par étape (API `actions/jobs`) a montré une tâche en chaîne, un cache sans repli et un test d'une seconde
+  qui en prenait 83 sous la couverture. Elle a permis de passer de 9 min 39 à 6 min 22, avec la liste des tests
+  passés comparée avant et après pour prouver qu'aucun n'a disparu.
+- **Ne jamais lancer `git pull` sur la branche de base, même en avance rapide** : `fetch` puis `git show` ou
+  `origin/<base>` suffisent à la tour.
+
+## Lot 7 de batdetect (12 octobre 2026), en cours
+
+- **Une attente qui ne guette que le compte rendu ne voit pas les questions.** Trois agents sont restés bloqués sur une
+  question pendant que la tour attendait leur fichier ; l'utilisateur l'a vu (« je pense que tes shells marchent pas »).
+  L'attente doit rendre la main dès que l'agent est `blocked`, et aussi s'il s'arrête longtemps sans écrire le fichier.

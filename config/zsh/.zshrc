@@ -93,5 +93,6 @@ if [ -e "$HOME/.zshrc.local" ]; then
 fi
 
 # Must stay sourced last so it can hook everything defined above
-[ -r /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && \
+if [ -r /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
   source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
