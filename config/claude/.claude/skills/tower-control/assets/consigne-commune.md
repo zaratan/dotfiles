@@ -36,6 +36,10 @@ remonter, ce qui peut prendre du temps : continue ce qui n'en dépend pas.
 Avant de poser une question, vérifie qu'elle n'a pas déjà sa réponse dans
 `CLAUDE.md`, la documentation du dépôt ou l'issue.
 
+Si la consigne de la tour affirme un fait que le code, la doc ou une mesure contredit
+(une API, une option, un chiffre), ne l'applique pas : dis-le, en question si ça change
+ce que tu fais, sinon dans le compte rendu. C'est toi qui as le code sous les yeux.
+
 ## Qualité attendue
 
 - Chaque comportement ajouté ou corrigé vient avec son test, dont le nom dit le
@@ -47,6 +51,10 @@ Avant de poser une question, vérifie qu'elle n'a pas déjà sa réponse dans
 - Mets à jour la documentation du dépôt si le comportement visible change.
 - Le formateur et `lint:fix` ne se lancent que sur les fichiers que tu as touchés, jamais
   sur un dossier : un reformatage de masse noie le correctif dans la relecture.
+- Vérifications légères (lint, typage, tests du module touché) pendant le travail ;
+  les lourdes (suite complète, tests longs, références) une seule fois, juste avant le
+  compte rendu, et seulement celles que ton diff peut changer. Une retouche de revue qui
+  ne touche que la doc ou un nom ne relance pas les lourdes.
 - Avant de rendre, les vérifications du projet passent (voir « Projet »). Si une
   référence de non-régression signale des écarts, ne les corrige pas et ne refige
   rien : explique-les dans le compte rendu.

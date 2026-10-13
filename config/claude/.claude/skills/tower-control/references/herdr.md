@@ -109,9 +109,11 @@ transcriptions de l'agent, seul le lien `memory` se retire.
 
 ## Attendre depuis la tour sans bloquer
 
-`herdr agent wait` bloque le shell. Depuis Claude Code, le lancer avec
-`run_in_background` : la tour est réveillée quand la commande sort, sans polling.
-Un `wait` par agent, en parallèle.
+`herdr agent wait` bloque le shell, et il rend « done » pendant qu'un agent attend des
+mesures en arrière-plan. Depuis Claude Code, lancer plutôt `assets/guetter.sh <agent>
+<compte rendu>` avec `run_in_background` : il rend la main sur une question, sur un
+compte rendu suivi de trois minutes d'arrêt, ou sur six minutes d'arrêt sans compte
+rendu. Un guetteur par agent, en parallèle.
 
 ## Pièges rencontrés
 

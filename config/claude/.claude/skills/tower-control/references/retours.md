@@ -494,7 +494,7 @@ La tour a dit « je ne peux pas lire la PR, `gh` ne voit que GitHub » pour une 
   pytest-xdist) : les signaler à l'agent dès qu'ils apparaissent, pour qu'ils ne finissent ni dans un commit ni
   dans un retrait forcé.
 
-## Lot 5 de batdetect (10 octobre 2026) : planifier une réécriture dans un autre langage
+## Lot de planification d'une réécriture dans un autre langage (10 octobre 2026)
 
 - **Une contrainte de publication change l'ordre.** L'utilisateur a annoncé en cours de route « rien avant la
   0.2.0 ». Du coup, l'ergonomie faite dans l'ancien langage n'a plus de valeur : personne ne la verrait. Et le
@@ -514,10 +514,10 @@ La tour a dit « je ne peux pas lire la PR, `gh` ne voit que GitHub » pour une 
 - **Le compteur `open_issues` de l'API des jalons est en retard** après une création en lot (13 au lieu de 21) :
   recompter avec `gh issue list --milestone`.
 
-## Lot 6 de batdetect (10 au 12 octobre 2026) : réécriture en Rust, jusqu'à quatre agents
+## Réécriture en Rust, premier lot de code, jusqu'à quatre agents (10 au 12 octobre 2026)
 
 - **Une attente par agent.** Une seule attente en arrière-plan partagée entre agents a laissé passer la fin de
-  l'un d'eux : l'utilisateur a dû demander « on fait quoi de #111 ? ». Lancer une attente dédiée à chaque agent,
+  l'un d'eux : l'utilisateur a dû demander « on fait quoi de cette issue ? ». Lancer une attente dédiée à chaque agent,
   avec le compte rendu comme signal de fin, puis l'écran arrêté trois minutes de suite.
 - **Le verrou de mesure doit couvrir la compilation.** `MESURES.md` classait `cargo build` et `clippy` comme
   légers. Les compilations froides d'un agent (dossier `target` neuf) ont donc tourné hors du verrou pendant
@@ -543,7 +543,7 @@ La tour a dit « je ne peux pas lire la PR, `gh` ne voit que GitHub » pour une 
 - **Ne jamais lancer `git pull` sur la branche de base, même en avance rapide** : `fetch` puis `git show` ou
   `origin/<base>` suffisent à la tour.
 
-## Lot 7 de batdetect (12 octobre 2026), en cours
+## Réécriture en Rust, deuxième lot de code, jusqu'à trois agents (12 et 13 octobre 2026)
 
 - **Une attente qui ne guette que le compte rendu ne voit pas les questions.** Trois agents sont restés bloqués sur une
   question pendant que la tour attendait leur fichier ; l'utilisateur l'a vu (« je pense que tes shells marchent pas »).
@@ -551,8 +551,28 @@ La tour a dit « je ne peux pas lire la PR, `gh` ne voit que GitHub » pour une 
 - **La vérification de la tour, c'est ce que la CI ne fait pas.** La tour relançait en local `check`, `slow` et `reference`
   après chaque issue, que l'agent venait de lancer et que la CI relancerait sur trois systèmes : 15 à 20 min de verrou par
   issue. L'utilisateur l'a relevé. Revérifier seulement les tests locaux que la CI ne voit pas (les 26 vidéos), le diff
-  (commentaires, fichiers non suivis), et remesurer au calme un temps annoncé quand il compte.
+  (commentaires, fichiers non suivis), et remesurer au calme un temps annoncé quand il compte. Pour l'utilisateur, la
+  règle tient aux tests de ce projet, très longs ; avec des tests rapides, la tour garde sa vérification complète.
 - **Une issue créée en chemin suit toute la convention du dépôt**, pas seulement le statut Backlog : points et priorité
   sur le board, étiquettes (type et `complexité: N`), ligne « Complexité (planning poker) » en pied, jalon s'il y en a un.
   Onze issues du lot 7 en manquaient, relevé deux fois par l'utilisateur. Lire une issue existante du dépôt pour la
   convention, proposer points et priorité avec la création, tout poser dans le même script.
+- **Une PR pour plusieurs petites issues quand la CI est longue.** Sur une CI de quinze minutes, l'utilisateur a demandé
+  de livrer trois issues d'un banc de mesure en une seule PR : une CI et une relecture au lieu de trois. À proposer dès
+  le groupement.
+- **Un critère de calme se mesure avant d'être écrit.** `MESURES.md` demandait une charge moyenne basse et aucun
+  processus « chrome » : sur ce Mac, la charge vaut 5 à 6 au repos et un `crashpad_handler` de messagerie tourne
+  toujours. Un agent a attendu sans fin. Critère retenu : somme des `%CPU` des autres processus sous 100 %, `pgrep` des
+  outils lourds vide.
+- **Une demande de permission bloque comme une question.** Un agent a demandé `rm -f $S/*.profraw` ; la tour a refusé
+  et demandé `"${S:?}"`, pour qu'une variable vide ne vise jamais la racine.
+- **Un temps réel mesuré sous charge n'est pas un coût.** La tour a annoncé 6 s pour une étape ; mesurée au calme, elle
+  en coûtait 0,5. Remesurer seul, sous le verrou, avant de citer un coût.
+- **L'agent peut refuser une retouche de la tour.** Une réutilisation proposée par la tour aurait fait dépendre une crate
+  sans FFmpeg d'une crate qui l'embarque ; l'agent l'a refusée, à raison. Une retouche de la tour est une proposition.
+- **Un `index.lock` périmé bloque git dans un worktree** après une commande interrompue ; c'est l'utilisateur qui le
+  retire, la tour le signale avec le chemin.
+- **Revue du skill à la clôture.** Les lots 6 et 7 ont rempli ce fichier sans retoucher `SKILL.md`, qui disait encore
+  d'attendre par `agent wait` ; l'utilisateur a dû le demander. L'étape est maintenant écrite dans « Clore le lot ».
+- **Ordres de grandeur** : 15 issues et 13 PR en deux jours, jusqu'à trois agents en parallèle ; la CI d'une PR, ramenée
+  à 4 min au lot précédent, est remontée à 14-17 min avec les nouveaux tests de bout en bout.

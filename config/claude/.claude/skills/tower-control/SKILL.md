@@ -114,6 +114,11 @@ second merge conflicte à coup sûr. Lire chaque issue, noter les fichiers proba
 former des grappes. Trois ou quatre worktrees est un bon nombre : au-delà, la tour
 ne suit plus et la machine chauffe.
 
+**Quand la CI d'une PR dépasse une dizaine de minutes**, proposer au groupement de réunir
+les petites issues d'une même grappe en une seule PR (une branche, un `Closes` par issue) :
+chaque PR coûte une CI complète et une relecture. Trois issues d'un banc de mesure sont
+passées ainsi en une PR, à la demande de l'utilisateur, sur une CI de quinze minutes.
+
 **Contrôler la couverture** : chaque issue du lot est dans exactement une grappe (`comm` entre la
 liste « À faire » assignée et la somme des grappes) ; une issue décidée et jamais lancée a été
 retrouvée en fin de lot par la colonne du board.
@@ -146,6 +151,11 @@ de l'issue à la doc du dépôt avant de la recopier dans une consigne.
 **Si plusieurs agents mesurent sur la même machine**, poser un verrou commun avant de
 lancer (`lockf`, une commande par verrou, règle écrite dans un `MESURES.md` du dossier
 des worktrees, seuil d'espace disque avant tout balayage) ; voir `references/retours.md`.
+Toute compilation chronométrée ou partie de zéro passe sous le verrou, comme la mesure.
+Le critère de calme d'avant mesure se mesure sur la machine au repos avant d'être écrit :
+la charge moyenne d'un Mac vaut 5 à 6 à vide, et un agent qui l'attendait plus basse a
+attendu sans fin ; la somme des `%CPU` des autres processus et un `pgrep` des outils
+lourds conviennent.
 Une série de mesures lancée par la tour elle-même se dimensionne au besoin (à quoi sert
 chaque ligne, qui attend le verrou pendant ce temps) et se dit à l'utilisateur avec son
 coût : un balayage exhaustif a bloqué trois agents une matinée pour un tableau que sept
@@ -246,12 +256,16 @@ branche de base après chaque merge. Une tâche annulée par son délai n'est pa
 échoue : lire l'étape avant de relancer, et proposer la cause et le correctif avec la
 relance.
 
-**Attendre sans surveiller** : `herdr agent wait <nom>` lancé en arrière-plan
-(`run_in_background`) réveille la tour quand l'agent passe en `done` ou `blocked`.
-Ne pas boucler sur `agent get`.
-Quand l'agent lance des mesures longues en arrière-plan, `wait` rend « done » trop tôt :
-demander que le compte rendu ne soit écrit qu'à la toute fin, et attendre ce fichier
-(`until [ -f … ]; do sleep 120; done`) avant `agent wait`.
+**Attendre sans surveiller, un guetteur par agent** : `assets/guetter.sh <agent>
+<compte rendu attendu>`, lancé en arrière-plan (`run_in_background`, après un `sleep 90`
+qui laisse l'agent démarrer). Il rend la main dès que l'agent est `blocked` (question ou
+demande de permission), quand le compte rendu existe et que l'agent est arrêté trois
+minutes de suite sans tâche de fond, ou après six minutes d'arrêt sans compte rendu.
+Le relancer après chaque réponse. Ne pas guetter seulement le fichier : trois agents sont
+restés bloqués sur une question pendant que la tour attendait leur compte rendu. Ne pas
+se fier à `herdr agent wait` seul : il rend « done » pendant que l'agent a des mesures en
+arrière-plan. Ne pas partager une attente entre agents : la fin de l'un est passée
+inaperçue.
 
 **Vérifier indépendamment, mais jamais en même temps que l'agent.** Attendre `done`
 et un écran arrêté : deux générations dans le même `travail/` se marchent dessus et
@@ -281,8 +295,13 @@ même agent si le fichier est dans sa branche, ou bloc « reliquats » dans la c
 suivante de la même grappe), attaché à une issue existante (commentaire avec
 fichier:ligne), ou nouvelle issue. Jamais seulement listé. **Une issue créée en chemin
 va dans la colonne Backlog, explicitement** (`item-add` laisse le statut vide) : c'est
-l'utilisateur qui trie. `gh issue create` n'a pas de `--json` : prendre le numéro sur
-l'URL imprimée.
+l'utilisateur qui trie. Elle suit toute la convention du dépôt, posée dans le même script
+que la création : relire d'abord une issue existante (étiquettes de type et de
+complexité, pied de texte, jalon), et proposer points et priorité avec le texte. Onze
+issues créées sans eux ont été relevées deux fois par l'utilisateur. `gh issue create`
+n'a pas de `--json` : prendre le numéro sur l'URL imprimée. Avant d'attacher un point à
+une issue existante, relire ce qu'elle produit : la tour a annoncé des extraits vidéo
+d'une issue qui ne sort que des tableaux.
 
 **Quand la branche est en retard et partage des fichiers avec ce qui a été fusionné**,
 ne pas se contenter de `merge-tree` : jouer la fusion dans un worktree jetable, puis
@@ -301,6 +320,8 @@ après un `fetch`**, pas du HEAD local : d'autres worktrees ont pu merger entre-
 branche partie du HEAD local ne « prend » jamais ces changements toute seule. Faire
 `git branch --unset-upstream` aussitôt, sinon un `push` nu irait sur la branche de
 base. On n'empile sur le HEAD local que si la PR précédente n'est pas encore mergée.
+Jamais `git pull` sur la branche de base, même en avance rapide : `fetch`, puis
+`origin/<base>` ou `git show`, suffisent à la tour.
 
 **Avant de passer en Review, mesurer le retard.** Jamais `git diff origin/<base>` à deux
 voies pour lire une branche : ce qui a été fusionné entre-temps y apparaît comme un retrait,
@@ -325,6 +346,13 @@ elle survivra.
 Règles :
 
 - Lire le contexte (`herdr agent read`) avant de répondre.
+- **Une demande de permission bloque l'agent comme une question.** La lire avant de
+  répondre ; refuser un `rm` dont le chemin dépend d'une variable qui peut être vide, et
+  demander `"${VAR:?}"/…` à la place.
+- **Avant de soumettre un écart à la personne qui juge** (naturaliste, client,
+  designer), chercher s'il a déjà été jugé : issues parentes, rapports d'exploration,
+  journal. La tour a proposé de renvoyer huit écarts jugés deux jours plus tôt ; c'est un
+  agent qui a fait le rapprochement.
 - La tour répond seule **uniquement** quand la réponse existe déjà : dans CLAUDE.md,
   la documentation du dépôt, l'issue, ou une décision que l'utilisateur a prise plus
   tôt dans le lot. Elle cite alors la source à l'agent et liste la réponse dans le
@@ -371,6 +399,11 @@ parler à l'utilisateur.
   manque, la proposer.
 - **Remonter dans `references/retours.md` du skill** ce qui vaut pour tout projet :
   ce qui a coincé et la règle qui en sort, ce qui a bien marché, les ordres de
-  grandeur — sans nom de projet, sans numéro d'issue. Puis retoucher `SKILL.md` et
-  `assets/` en conséquence. C'est cette étape qui fait que le lot suivant se passe
-  mieux ; ne pas la sauter parce que le lot est fini.
+  grandeur — sans nom de projet ni numéro d'issue, titre de section compris.
+- **Puis confronter le skill aux leçons du lot** : pour chaque leçon, l'endroit de
+  `SKILL.md`, `assets/` ou `references/herdr.md` qui la contredit ou l'omet. Proposer
+  les retouches à l'utilisateur (AskUserQuestion en forme positive, une recommandation
+  par retouche) et les appliquer après son accord. Deux lots ont rempli `retours.md`
+  sans toucher au skill, qui disait encore l'inverse sur l'attente ; l'utilisateur a dû
+  le demander. C'est cette étape qui fait que le lot suivant se passe mieux ; ne pas la
+  sauter parce que le lot est fini.
