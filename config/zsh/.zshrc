@@ -40,8 +40,12 @@ export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
 #z
 
 command -v direnv >/dev/null && eval "$(direnv hook zsh)"
-[ -r /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] && \
-  source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+for plugin_prefix in /opt/homebrew/share /usr/local/share; do
+  if [ -r "$plugin_prefix/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
+    source "$plugin_prefix/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    break
+  fi
+done
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=6'
 
 export LANG=fr_FR.UTF-8
@@ -93,6 +97,10 @@ if [ -e "$HOME/.zshrc.local" ]; then
 fi
 
 # Must stay sourced last so it can hook everything defined above
-if [ -r /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
-  source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
+for plugin_prefix in /opt/homebrew/share /usr/local/share; do
+  if [ -r "$plugin_prefix/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
+    source "$plugin_prefix/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+    break
+  fi
+done
+unset plugin_prefix

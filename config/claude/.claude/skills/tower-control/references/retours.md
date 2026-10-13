@@ -548,3 +548,11 @@ La tour a dit « je ne peux pas lire la PR, `gh` ne voit que GitHub » pour une 
 - **Une attente qui ne guette que le compte rendu ne voit pas les questions.** Trois agents sont restés bloqués sur une
   question pendant que la tour attendait leur fichier ; l'utilisateur l'a vu (« je pense que tes shells marchent pas »).
   L'attente doit rendre la main dès que l'agent est `blocked`, et aussi s'il s'arrête longtemps sans écrire le fichier.
+- **La vérification de la tour, c'est ce que la CI ne fait pas.** La tour relançait en local `check`, `slow` et `reference`
+  après chaque issue, que l'agent venait de lancer et que la CI relancerait sur trois systèmes : 15 à 20 min de verrou par
+  issue. L'utilisateur l'a relevé. Revérifier seulement les tests locaux que la CI ne voit pas (les 26 vidéos), le diff
+  (commentaires, fichiers non suivis), et remesurer au calme un temps annoncé quand il compte.
+- **Une issue créée en chemin suit toute la convention du dépôt**, pas seulement le statut Backlog : points et priorité
+  sur le board, étiquettes (type et `complexité: N`), ligne « Complexité (planning poker) » en pied, jalon s'il y en a un.
+  Onze issues du lot 7 en manquaient, relevé deux fois par l'utilisateur. Lire une issue existante du dépôt pour la
+  convention, proposer points et priorité avec la création, tout poser dans le même script.
