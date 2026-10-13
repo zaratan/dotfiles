@@ -294,7 +294,14 @@ tests de base passent par le wrapper du projet, pas par le CLI brut.
 de résumer à l'utilisateur, relancer soi-même dans le worktree les vérifications
 que le projet définit (`pnpm run check`, référence de non-régression, contrôle des
 données) et comparer aux chiffres annoncés. Un écart entre les deux est la première
-chose à dire.
+chose à dire. **Exception, quand ces vérifications sont longues** (plus d'une dizaine de
+minutes par issue) **et que la CI de la PR les relance** : la tour ne refait que ce que la
+CI ne voit pas, soit les tests locaux sur des données absentes de la CI, le diff
+(commentaires, fichiers non suivis), et un temps annoncé quand il compte, remesuré au
+calme. Sur un projet vidéo, la relance de `check`, des tests lents et de la référence
+coûtait 15 à 20 min de verrou par issue, pour des tests que l'agent venait de lancer et
+que la CI relançait sur trois systèmes. Avec des tests rapides, la vérification complète
+reste la règle.
 
 **Résumer court** : ce qui est fait, les chiffres vérifiés, ce qui reste ouvert. Le
 compte rendu complet est dans `travail/rapport-<N>.md` ou lisible par
