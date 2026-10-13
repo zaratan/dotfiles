@@ -139,6 +139,10 @@ rendu. Un guetteur par agent, en parallèle.
   alors que l'agent enchaînait encore des commandes. Après un `wait`, lire l'écran
   (`agent read --source visible`) et ne vérifier dans le worktree que si la dernière
   ligne est un compte rendu, pas une commande en cours.
+- **Un panneau ouvert dans le pane d'un agent avale `agent prompt`** : la vue d'un shell de fond
+  (« Showing N lines · Esc/Enter/Space to close ») reste ouverte après un coup d'œil, et le texte envoyé
+  s'y perd, alors que la commande répond `agent_prompted`. Après chaque envoi important, vérifier que l'état
+  passe à `working` ; sinon `agent send-keys <nom> esc`, relire l'écran, renvoyer.
 - **`agent read --lines N` est refusé quand l'agent est `blocked`** ; utiliser
   `--source visible`. L'aperçu d'une question `AskUserQuestion` n'y figure pas : demander
   à l'agent d'écrire son contenu dans un fichier avant de reposer la question.

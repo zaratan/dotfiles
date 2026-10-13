@@ -245,7 +245,7 @@ La tour a dit « je ne peux pas lire la PR, `gh` ne voit que GitHub » pour une 
   fichier:ligne sur l'issue existante) / nouvelle issue. L'utilisateur l'a redemandé au troisième
   compte rendu du lot, comme au lot précédent : c'est la règle la plus souvent oubliée.
 - **Une issue créée en chemin va dans la colonne Backlog, explicitement** : `gh project
-  item-add` laisse le statut vide ou au défaut du board, et l'utilisateur trie lui-même.
+item-add` laisse le statut vide ou au défaut du board, et l'utilisateur trie lui-même.
   `gh project item-edit <n> --owner <o> --url <issue> --field Status --value Backlog`. La forme
   par URL et nom de champ évite les identifiants de nœuds et le `jq` sur `item-list`, qui casse
   dès qu'un corps d'issue contient un caractère de contrôle.
@@ -438,7 +438,7 @@ La tour a dit « je ne peux pas lire la PR, `gh` ne voit que GitHub » pour une 
   hors table, et vérifier dans le lanceur que le port est libre avant `docker compose up`.
 - **Jamais `git diff origin/main` à deux voies pour lire une branche** : les commits fusionnés entre-temps y apparaissent
   comme des retraits, et la tour a annoncé un « retrait » qui n'existait pas. Toujours `git diff $(git merge-base HEAD
-  origin/main) HEAD`, et `merge-tree` + worktree jetable pour la fusion ; c'est ce dernier qui a vu un identifiant
+origin/main) HEAD`, et `merge-tree` + worktree jetable pour la fusion ; c'est ce dernier qui a vu un identifiant
   Bicep déclaré deux fois là où `merge-tree` disait « sans conflit ».
 - **`git branch -d` après un merge est une écriture git** : la tour l'a faite sans demande. La clôture retire le
   worktree et ferme le sous-espace ; la branche locale reste à l'utilisateur.
@@ -576,7 +576,6 @@ La tour a dit « je ne peux pas lire la PR, `gh` ne voit que GitHub » pour une 
   d'attendre par `agent wait` ; l'utilisateur a dû le demander. L'étape est maintenant écrite dans « Clore le lot ».
 - **Ordres de grandeur** : 15 issues et 13 PR en deux jours, jusqu'à trois agents en parallèle ; la CI d'une PR, ramenée
   à 4 min au lot précédent, est remontée à 14-17 min avec les nouveaux tests de bout en bout.
-
 - **Guet bloqué par les shells de fond (lot 3, 14 oct. 2026).** `guetter.sh` ne rendait la main qu'avec zéro shell de fond : un agent qui laisse un `next start` ou une mesure ouverte (« 2 shells ») le faisait attendre sans fin, compte rendu écrit depuis longtemps ; l'utilisateur l'a relevé deux fois. Corrigé : le fichier compte s'il a été modifié après le lancement du guet (un ancien compte rendu ne déclenche plus rien), une section optionnelle (`## Retouche`) remplace la boucle `until grep` maison, et l'agent arrêté rend la main après 3 minutes sans shell ou 10 minutes avec. Testé contre un faux `herdr` (7 cas). Les consignes de retouche demandent aussi de fermer ses shells de fond avant de finir.
 - **Suggestion de prompt prise pour une réponse de l'utilisateur.** Claude Code affiche dans la zone de saisie d'un agent arrêté une suggestion grisée (« Garde la ligne sans lien… », « donne-moi un message de commit ») : ce n'est pas un texte tapé par l'utilisateur, et `send-keys Enter` ne l'envoie pas. Ne jamais l'attribuer à l'utilisateur.
 - **Droits délégués quand l'utilisateur est absent.** Un utilisateur en déplacement a donné le droit de commiter (format de ses messages : un titre, rien d'autre), d'ouvrir puis de merger les PR. Ce qui a marché : relire son format sur `git log` et ses PR avant le premier commit ; commit, `push` de la seule branche, `gh pr create` au corps vide ; merger une PR à la fois, en attendant sa CI puis celle de la branche de base ; poser les décisions des agents par AskUserQuestion, qu'il peut cocher depuis un téléphone. La délégation vaut pour la session, pas au-delà.
@@ -585,3 +584,10 @@ La tour a dit « je ne peux pas lire la PR, `gh` ne voit que GitHub » pour une 
 - **Une mesure d'agent de relecture n'est pas une preuve.** Une consigne a recopié « déjà équivalent » d'un rapport de relecture ; l'agent de code a trouvé le contraire dès la lecture. Une affirmation d'équivalence ou d'absence dans une consigne vient avec la commande qui la prouve, ou se formule en question.
 - **Réutiliser un worktree terminé pour la grappe suivante** plutôt qu'en créer un : pas d'installation ni de pile à monter, l'agent garde le contexte du dépôt. Branche nouvelle depuis `origin/<base>` quand rien n'est commun, sur la branche précédente quand un fichier l'est.
 - **Conflits de doc entre deux branches de la même grappe** : quand l'utilisateur a délégué les commits, la tour merge la base dans la branche et résout (les deux côtés d'un runbook sont souvent deux ajouts), puis revérifie la suite complète sur l'arbre fusionné avant d'ouvrir la PR.
+- **Un message perdu sans erreur.** `agent prompt` a répondu `agent_prompted`, mais l'agent est resté `idle` : la vue
+  d'un shell de fond était ouverte dans son pane et a avalé le texte. C'est sans doute aussi la cause du message perdu
+  au lot précédent. Vérifier l'état après chaque envoi ; `esc` ferme la vue.
+- **Une sonde d'agent sous le verrou se dimensionne comme une série de la tour.** Une mesure de mémoire sous `dhat`
+  prévue à « deux ou trois points » en a pris sept, dont les plus coûteux au bout : plus de deux heures de verrou, et un
+  autre agent bloqué à ses tests de fin. Cinq points alignés sur la formule suffisaient. Demander dans le plan le nombre
+  de points et le temps estimé de chacun, et regarder le verrou quand une mesure dure.
