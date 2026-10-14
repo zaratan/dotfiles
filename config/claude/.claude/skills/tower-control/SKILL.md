@@ -250,18 +250,32 @@ tour  : crée la branche suivante depuis ce HEAD, envoie la consigne suivante
 merge : ferme l'issue, le workflow du board la passe en Fait — la tour n'y touche pas
 ```
 
+Quand l'utilisateur s'absente, il peut taper `/tc-delegate on` : la tour fait alors elle-même les
+lignes « user » (commit, PR, merge) selon ce skill, pour la session seulement. Sans cette commande,
+une délégation ne se déduit jamais d'une conversation.
+
 **Lire la CI soi-même** : celle de chaque PR jusqu'au bout (boucler tant qu'une tâche est
 « pending » ; `gh pr checks --watch` rend la main au premier résultat) et celle de la
 branche de base après chaque merge. Une tâche annulée par son délai n'est pas un test qui
 échoue : lire l'étape avant de relancer, et proposer la cause et le correctif avec la
-relance.
+relance. Sur la branche de base, attendre que **toutes les exécutions du commit de merge**
+soient terminées, jamais un nombre fixe de workflows : un filtre `paths:` en lance moins
+quand la base de données n'est pas touchée, et une attente sur « trois » ne rend jamais la
+main. Une PR empilée que GitHub recible sur la base après le merge de celle du dessous ne
+relance pas sa CI : la fermer puis la rouvrir la déclenche.
 
 **Attendre sans surveiller, un guetteur par agent** : `assets/guetter.sh <agent>
-<compte rendu attendu>`, lancé en arrière-plan (`run_in_background`, après un `sleep 90`
-qui laisse l'agent démarrer). Il rend la main dès que l'agent est `blocked` (question ou
-demande de permission), quand le compte rendu existe et que l'agent est arrêté trois
-minutes de suite sans tâche de fond, ou après six minutes d'arrêt sans compte rendu.
-Le relancer après chaque réponse. Ne pas guetter seulement le fichier : trois agents sont
+<compte rendu attendu> [section]`, lancé en arrière-plan (`run_in_background`). Il rend la
+main dès que l'agent est `blocked` (question ou demande de permission) ; quand le compte
+rendu a été **modifié après le lancement du guet** (un ancien fichier ne compte pas) et que
+l'agent est arrêté depuis trois minutes sans shell de fond, ou depuis dix minutes avec (un
+agent laisse souvent un `next start` ouvert : un guet qui exigeait zéro shell a attendu sans
+fin un compte rendu écrit depuis longtemps) ; ou après dix minutes d'arrêt sans compte rendu.
+Pour une retouche, passer la section attendue (`"## Retouche"`) plutôt qu'une boucle
+`until grep` maison. Demander dans chaque consigne de fermer ses shells de fond avant
+d'écrire le compte rendu. Le relancer après chaque réponse. La zone de saisie d'un agent
+arrêté peut montrer une suggestion de prompt grisée de Claude Code : ce n'est pas un texte
+de l'utilisateur, ne jamais la lui attribuer. Ne pas guetter seulement le fichier : trois agents sont
 restés bloqués sur une question pendant que la tour attendait leur compte rendu. Ne pas
 se fier à `herdr agent wait` seul : il rend « done » pendant que l'agent a des mesures en
 arrière-plan. Ne pas partager une attente entre agents : la fin de l'un est passée
@@ -381,7 +395,10 @@ parler à l'utilisateur.
 ## 5. Clore le lot
 
 - Proposer l'ordre de merge qui minimise les conflits (les grappes qui partagent un
-  fichier en dernier, l'une après l'autre).
+  fichier en dernier, l'une après l'autre). **Comparer d'abord les horodatages des
+  migrations des PR ouvertes** : si la branche de base se déploie à chaque merge et que les
+  instances refusent une migration plus ancienne que la dernière appliquée, l'ordre des
+  migrations impose l'ordre des merges. Le dire à l'utilisateur dès que deux PR en portent.
 - Une fois tout mergé : `herdr workspace close` des sous-espaces créés par la tour,
   `git worktree remove` (jamais `--force` ; avant chacun, la PR de la branche est mergée et
   `git status --short` du worktree est vide), suppression des liens de mémoire.
