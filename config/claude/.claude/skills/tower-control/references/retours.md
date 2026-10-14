@@ -591,3 +591,29 @@ origin/main) HEAD`, et `merge-tree` + worktree jetable pour la fusion ; c'est ce
   prévue à « deux ou trois points » en a pris sept, dont les plus coûteux au bout : plus de deux heures de verrou, et un
   autre agent bloqué à ses tests de fin. Cinq points alignés sur la formule suffisaient. Demander dans le plan le nombre
   de points et le temps estimé de chacun, et regarder le verrou quand une mesure dure.
+- **L'exigence de branche à jour coûte cher en parallèle.** Avec deux worktrees et dix minutes de CI, presque chaque
+  merge demandait une mise à jour et une CI de plus. L'utilisateur l'a retirée du ruleset, en gardant les vérifications
+  requises. Ce qui compense : la tour prédit chaque fusion avant la Review, la joue quand des fichiers sont partagés,
+  et lit la CI de la branche de base après chaque merge. La file de fusion de GitHub ne vaut que pour un dépôt
+  d'organisation.
+- **Un état de PR se relit avant d'être annoncé.** La tour a écrit deux fois « la PR attend ton merge » alors qu'elle
+  était fusionnée depuis près de deux heures (l'auto-merge l'avait prise). Et un guetteur de la CI de la branche de base
+  attendait un commit précis : un merge suivant l'a rendu introuvable, et la boucle aurait tourné sans fin. Relire
+  `gh pr view` avant chaque phrase sur l'état d'une PR, et guetter « la dernière CI de la base terminée », pas un commit.
+- **`board-field.py` juste après `gh project item-add`** échoue parfois (`KeyError` : l'item n'est pas encore lisible
+  dans le projet). Relancer le champ manquant suffit ; vérifier les trois champs après une création.
+- **Ce que le poste local ne voit pas, la CI le voit.** Deux classes d'échecs sont apparues seulement en CI : un import
+  utilisé par un seul test réservé à un système (inutilisé ailleurs, donc refusé par `-D warnings`), et un test qui
+  exige une sortie d'erreur vide, alors que le runner macOS virtualisé y écrit lui-même un message du système. À la
+  relecture d'un diff, la tour cherche les `#[cfg(...)]` sur des tests et les égalités exactes sur stderr.
+- **Une retouche proposée par la tour se vérifie dans le code avant d'être envoyée.** La tour a demandé de contrôler des
+  `pts` « déjà rendus » d'après le compte rendu de l'agent ; le code montrait que ces fichiers sont réécrits à une autre
+  cadence, et le contrôle aurait échoué. L'agent l'a vu et a posé la question. Lire le passage cité avant de transformer
+  une remarque de revue en retouche.
+- **Avant de déclarer un attribut inutile, chercher ce qu'il permet.** La tour a fait retirer des `#[cfg(test)]` de
+  fichiers de tests en les disant sans effet ; ils servent à un lint (`unwrap` permis seulement en `cfg(test)`). L'agent
+  l'a vérifié en essayant, et n'a retiré que ceux des aides sans `unwrap`.
+- **Le dossier des comptes rendus enfle sans qu'on le voie.** Les planches vidéo d'un lot de rendu ont porté
+  `rapports/` à 9,7 Go, dont 9 Go pour deux issues déjà fusionnées ; les sous-agents de revue ont laissé 2 Go de
+  maquettes dans les dossiers temporaires. À chaque merge, proposer de retirer la planche lourde de l'issue fusionnée ;
+  à la clôture, mesurer `rapports/` et les dossiers temporaires des agents.
