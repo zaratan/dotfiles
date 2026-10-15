@@ -90,13 +90,17 @@ for name in "${!GRAPPES[@]}"; do
   # et ses docs priment et qu'une issue puisse toucher plusieurs sous-dépôts.
   if [ -n "$r" ]; then herdr pane run "$pane" "cd '$REPO'" >/dev/null; fi
   # Juste après l'amorçage, le prompt n'est pas toujours détecté (agent_pane_busy) : on réessaie.
+  # Le nom d'un agent herdr est global à la machine : préfixé par le dépôt des issues pour ne pas
+  # heurter une grappe homonyme d'un autre projet. Un refus laisse les autres grappes partir.
+  agent="$(basename "$REPO")-$name"
+  started=0
   for attempt in 1 2 3 4 5; do
-    if herdr agent start "$name" --kind claude --pane "$pane" --timeout 60000 -- \
-        --model "$MODEL" --permission-mode auto --disallowedTools "$DENY" >/dev/null; then break; fi
-    [ "$attempt" = 5 ] && { echo "agent $name : démarrage refusé cinq fois" >&2; exit 1; }
+    if herdr agent start "$agent" --kind claude --pane "$pane" --timeout 60000 -- \
+        --model "$MODEL" --permission-mode auto --disallowedTools "$DENY" >/dev/null; then started=1; break; fi
     sleep 3
   done
-  echo "   agent $name prêt"
+  if [ "$started" = 0 ]; then echo "agent $agent : démarrage refusé cinq fois, grappe $name laissée amorcée sans agent" >&2; continue; fi
+  echo "   agent $agent prêt"
 
   terminal=$(herdr pane split --pane "$pane" --direction right --cwd "$path" --no-focus | jq -r '.result.pane.pane_id')
   echo "   terminal $terminal à droite"

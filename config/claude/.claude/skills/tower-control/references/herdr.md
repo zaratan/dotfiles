@@ -132,6 +132,17 @@ rendu. Un guetteur par agent, en parallèle.
 - **Branche créée depuis `origin/main`** (`git switch -c x origin/main`) : git la fait
   suivre `origin/main`, et un `git push` sans argument pousserait sur `main`. Faire
   `git branch --unset-upstream` aussitôt. Empiler sur le HEAD local n'a pas ce piège.
+- **Le nom d'un agent est global à la machine, pas au workspace** : `agent start qa-1` échoue en
+  `agent_name_taken` si un autre projet a un agent `qa-1`, et `agent get qa-1` rend celui de l'autre
+  projet. Le lanceur préfixe par le dépôt des issues (`<méta>-<grappe>`) ; une tour qui démarre un
+  agent à la main fait pareil et vérifie `cwd` dans `agent get` avant tout `agent prompt`.
+- **Worktree sur une branche qui existe déjà** (reprise d'un lot, branche poussée par l'utilisateur) :
+  `herdr worktree create` créerait une branche ; faire `git worktree add <chemin> <branche>` puis
+  `herdr workspace create --cwd <chemin> --label <nom> --no-focus` (rend `.result.root_pane.pane_id`),
+  amorcer dans ce pane, `agent start` dessus.
+- **`herdr agent prompt <nom> '<texte>'`** : des apostrophes dans le texte cassent les guillemets
+  simples, des backticks s'expansent dans les doubles. Écrire la consigne dans un fichier et envoyer
+  `"$(cat fichier)"` : le résultat d'une substitution de commande n'est pas réinterprété.
 - **`agent start` juste après l'amorçage répond parfois `agent_pane_busy`** alors que le
   prompt est affiché (2 fois sur 4 sur un lot) : réessayer, cinq fois à 3 s d'écart suffisent
   (le lanceur le fait).

@@ -221,7 +221,13 @@ Trois choses que le lanceur fait et qu'il ne faut pas retirer :
 L'amorçage d'un worktree qui dérive ses ports d'une table de noms de grappes met tout nom
 nouveau sur le même port : deux worktrees ont voulu le même PostgreSQL. Dériver l'offset du
 nom (checksum modulo) pour les noms hors table, et lire la sortie du pane quand l'amorçage
-échoue avant de chercher ailleurs.
+échoue avant de chercher ailleurs. **Sonder l'amorçage sur la machine qui lance**, pas sur
+celle qui l'a écrit : un script écrit sur Mac a cassé trois fois sur un serveur EL (`sed -i ''`
+que GNU sed lit comme un fichier, `lsof` absent, SELinux `Enforcing` qui refuse au conteneur
+un bind-mount du worktree tant que le dossier n'a pas le label `container_file_t`). Le nom
+d'agent herdr est global à la machine : le lanceur le préfixe par le dépôt des issues
+(`<méta>-<grappe>`), et c'est ce nom que la tour emploie dans `agent prompt`, `agent get` et
+le guetteur.
 
 Envoyer à chaque agent **la consigne commune et la consigne de l'issue en un seul
 `agent prompt`** (les deux fichiers concaténés) : en deux envois, l'agent répond à la
@@ -248,7 +254,18 @@ tour  : vérifie le lien PR → issue par `gh pr view <PR> --json closingIssuesR
         si le lien manque au merge, c'est la tour qui ferme l'issue, avec un commentaire
 tour  : crée la branche suivante depuis ce HEAD, envoie la consigne suivante
 merge : ferme l'issue, le workflow du board la passe en Fait — la tour n'y touche pas
+tour  : pose le label du lot sur l'issue fermée (`lot: <n>`)
 ```
+
+**Chaque issue fermée par un merge du lot porte le label `lot: <n>`**, `<n>` étant le numéro du
+dossier `lot-<n>/`. On retrouve ainsi ce qu'un lot a livré (`gh issue list --repo "$ISSUES_REPO"
+--state closed --label "lot: <n>"`). La tour le pose au moment où elle constate le merge, que
+l'issue ait été fermée par `Closes` ou à la main :
+`gh issue edit <N> --repo "$ISSUES_REPO" --add-label "lot: <n>"`. Au premier merge du lot, créer
+le label s'il manque (`gh label create "lot: <n>" --repo "$ISSUES_REPO" --color 5319e7`). Le label
+reste dans le dépôt des issues : il n'existe ni sur la PR ni dans le dépôt du code. Une issue
+jetée, découpée ou fermée sans merge ne le reçoit pas. À la clôture, comparer la liste du label
+avec le tableau des merges du journal.
 
 Quand l'utilisateur s'absente, il peut taper `/tc-delegate on` : la tour fait alors elle-même les
 lignes « user » (commit, PR, merge) selon ce skill, pour la session seulement. Sans cette commande,
@@ -262,7 +279,14 @@ relance. Sur la branche de base, attendre que **toutes les exécutions du commit
 soient terminées, jamais un nombre fixe de workflows : un filtre `paths:` en lance moins
 quand la base de données n'est pas touchée, et une attente sur « trois » ne rend jamais la
 main. Une PR empilée que GitHub recible sur la base après le merge de celle du dessous ne
-relance pas sa CI : la fermer puis la rouvrir la déclenche.
+relance pas sa CI : la fermer puis la rouvrir la déclenche, **à condition de laisser une pause
+entre les deux** (un close/reopen à trois secondes d'écart n'a déclenché aucun run sur deux PR ;
+45 s ont suffi). Quand la base n'a pas de déclencheur `push` (décision de coût de l'utilisateur),
+le run d'après merge n'existe pas : **recibler chaque PR en attente sur la base courante** par
+ce même close/reopen avant de la merger, pour que sa CI rejoue sur le merge réel. Le titre par
+défaut d'un merge commit GitHub cite le numéro de PR et le propriétaire (« Merge pull request
+#10 from owner/branche ») : si le dépôt du code interdit ces références, merger avec
+`gh pr merge --merge --subject "Merge branch '<branche>'"`.
 
 **Attendre sans surveiller, un guetteur par agent** : `assets/guetter.sh <agent>
 <compte rendu attendu> [section]`, lancé en arrière-plan (`run_in_background`). Il rend la
@@ -303,6 +327,15 @@ coûtait 15 à 20 min de verrou par issue, pour des tests que l'agent venait de 
 que la CI relançait sur trois systèmes. Avec des tests rapides, la vérification complète
 reste la règle.
 
+Pour revoir un écran, démarrer l'app du worktree comme en production avec
+`assets/demarrer-prod.sh <dépôt des issues> <grappe>`, en arrière-plan. Le script lit la
+recette du projet dans `config.sh` (`REPO_PROD_START[<dépôt>]`, ou `PROD_START` en dépôt
+unique) ; si elle manque, l'écrire une fois avec l'utilisateur plutôt que la refaire à la main
+à chaque vérification. Arrêter ensuite l'app par son port. **Les scripts et captures de la
+tour vont dans son scratchpad, jamais dans le cwd d'un worktree** : un outil qui écrit un
+chemin relatif (capture d'écran, rapport de test) laisse sinon un fichier non suivi que l'agent
+trouve et signale, ou qui part dans un commit.
+
 **Résumer court** : ce qui est fait, les chiffres vérifiés, ce qui reste ouvert. Le
 compte rendu complet est dans `travail/rapport-<N>.md` ou lisible par
 `herdr agent read`. **Les décisions que l'agent a prises seul ne vont pas dans le
@@ -333,6 +366,11 @@ install, build, typecheck, tests, et le retirer. Branche commitée : `merge-tree
 dans le worktree de l'agent, ce sont des écritures d'index et l'arbre obtenu est faux. Un
 rebase sans conflit a déjà cassé `tsc` deux fois, et un `merge-tree` propre a caché un
 conflit sémantique (un test qui compte des fichiers qu'une autre branche ajoute).
+
+**Tout geste git d'écriture de la tour passe par `git -C <chemin absolu>`**, jamais par un
+`cd <worktree> &&` en tête de chaîne : une fois, le `cd` n'a pas pris dans le shell de l'outil,
+`git add` a échoué sur un chemin inexistant et un `push` a visé le dépôt des issues, refusé
+parce que la référence n'existait pas. Rien d'écrit, par chance.
 
 **Une branche par issue, et d'où elle part.** Après le commit de l'utilisateur, la
 tour crée la branche suivante dans le même worktree (`git switch -c` — c'est la tour
@@ -406,6 +444,67 @@ parler à l'utilisateur.
   migrations des PR ouvertes** : si la branche de base se déploie à chaque merge et que les
   instances refusent une migration plus ancienne que la dernière appliquée, l'ordre des
   migrations impose l'ordre des merges. Le dire à l'utilisateur dès que deux PR en portent.
+- **Passe de QA de fin de lot**, une fois tout mergé et avant de dire le lot livrable. Les tests
+  de chaque PR ne voient pas une régression qui naît de la somme des merges, ni celle d'une
+  zone qu'aucune issue n'a touchée : un import XLS qui n'écrivait plus aucune réponse, cassé
+  par un changement de droits ailleurs, est parti ainsi chez les clients. On vérifie dans le
+  navigateur, sur le dernier commit de la base, que tout ce que le lot a livré marche encore,
+  ainsi que les chemins d'or de l'application.
+  - **Le cahier** a deux parties :
+    - les **chemins d'or**, dans `.claude/tower-control/chemins-d-or.md` du dépôt des issues
+      (versionné, commun aux lots). C'est le parcours de chaque fonction principale de
+      l'application, de bout en bout, avec le compte, où cliquer, ce qui doit apparaître et
+      la donnée à constater. S'il manque, la tour le rédige depuis les runbooks produit et le
+      fait valider par l'utilisateur avant la première passe. Quand un agent de lecture le
+      rédige, lui demander d'emblée **les variantes de chaque écran, les profils, les états
+      forcés et une section de contrôles transverses** (santé, en-têtes, 404, erreurs de
+      l'API, accessibilité de base) : une première passe « parcours de référence seulement »
+      a été jugée trop mince et refaite ; la seconde a doublé le fichier ;
+    - **une ligne par issue du label `lot: <n>`**, tirée de la section « Vérifier sur une
+      instance » de son runbook ou de l'Attendu de sa consigne.
+  - **Une ligne vaut par son résultat**, pas par l'absence d'erreur : réponses écrites et
+    comptées, score affiché avec sa valeur, mail arrivé dans la boîte de test.
+  - **Les agents** : deux ou trois agents de QA, un par zone du cahier. Chacun a son worktree
+    temporaire `wt/qa-<k>` sur `origin/<base>` (grappes `qa-<k>` dans le fichier de lot, branche
+    locale `qa/lot-<n>-<k>` jamais poussée), sa pile locale et l'app en mode production. Il
+    utilise le Chromium headless du projet, avec un onglet par compte. Consigne :
+    `assets/consigne-qa.md`, seule, sans la consigne commune. Ils ne corrigent rien.
+  - **Suivi en direct** : chaque agent ajoute une ligne à `travail/qa-<n>-<k>-suivi.md` par ligne
+    jouée, avec le détail de chaque KO. La tour lit ces fichiers pendant la passe (un point toutes
+    les 15 minutes si l'utilisateur le demande). Elle n'attend pas le rapport final pour agir sur un
+    KO : rejouer, ouvrir l'issue, et lancer le correctif dans une grappe neuve partie de
+    `origin/<base>`, en suivant le cycle normal (consigne, vérification, décisions posées,
+    PR). Elle redirige l'agent si une ligne dépend d'un défaut déjà connu. Elle réordonne les
+    lignes d'un agent quand une autre passe d'abord (correctif mergé, donnée prête). Une ligne KO
+    se rejoue après le merge de son correctif.
+  - **Contournements partagés** : `travail/qa-<n>-contournements.md`, commun aux agents. Chacun y
+    ajoute ce qui servirait aux autres (sélecteur, double facteur, préparation de donnée,
+    libellé réel), et le relit avant chaque ligne. La tour y relaie ce qu'elle voit dans un fichier
+    de suivi et que les autres n'ont pas encore écrit. Après la passe, ces contournements vont dans
+    `chemins-d-or.md` (section 0) ou dans les seeds.
+  - **États hors écran** : une ligne qui exige un état que l'app refuse de fabriquer (transition
+    interdite, doublon, dates passées) se signale « attente tour » dans le suivi. La tour prépare
+    cet état elle-même sur la pile locale de l'agent, au besoin en contournant les protections de
+    l'app (jamais ailleurs que sur une pile locale), puis dit à l'agent ce qu'elle a fait et
+    l'ajoute aux seeds à prévoir. Le garde-fou d'un agent a déjà refusé cette préparation, et la
+    ligne est restée bloquée toute une passe. Un état fabriqué ainsi n'est pas une donnée normale :
+    un écart vu dessus se rejoue sur des données faites par l'écran avant d'être compté comme KO.
+  - **Chaque KO**, la tour le rejoue elle-même avant d'en parler. Puis elle le classe :
+    régression du lot (à dire tout de suite, avec la recommandation de ne pas livrer avant
+    le correctif) ou défaut préexistant. Le classement se **date par `git log -- <fichiers de
+    la cause>` entre la base du lot et la tête**, pas par la seule lecture de la cause : sur
+    une passe, les quatre KO étaient antérieurs au lot, et le dire a changé la décision
+    (corriger tout de suite ou trier). Dans les deux cas, une issue va au Backlog, et
+    l'utilisateur trie ; un correctif décidé passe par le cycle normal dans un worktree
+    libéré, avec un agent qui a déjà le cadre.
+  - **Après la passe**, le jour même : réécrire `chemins-d-or.md` avec les apprentissages des
+    agents (libellés réels, `h2` contre `h3`, montants à figer, codes HTTP), qui se perdent
+    sinon. Réunir
+    leurs « seeds à ajouter » en une issue au Backlog, pour qu'une passe parte un jour d'une
+    base remise à zéro sans préparation à la main. Y ajouter
+    un chemin d'or pour chaque fonction livrée par le lot qui en mérite un, après accord de
+    l'utilisateur. Puis ranger les worktrees `qa-<k>` comme les autres. Comme ils n'ont pas de
+    PR, la condition se réduit à un `git status --short` vide.
 - Une fois tout mergé : `herdr workspace close` des sous-espaces créés par la tour,
   `git worktree remove` (jamais `--force` ; avant chacun, la PR de la branche est mergée et
   `git status --short` du worktree est vide), suppression des liens de mémoire.

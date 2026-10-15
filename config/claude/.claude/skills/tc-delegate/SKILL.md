@@ -53,7 +53,8 @@ pas mergée : la tour s'arrête et le dit.
   instances refusent une migration plus ancienne que la dernière appliquée.
 - PR empilée : viser la branche de la PR du dessous tant qu'elle n'est pas mergée ; après son merge, GitHub
   recible sur la base sans relancer la CI : fermer puis rouvrir la PR.
-- Après chaque merge : fermer l'issue privée avec la PR et le commit, passer à l'issue suivante.
+- Après chaque merge : fermer l'issue privée avec la PR et le commit, lui poser le label `lot: <n>`
+  (voir tower-control), passer à l'issue suivante.
 
 ### Rendre compte
 

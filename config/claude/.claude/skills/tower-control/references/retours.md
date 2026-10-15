@@ -617,3 +617,79 @@ origin/main) HEAD`, et `merge-tree` + worktree jetable pour la fusion ; c'est ce
   `rapports/` à 9,7 Go, dont 9 Go pour deux issues déjà fusionnées ; les sous-agents de revue ont laissé 2 Go de
   maquettes dans les dossiers temporaires. À chaque merge, proposer de retirer la planche lourde de l'issue fusionnée ;
   à la clôture, mesurer `rapports/` et les dossiers temporaires des agents.
+
+## Reprise d'un lot depuis un serveur Linux, forge GitHub, délégation des gestes git (14 octobre 2026)
+
+- **Un amorçage écrit sur Mac casse trois fois sur un serveur EL.** `sed -i ''` (BSD) fait lire à GNU sed un fichier vide ;
+  `lsof` absent ; SELinux `Enforcing` refuse au conteneur un bind-mount du worktree (`Permission denied` sur
+  `/docker-entrypoint-initdb.d`, exit 2), à corriger côté hôte par `chcon -Rt container_file_t <dossier>` quand
+  `getenforce` dit Enforcing. Règle : `sed -i.bak … && rm -f *.bak`, repli `ss -ltnH "sport = :<port>"`, et sonder
+  l'amorçage sur l'hôte cible avant le premier agent ; lire la sortie du pane quand il échoue.
+- **Reprendre un lot sur une autre machine demande cinq choses** : la passation dans le dépôt des issues, les branches
+  poussées, le fichier de lot ignoré par git recréé, `mise trust` et `gh auth`, et des worktrees sur des **branches
+  existantes** : `herdr worktree create` crée une branche, donc `git worktree add <chemin> <branche>` puis
+  `herdr workspace create --cwd <chemin>` pour le pane de l'agent. Un pre-rebase sur la branche voisine, décidé par
+  l'utilisateur, a gagné une heure de chemin critique ; après la fusion de la voisine, la branche en était un descendant.
+- **Un close/reopen de PR à trois secondes d'écart ne déclenche aucun workflow `pull_request`** : zéro run sur deux PR.
+  Avec 45 s entre `close` et `reopen`, les deux sont parties. Le changement de base seul (`edited`) ne déclenche rien.
+- **Le titre par défaut d'un merge commit GitHub cite le numéro de PR et le propriétaire** (« Merge pull request #10 from
+  owner/branche »). Quand le dépôt interdit ces références, `gh pr merge --merge --subject "Merge branch '<branche>'"`.
+  Vérifier aussi `git log` des branches et de la base pour les mentions interdites avant la première PR.
+- **Sans déclencheur `push` sur la base, chaque PR en attente se recible sur la base courante avant son merge**
+  (close, pause, reopen, run complet) : c'est ce qui remplace le run d'après merge. Décision de coût de l'utilisateur,
+  posée en question avec le gain chiffré (un run de 20 min par merge).
+- **Paralléliser une CI se mesure d'abord par étape** (`actions/runs/<id>` → `jobs[].steps[].startedAt/completedAt`) :
+  une chaîne de 20 min s'est séparée en deux jobs de 5,8 et 11,9 min, soit 12 min murales pour 17,7 facturées.
+  L'agent a trouvé une prémisse fausse de la consigne (le job e2e avait besoin du build et des migrations : la suite
+  compile l'API par un script et le profil des images ne migre pas la base) : lire les helpers de la suite avant de
+  découper.
+- **Une chaîne `cd <worktree> && git add …` a tourné une fois depuis le mauvais dossier** (le `cd` n'a pas pris dans le
+  shell de l'outil) : `git add` a échoué sur un chemin inexistant et un `push` a visé le dépôt des issues, refusé parce
+  que la référence n'existait pas. Rien d'écrit, par chance. Règle : tout geste git d'écriture passe par `git -C <chemin>`
+  ou un chemin absolu, jamais par un `cd` en tête de chaîne.
+- **Un agent repris pour une seconde issue dans le même worktree garde son contexte** (12 % consommé après deux issues et
+  une retouche) : la tour crée la branche depuis la base distante, envoie la nouvelle consigne avec un rappel d'une
+  ligne que le cadre reçu au début tient, pas besoin de renvoyer la consigne commune.
+- **`herdr agent prompt '<texte avec apostrophes>'` casse le shell** (« unmatched ' ») : écrire la consigne dans un fichier
+  et envoyer `"$(cat fichier)"`, ce qui protège aussi les backticks.
+- **Délégation des gestes git** : relire d'abord le format de l'utilisateur (`git log` : titre seul, type conventionnel,
+  sans corps ; commitlint y borne le corps à 100 colonnes), préparer les corps de PR dans le scratchpad pendant les runs,
+  un merge à la fois, fermer l'issue privée au merge avec PR, commit et durée du run. Chaque décision d'agent reste posée à
+  l'utilisateur avant le commit.
+- Ordres de grandeur : reprise à 16 h 15, 6 PR fusionnées à 19 h ; une issue d'outillage de 3 points en 12 min d'agent,
+  sa suite de 2 points en 10 min + 5 de retouche ; un portage de rebase (9 erreurs TypeScript dans deux specs) en 5 min
+  d'agent ; 0 compte rendu faux ; 2 prémisses de la tour fausses (le job e2e, « azure/main » sur une machine sans ce
+  remote) ; une dizaine de questions directes à l'utilisateur.
+- **Première passe de QA de fin de lot, trois agents (14 octobre 2026, même lot).** Le cahier n'existait pas : un agent de lecture l'a écrit en deux passes (la première jugée « sparse » par l'utilisateur : demander d'emblée les variantes de chaque écran, les profils, les états forcés, les contrôles transverses ; 475 lignes à la seconde), puis trois agents de QA ont joué 131 lignes en 28 minutes sur les images de production de trois worktrees : 4 KO (deux défauts préexistants corrigés dans le lot, un préexistant au Backlog, une ligne de cahier fausse), 1 bloquée, 0 régression. Ce qui a marché : la section 0 « contournements connus » du cahier, le fichier de contournements partagé (dix lignes en 20 minutes, dont deux pièges de pile vus par les trois agents à la même minute), le suivi au fil de l'eau lu par la tour, et la tour qui classe chaque KO (préexistant ou régression) en datant les fichiers par `git log` avant d'ouvrir l'issue. Les agents de QA rendent aussi des « apprentissages pour le cahier » précis (libellés réels, `h2` contre `h3`, montants à figer, HTTP 200 sur un lien expiré) : réécrire le cahier le jour même, sinon ils se perdent.
+- **Le nom d'agent herdr est global à la machine, pas au workspace** : `qa-1` existait dans un autre projet, le lanceur a refusé cinq fois et s'est arrêté avant les grappes suivantes. Préfixer les noms de grappes par le projet (`fepem-qa-2`) ou faire préfixer le nom d'agent par le lanceur. Un agent en place dans son pane se démarre à la main avec `herdr agent start <nom> --kind claude --pane <pane> -- …`.
+- **Pièges de pile vus par la QA** : SELinux Enforcing refuse aussi le volume du certificat du stand-in (`dev/legacy-bridge/tls`, `chcon -R -t container_file_t` avant `compose up`) ; la version de Playwright du worktree peut réclamer un `chromium_headless_shell-<n>` absent du cache (`executablePath` vers la version présente, pas d'installation) ; le POST auto-soumis d'une page https vers http part avec `Origin: null`, donc le vrai pont ne se joue pas en local, il faut poster le jeton soi-même ; les horodatages des agents sont en UTC, ne pas s'en servir pour mesurer.
+- **Les correctifs nés de la QA passent par le cycle normal, dans un worktree libéré** : agent qui a déjà le cadre (`ci`, `severance`), branche depuis la base distante, décisions posées, retouche, PR reciblée. Deux correctifs de 1 et 2 points en 25 et 40 minutes d'agent, revue comprise ; l'un a révélé un troisième endroit avec le même défaut (la branche renvoyée), que l'agent a corrigé en le disant.
+- **Classer un KO demande de dater les fichiers**, pas seulement de lire la cause : `git log -- <fichiers>` entre la base du lot et la tête dit si le lot y a touché. Les quatre KO de la passe étaient antérieurs au lot ; le dire à l'utilisateur change la décision (corriger maintenant ou trier).
+
+## Première passe de QA de fin de lot (14 octobre 2026)
+
+- **La passe a trouvé ce que la CI ne voyait pas.** Sur 21 issues mergées avec CI verte, 4 régressions sont sorties
+  dans le navigateur en build de production : une dépendance qui charge deux versions d'une même bibliothèque (écran
+  noir, aucun test ne rend la vue), une garde ajoutée en base qui casse une écriture faite champ par champ, un prédicat
+  de menu qui plante sur une valeur nulle, et un consommateur que l'issue n'avait pas branché sur la nouvelle règle
+  alors que le runbook l'affirmait. Les deux premières n'étaient sur aucun chemin d'or : elles sont sorties de lignes
+  jouées en variante (session sans validation, dernière question) ou hors cahier. D'où les chemins d'argent.
+- **Agir en direct paie.** Les fichiers de suivi au fil de l'eau ont permis d'ouvrir l'issue, de lancer le correctif et
+  de rediriger les autres agents pendant la passe ; quatre correctifs étaient mergés avant la fin des rapports.
+- **Un état de déploiement repris d'un résumé est une hypothèse.** Un résumé de session disait un correctif « déjà
+  appliqué » sur deux instances ; c'était faux, et toute une doc de livraison (scénario de migration hors ordre) a été
+  écrite dessus avant que l'utilisateur corrige. Avant d'écrire une livraison : demander l'état réel de chaque instance
+  (ou la commande de lecture qui le donne), ne jamais le déduire des heures de merge ni d'un résumé.
+- **Données hors écran** : un agent de QA s'est vu refuser la préparation d'un état impossible par l'écran (transition
+  interdite) ; la tour l'a faite sur la pile locale en contournant les triggers. Un écart vu sur ces données doit être
+  rejoué sur des données faites par l'écran avant d'être compté : un des KO de la repasse venait de là.
+- **Ordres de grandeur** : 3 agents, ~50 minutes chacun pour 12 à 21 lignes ; repasse ciblée 1 agent ~50 minutes ;
+  chaque correctif 20 à 60 minutes d'agent ; ~40 frictions UX relevées sans les chercher, regroupées en 5 issues.
+- **Une boîte de dialogue de Claude Code peut avaler une consigne** : après une longue session, l'agent a affiché
+  « Teach auto mode about your environment? » (proposition de lire l'historique du shell), et le `prompt` suivant est
+  resté sans effet, l'agent en `done`. Après chaque envoi, vérifier que l'agent passe en `working` ; sinon lire l'écran,
+  fermer la boîte par `esc` (ne pas accepter de lecture de l'historique sans l'utilisateur) et renvoyer.
+- **Un agent lancé sans guet attend en silence** : un agent démarré en fin de série (après d'autres réponses) n'a pas eu
+  son `guetter.sh`, et sa question est restée sans réponse jusqu'à ce que l'utilisateur la voie. Lancer le guet dans le
+  même tour que le `agent prompt` de la consigne, sans exception, et vérifier au point périodique que chaque agent
+  vivant a un guet en cours.
