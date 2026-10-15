@@ -25,17 +25,27 @@ project = gql("""query($o:String!,$n:Int!){ user(login:$o){ projectV2(number:$n)
   fields(first:30){ nodes{ ... on ProjectV2FieldCommon{ id name } ... on ProjectV2SingleSelectField{ id name options{ id name } } } } } } }""", o=OWNER, n=PROJECT)["data"]["user"]["projectV2"]
 pid = project["id"]
 field = next(f for f in project["fields"]["nodes"] if f.get("name") == FIELD)
-items, cursor = {}, None
-while True:
-    page = gql("""query($o:String!,$n:Int!,$a:String){ user(login:$o){ projectV2(number:$n){ items(first:100, after:$a){ pageInfo{ hasNextPage endCursor } nodes{ id content{ ... on Issue{ number } } } } } } }""", o=OWNER, n=PROJECT, **({"a": cursor} if cursor else {}))["data"]["user"]["projectV2"]["items"]
-    for it in page["nodes"]:
-        if it["content"] and "number" in it["content"]:
-            items[it["content"]["number"]] = it["id"]
-    if not page["pageInfo"]["hasNextPage"]:
-        break
-    cursor = page["pageInfo"]["endCursor"]
+def read_items():
+    found, cursor = {}, None
+    while True:
+        page = gql("""query($o:String!,$n:Int!,$a:String){ user(login:$o){ projectV2(number:$n){ items(first:100, after:$a){ pageInfo{ hasNextPage endCursor } nodes{ id content{ ... on Issue{ number } } } } } } }""", o=OWNER, n=PROJECT, **({"a": cursor} if cursor else {}))["data"]["user"]["projectV2"]["items"]
+        for it in page["nodes"]:
+            if it["content"] and "number" in it["content"]:
+                found[it["content"]["number"]] = it["id"]
+        if not page["pageInfo"]["hasNextPage"]:
+            break
+        cursor = page["pageInfo"]["endCursor"]
+    return found
+
+
+items = read_items()
 
 for n in numbers:
+    for _ in range(6):
+        if n in items:
+            break
+        time.sleep(10)
+        items.update(read_items())
     item = items[n]
     if value == "clear":
         gql("""mutation($p:ID!,$i:ID!,$f:ID!){ clearProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f}){ projectV2Item{ id } } }""", p=pid, i=item, f=field["id"])

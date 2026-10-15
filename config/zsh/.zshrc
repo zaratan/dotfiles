@@ -104,3 +104,6 @@ for plugin_prefix in /opt/homebrew/share /usr/local/share; do
   fi
 done
 unset plugin_prefix
+
+# Scaleway CLI autocomplete initialization.
+eval "$(scw autocomplete script shell=zsh)"

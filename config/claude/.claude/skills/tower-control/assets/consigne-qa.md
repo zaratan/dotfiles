@@ -1,7 +1,9 @@
 # Gabarit de consigne de QA de fin de lot
 
 Envoyé seul (pas de consigne commune : l'agent ne code pas) à chaque agent de QA, avec sa part
-du cahier. La tour remplit les `<…>`.
+du cahier. La tour remplit les `<…>`. Pour une commande plutôt qu'une application web, remplacer
+le navigateur par la vraie commande lancée sur des copies des données, et la capture par la sortie
+standard, la sortie d'erreur et le code de sortie de chaque ligne.
 
 ```
 # QA de fin de lot <n> — part <k>/<total>

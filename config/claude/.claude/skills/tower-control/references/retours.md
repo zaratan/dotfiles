@@ -584,6 +584,9 @@ origin/main) HEAD`, et `merge-tree` + worktree jetable pour la fusion ; c'est ce
 - **Une mesure d'agent de relecture n'est pas une preuve.** Une consigne a recopié « déjà équivalent » d'un rapport de relecture ; l'agent de code a trouvé le contraire dès la lecture. Une affirmation d'équivalence ou d'absence dans une consigne vient avec la commande qui la prouve, ou se formule en question.
 - **Réutiliser un worktree terminé pour la grappe suivante** plutôt qu'en créer un : pas d'installation ni de pile à monter, l'agent garde le contexte du dépôt. Branche nouvelle depuis `origin/<base>` quand rien n'est commun, sur la branche précédente quand un fichier l'est.
 - **Conflits de doc entre deux branches de la même grappe** : quand l'utilisateur a délégué les commits, la tour merge la base dans la branche et résout (les deux côtés d'un runbook sont souvent deux ajouts), puis revérifie la suite complète sur l'arbre fusionné avant d'ouvrir la PR.
+
+## Réécriture en Rust, troisième lot de code, deux agents, QA d'une commande (13 au 15 octobre 2026)
+
 - **Un message perdu sans erreur.** `agent prompt` a répondu `agent_prompted`, mais l'agent est resté `idle` : la vue
   d'un shell de fond était ouverte dans son pane et a avalé le texte. C'est sans doute aussi la cause du message perdu
   au lot précédent. Vérifier l'état après chaque envoi ; `esc` ferme la vue.
@@ -617,6 +620,20 @@ origin/main) HEAD`, et `merge-tree` + worktree jetable pour la fusion ; c'est ce
   `rapports/` à 9,7 Go, dont 9 Go pour deux issues déjà fusionnées ; les sous-agents de revue ont laissé 2 Go de
   maquettes dans les dossiers temporaires. À chaque merge, proposer de retirer la planche lourde de l'issue fusionnée ;
   à la clôture, mesurer `rapports/` et les dossiers temporaires des agents.
+
+- **Avec le guetteur qui ne compte qu'un fichier écrit après son départ, ne plus mettre de `sleep` avant lui.** Un agent
+  rapide a écrit sa retouche pendant les 45 s d'attente : le guetteur a vu un fichier « ancien » et a rendu « arrêté sans
+  compte rendu ». La fraîcheur suffit à écarter l'ancien compte rendu ; lancer le guet dans le même tour que le prompt.
+- **Une passe de QA sur une commande, pas un navigateur.** Le cahier joue la vraie commande sur des **copies** des données
+  (sans `-o`, la commande écrit à côté des vidéos), avec chemins d'or, chemins d'argent demandés par l'utilisateur
+  (entrées, options, langue et terminal, relances et pannes, disque plein par une image disque) et contrôles transverses
+  (code de sortie, stdout contre stderr, rien d'écrit ailleurs, pic de mémoire). Un agent, ~2 h, 58 lignes, 3 KO dont un
+  né du lot, corrigé avant la clôture. La tour rejoue chaque KO et le date par `git log` avant d'en parler.
+- **Des données de test hors du poste.** Le quota LFS gratuit de GitHub est de 10 Gio de stockage et 10 Gio de bande
+  passante par mois pour tout le compte, et un budget à 0 $ bloque tout le LFS au dépassement, CI comprise. 11 Go de
+  vidéos sont allés dans un bucket S3 (Scaleway, quelques centimes par mois), le reste dans un dépôt privé.
+- **Ordres de grandeur** : 19 issues et 18 PR en trois jours, deux agents ; une garde de 3 points en 1 à 2 h d'agent,
+  plan court compris ; CI d'une PR divisée par deux (15 → 7 min) par trois issues de CI.
 
 ## Reprise d'un lot depuis un serveur Linux, forge GitHub, délégation des gestes git (14 octobre 2026)
 

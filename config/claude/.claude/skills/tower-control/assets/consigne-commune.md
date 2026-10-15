@@ -33,6 +33,9 @@ Pose-les avec AskUserQuestion, une à la fois, avec ta recommandation. La tour
 répond ; si la question engage un choix produit ou de maquette, elle la fait
 remonter, ce qui peut prendre du temps : continue ce qui n'en dépend pas.
 
+Une mesure que tu prévois sous un verrou commun à plusieurs agents se décrit d'abord, dans ton plan ou en question :
+nombre de points et temps estimé de chacun. Tiens ce budget ; s'il déborde, arrête-toi et dis-le.
+
 Avant de poser une question, vérifie qu'elle n'a pas déjà sa réponse dans
 `CLAUDE.md`, la documentation du dépôt ou l'issue.
 

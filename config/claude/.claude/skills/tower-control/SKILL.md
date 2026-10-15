@@ -271,6 +271,9 @@ Quand l'utilisateur s'absente, il peut taper `/tc-delegate on` : la tour fait al
 lignes « user » (commit, PR, merge) selon ce skill, pour la session seulement. Sans cette commande,
 une délégation ne se déduit jamais d'une conversation.
 
+**Relire l'état d'une PR (`gh pr view <N> --json state,mergedAt`) avant toute phrase sur lui** : une PR prise par
+l'auto-merge a été annoncée deux fois « en attente de ton merge » alors qu'elle était fusionnée depuis deux heures.
+
 **Lire la CI soi-même** : celle de chaque PR jusqu'au bout (boucler tant qu'une tâche est
 « pending » ; `gh pr checks --watch` rend la main au premier résultat) et celle de la
 branche de base après chaque merge. Une tâche annulée par son délai n'est pas un test qui
@@ -314,6 +317,10 @@ dans une consigne** (« doit être muet » était faux pour un script qui imprim
 de succès : trois agents sur trois l'ont signalé). Dans un worktree à ports dérivés, les
 tests de base passent par le wrapper du projet, pas par le CLI brut.
 
+**Relire le diff pour ce que le poste local ne voit pas** : un import ou une aide qui ne sert qu'à un test réservé à
+un système (`#[cfg(unix)]`), inutilisé ailleurs et refusé par `-D warnings` ; une égalité exacte sur la sortie
+d'erreur, qu'un runner virtualisé salit de ses propres messages. Deux PR ont cassé en CI ainsi, vertes sur le Mac.
+
 **Vérifier indépendamment.** Le compte rendu de l'agent est une affirmation. Avant
 de résumer à l'utilisateur, relancer soi-même dans le worktree les vérifications
 que le projet définit (`pnpm run check`, référence de non-régression, contrôle des
@@ -342,6 +349,11 @@ compte rendu complet est dans `travail/rapport-<N>.md` ou lisible par
 résumé : elles se posent en questions directes** (AskUserQuestion, une à la fois,
 avec le texte avant et après), avant de dire « prêt à commiter ». Un utilisateur qui
 traite plusieurs sujets fusionne sans relire ce qu'un résumé lui signale en prose.
+
+**Une retouche que la tour tire d'un compte rendu ou d'une revue se vérifie dans le code avant l'envoi** : lire le
+passage cité. Trois retouches fausses sont parties ainsi en un lot (des valeurs « déjà rendues » qui ne l'étaient pas,
+un attribut dit inutile qui servait à un lint, un chemin de cache dont la forme changeait la version de l'entrée) ;
+les agents les ont arrêtées. Au merge d'une issue, proposer de retirer sa planche lourde (vidéos, images).
 
 **Chaque « hors périmètre repéré » finit quelque part, avant le résumé** : écrire la
 table point → destination, avec trois destinations possibles : traité (retouche par le
@@ -505,6 +517,13 @@ parler à l'utilisateur.
     un chemin d'or pour chaque fonction livrée par le lot qui en mérite un, après accord de
     l'utilisateur. Puis ranger les worktrees `qa-<k>` comme les autres. Comme ils n'ont pas de
     PR, la condition se réduit à un `git status --short` vide.
+  - **Pour une commande plutôt qu'une application web**, la passe joue la vraie commande sur des **copies** des données
+    (une commande qui écrit à côté de ses entrées ne doit jamais toucher les originaux), avec des chemins d'argent
+    (entrées, options, langue et terminal, relances, pannes simulées) et des contrôles transverses : code de sortie,
+    sortie standard contre sortie d'erreur, rien d'écrit hors des dossiers de sortie ni dans le dossier temporaire,
+    pic de mémoire. Un seul agent suffit quand tout passe par le même verrou de mesure.
+- **Mesurer le dossier des comptes rendus et les dossiers temporaires des agents** (planches, maquettes des
+  sous-agents de revue) : 9,7 Go et 2 Go s'y étaient accumulés en un lot. Proposer la liste à supprimer.
 - Une fois tout mergé : `herdr workspace close` des sous-espaces créés par la tour,
   `git worktree remove` (jamais `--force` ; avant chacun, la PR de la branche est mergée et
   `git status --short` du worktree est vide), suppression des liens de mémoire.
