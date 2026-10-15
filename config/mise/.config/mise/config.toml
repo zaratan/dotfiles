@@ -4,6 +4,8 @@ ruby = "4.0"
 python = "3"
 
 bun = "latest"
+uv = "latest"
+pnpm = "latest"
 "npm:@prisma/language-server" = "latest"
 "npm:eslint_d" = "latest"
 "npm:prettier" = "latest"

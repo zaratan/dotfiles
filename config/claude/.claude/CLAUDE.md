@@ -63,3 +63,8 @@ plausible.
 Le repère de 7 % vaut pour une bibliothèque ou du code partagé. Dans du code applicatif
 qui ne sortira pas du projet, viser **1 à 2 %** : la justification va dans la
 documentation du dépôt, pas dans le code.
+
+## Poste de travail
+
+- Le shell interactif, sur le Mac comme sur lumiel, a des alias : `cat` → `bat --paging=never`, `df` → `duf`, `du` → `dust`. Quand la sortie brute compte (script, parsing, consigne à un autre agent), écrire `command cat`, `command df`, `command du`.
+- Sur lumiel, si la version de Playwright d'un projet réclame un Chromium absent de `~/.cache/ms-playwright`, l'installer sans root : `pnpm exec playwright install chromium-headless-shell`. Les bibliothèques système sont déjà là. Ne pas forcer `executablePath` vers une autre version.
