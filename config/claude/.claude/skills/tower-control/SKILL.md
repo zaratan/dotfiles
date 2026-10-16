@@ -28,6 +28,8 @@ consigne ou lancée par la tour tombe sur `duf`, `dust`, `ugrep` ; écrire `/bin
 `/usr/bin/grep` quand c'est le cas. Relever aussi `git config push.default` : en `upstream`,
 un `git push origin <branche>` sans `:destination` part vers l'amont de la branche, qui est la
 base quand elle a été créée depuis `origin/<base>` sans `--no-track`.
+**Un module Python absent** (`yaml`, `openpyxl`) ne s'installe pas :
+`uv run --with pyyaml script.py` crée l'environnement à la volée et le met en cache.
 
 **Relever le login GitHub** une fois (`gh api user -q .login`) : il nomme le fichier
 de lot, filtre le board et signe le journal. Vérifier qu'il peut être assigné sur
