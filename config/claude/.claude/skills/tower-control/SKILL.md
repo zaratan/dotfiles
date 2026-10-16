@@ -25,7 +25,9 @@ En cours → Bloqué → Review → Fait, et le workflow « item closed → Fait
 
 **Relever les alias du poste** (`type df du grep sed`) : une commande écrite dans une
 consigne ou lancée par la tour tombe sur `duf`, `dust`, `ugrep` ; écrire `/bin/df`,
-`/usr/bin/grep` quand c'est le cas.
+`/usr/bin/grep` quand c'est le cas. Relever aussi `git config push.default` : en `upstream`,
+un `git push origin <branche>` sans `:destination` part vers l'amont de la branche, qui est la
+base quand elle a été créée depuis `origin/<base>` sans `--no-track`.
 
 **Relever le login GitHub** une fois (`gh api user -q .login`) : il nomme le fichier
 de lot, filtre le board et signe le journal. Vérifier qu'il peut être assigné sur
@@ -66,7 +68,13 @@ branche de base (`REPO_BASE`), amorçage (`REPO_BOOTSTRAP`) et contrôle d'amor�
 **Les grappes sont dans `lot-<login>.sh`**, à côté de `config.sh`. `config.sh` porte
 les faits du projet et se partage ; le fichier de lot porte `GRAPPES`, c'est la tour
 qui l'écrit au groupement, et git l'ignore (`.claude/tower-control/lot-*.sh` dans le
-`.gitignore` du dépôt des issues ; si la ligne manque, la proposer). Il peut aussi corriger un chemin de poste, élément par
+`.gitignore` du dépôt des issues ; si la ligne manque, la proposer). **Si le dépôt des issues est
+public**, c'est tout `.claude/tower-control/` qui s'ignore dès le départ (journal, consignes,
+décisions sont le dossier personnel de la tour), ou il vit dans un méta-dépôt privé : l'utilisateur
+a dû sortir le dossier du suivi après neuf lots, et le rebase qui a suivi a buté sur un fichier non
+suivi puis effacé onze fichiers du disque à l'`--abort`. Avant toute opération git qui change
+d'arbre dans un dossier où vivent des fichiers non suivis (rebase, checkout, abort), en copier
+une sauvegarde hors du dépôt. Il peut aussi corriger un chemin de poste, élément par
 élément (`REPO_PATH[app]=…`), ou faire partir les branches de `origin/<base>` plutôt que
 de la branche locale (`REPO_BASE[app]="origin/develop"`, avec un `git fetch` avant de
 lancer : la tour ne met pas à jour le `develop` local du client) ; un `declare -A REPO_PATH=(…)` y effacerait les autres
@@ -113,6 +121,9 @@ modifient le même fichier vont dans le même worktree, l'une après l'autre ; s
 second merge conflicte à coup sûr. Lire chaque issue, noter les fichiers probables,
 former des grappes. Trois ou quatre worktrees est un bon nombre : au-delà, la tour
 ne suit plus et la machine chauffe.
+Trois petites issues (≤ 5 points) qui touchent le même fichier de tests ou le README vont dans
+une seule chaîne même si l'horloge en souffre : réparties sur deux grappes pour aller vite, elles
+ont coûté quatre `git merge origin/main` résolus par les agents (lot 10).
 
 **Quand la CI d'une PR dépasse une dizaine de minutes**, proposer au groupement de réunir
 les petites issues d'une même grappe en une seule PR (une branche, un `Closes` par issue) :
@@ -149,9 +160,14 @@ une issue codée et revue a déjà été jetée pour cette raison. Confronter au
 de l'issue à la doc du dépôt avant de la recopier dans une consigne.
 
 **Si plusieurs agents mesurent sur la même machine**, poser un verrou commun avant de
-lancer (`lockf`, une commande par verrou, règle écrite dans un `MESURES.md` du dossier
+lancer (une commande par verrou, règle écrite dans un `MESURES.md` du dossier
 des worktrees, seuil d'espace disque avant tout balayage) ; voir `references/retours.md`.
-Toute compilation chronométrée ou partie de zéro passe sous le verrou, comme la mesure.
+Le verrou a deux niveaux : `lourd`, partagé (vidéos entières, construction de zéro, tests
+lents, deux agents peuvent le tenir ensemble), et `chrono`, exclusif (un temps publié attend
+que tout le lourd soit fini) ; un script Python `fcntl.flock` fait les deux et reste compatible
+avec `lockf`. Toute compilation chronométrée ou partie de zéro passe sous le verrou, comme la
+mesure. **Le réseau n'est jamais sous le verrou** : un téléchargement de 11 Go mis sous le
+verrou par une consigne a bloqué les mesures 24 min sur un réseau d'hôtel.
 Le critère de calme d'avant mesure se mesure sur la machine au repos avant d'être écrit :
 la charge moyenne d'un Mac vaut 5 à 6 à vide, et un agent qui l'attendait plus basse a
 attendu sans fin ; la somme des `%CPU` des autres processus et un `pgrep` des outils
@@ -252,7 +268,7 @@ user  : ouvre le sous-espace herdr, relit le diff, commite, ouvre la PR (Closes 
 tour  : vérifie le lien PR → issue par `gh pr view <PR> --json closingIssuesReferences`,
         jamais par une regex sur le corps (GitHub accepte « Closes: #N », « fixes #N »…) ;
         si le lien manque au merge, c'est la tour qui ferme l'issue, avec un commentaire
-tour  : crée la branche suivante depuis ce HEAD, envoie la consigne suivante
+tour  : crée la branche suivante (`git switch -c <b> --no-track origin/<base>`), envoie la consigne suivante
 merge : ferme l'issue, le workflow du board la passe en Fait — la tour n'y touche pas
 tour  : pose le label du lot sur l'issue fermée (`lot: <n>`)
 ```
@@ -297,7 +313,10 @@ main dès que l'agent est `blocked` (question ou demande de permission) ; quand 
 rendu a été **modifié après le lancement du guet** (un ancien fichier ne compte pas) et que
 l'agent est arrêté depuis trois minutes sans shell de fond, ou depuis dix minutes avec (un
 agent laisse souvent un `next start` ouvert : un guet qui exigeait zéro shell a attendu sans
-fin un compte rendu écrit depuis longtemps) ; ou après dix minutes d'arrêt sans compte rendu.
+fin un compte rendu écrit depuis longtemps) ; ou après dix minutes d'arrêt sans compte rendu,
+trente quand il reste des shells de fond (un agent qui attend une mesure de huit minutes a été
+dit arrêté une minute avant son compte rendu). Le verdict « ARRÊTÉ » porte la dernière ligne
+visible de l'agent : la lire avant de conclure.
 Pour une retouche, passer la section attendue (`"## Retouche"`) plutôt qu'une boucle
 `until grep` maison. Demander dans chaque consigne de fermer ses shells de fond avant
 d'écrire le compte rendu. Le relancer après chaque réponse. La zone de saisie d'un agent
@@ -345,7 +364,11 @@ trouve et signale, ou qui part dans un commit.
 
 **Résumer court** : ce qui est fait, les chiffres vérifiés, ce qui reste ouvert. Le
 compte rendu complet est dans `travail/rapport-<N>.md` ou lisible par
-`herdr agent read`. **Les décisions que l'agent a prises seul ne vont pas dans le
+`herdr agent read`. **Chaque message de la tour, quel que soit son sujet, finit par un
+tableau d'une ligne par grappe** (issue, état, ce qu'elle fait ou attend) **et une ligne
+« À toi : … »** (commit, PR, merge, verdict, ou « rien ») : avec trois agents en vol,
+l'utilisateur a dû demander deux fois où en était une branche qu'un message sur une autre
+laissait invisible. **Les décisions que l'agent a prises seul ne vont pas dans le
 résumé : elles se posent en questions directes** (AskUserQuestion, une à la fois,
 avec le texte avant et après), avant de dire « prêt à commiter ». Un utilisateur qui
 traite plusieurs sujets fusionne sans relire ce qu'un résumé lui signale en prose.
@@ -385,8 +408,9 @@ conflit sémantique (un test qui compte des fichiers qu'une autre branche ajoute
 parce que la référence n'existait pas. Rien d'écrit, par chance.
 
 **Une branche par issue, et d'où elle part.** Après le commit de l'utilisateur, la
-tour crée la branche suivante dans le même worktree (`git switch -c` — c'est la tour
-qui le fait, l'agent en est interdit). Elle part de **`origin/<branche de base>`
+tour crée la branche suivante dans le même worktree (`git switch -c <b> --no-track origin/<base>` —
+c'est la tour qui le fait, l'agent en est interdit ; sans `--no-track`, la branche suit la base et un
+push sans refspec explicite y part). Elle part de **`origin/<branche de base>`
 après un `fetch`**, pas du HEAD local : d'autres worktrees ont pu merger entre-temps, et une
 branche partie du HEAD local ne « prend » jamais ces changements toute seule. Faire
 `git branch --unset-upstream` aussitôt, sinon un `push` nu irait sur la branche de
@@ -404,7 +428,11 @@ toucher aux branches : `tree=$(git write-tree); tmp=$(git commit-tree $tree -p H
 n'est pas de l'historique). Le point à l'utilisateur dit « N commits derrière, rebase sans
 conflit » ou nomme les fichiers en conflit. Le rebase lui-même est une écriture git :
 il se fait sur sa demande explicite, ou par lui. Un rebase sans conflit n'est pas un rebase
-vert : `check` complet avant de pousser, et la tour revérifie après.
+vert : `check` complet avant de pousser, et la tour revérifie après. **La prédiction se refait
+juste avant le merge**, sur l'`origin/<base>` du moment : un `merge-tree` propre à l'ouverture
+de la PR a été suivi de trois merges, et la PR était sale sur cinq fichiers à son tour. Dès
+qu'elle est sale, lancer la fusion dans le worktree de l'agent (sous délégation, `git merge
+origin/<base>` ; sinon la demander) et le laisser résoudre.
 
 ## 4. Les questions
 

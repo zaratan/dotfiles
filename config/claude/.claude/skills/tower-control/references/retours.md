@@ -710,3 +710,70 @@ origin/main) HEAD`, et `merge-tree` + worktree jetable pour la fusion ; c'est ce
   son `guetter.sh`, et sa question est restée sans réponse jusqu'à ce que l'utilisateur la voie. Lancer le guet dans le
   même tour que le `agent prompt` de la consigne, sans exception, et vérifier au point périodique que chaque agent
   vivant a un guet en cours.
+
+## La bascule vers le Rust, neuf issues, délégation des gestes git sur deux jours (15 et 16 octobre 2026)
+
+- **Un libellé d'option se relit contre les décisions déjà prises.** « Vidéos de QA en LFS » est passé dans une
+  question posée à 19 h, à contresens de ce que l'utilisateur avait dit la veille (tout dans le seau, rien en LFS) ; il
+  l'a cochée, l'issue a été redessinée deux fois et un dépôt créé pour rien. Avant d'écrire une option, vérifier qu'elle
+  ne contredit pas une décision du lot ; en cas de doute, la citer dans l'option.
+- **Le réseau n'est jamais sous le verrou.** Un téléchargement de 11 Go mis sous le verrou par la consigne a bloqué les
+  mesures 24 min sur un réseau d'hôtel. Le verrou est à deux niveaux : `lourd` partagé (vidéos entières, construction
+  de zéro, tests lents) et `chrono` exclusif (temps publiés), un script Python `fcntl.flock` compatible `lockf`.
+- **Prédire la fusion juste avant de merger, pas à l'ouverture de la PR.** Un `merge-tree` propre à l'ouverture a été
+  suivi de trois merges ; la PR était DIRTY sur cinq fichiers à son tour. Refaire la prédiction sur `origin/<base>`
+  du moment, et lancer la fusion dans le worktree de l'agent dès qu'elle est sale.
+- **Un hook de poussée nouvellement posé se teste par un vrai push.** Le pre-push qui lance `check` a refusé son propre
+  premier push : git exporte `GIT_DIR` dans les hooks et un test « hors d'un dépôt » voyait le dépôt. Défaut réel du code
+  (une commande git sans `env_remove`), trouvé par le hook, invisible en CI.
+- **Sortir un dossier du suivi git quand des fichiers non suivis y vivent déjà** : le rebase bute sur le fichier non
+  suivi (« would be overwritten »), et un `--abort` efface du disque tout ce que le commit de départ ne suit plus. Copier
+  le dossier hors du dépôt avant, déplacer le fichier gênant, prédire chaque `pick` par `merge-tree --merge-base`, puis
+  rebaser. La copie a servi : 11 fichiers restaurés.
+- **Signature gpg sous délégation** : deux commits délégués ont expiré sur pinentry, et le `!` de la session n'est pas un
+  terminal interactif. Avant le premier commit délégué, faire taper `gpg --clearsign <<< test` à l'utilisateur dans un
+  vrai terminal, et le redire après une longue pause.
+- **Guetteur** : « ARRÊTÉ » rendu après 10 min alors que l'agent attendait un shell de fond long (mesures de 8 min) ;
+  le compte rendu est arrivé une minute après. Avec des shells de fond ouverts, attendre plus longtemps avant de
+  conclure, et relire l'écran de l'agent avant de le dire arrêté.
+- **Un `check` de 20 min tue la cadence** : l'utilisateur l'a dit (« c'est aussi pour ça que ce projet avance moins »).
+  Couper tôt : le rapide (statique + tests nus, 20 s) en local et dans le pre-push, le lourd (couverture 519 s, lents,
+  réglages) en CI. Mesurer chaque morceau avant de décider : la couverture seule valait 85 % du temps.
+- **Le dossier de la tour dans un dépôt public** : l'utilisateur l'a sorti du suivi (l'historique reste). Si le dépôt des
+  issues est public, ignorer tout `.claude/tower-control/` dès le départ, pas seulement `lot-*.sh`, ou le tenir dans un
+  méta-dépôt privé.
+- **Une PR de docs seules coûte la CI entière** quand le ruleset exige des contrôles nommés : `paths-ignore` seul les
+  laisse « en attente » à jamais ; il faut un second workflow aux mêmes noms qui réussit sans rien faire. Issue ouverte
+  (#219) ; l'utilisateur a mergé en administrateur ce jour-là.
+- **Ordres de grandeur** : 9 issues, 9 PR, 28 points en deux jours, jusqu'à trois agents ; CI d'une PR 15 min ; une issue
+  de docs de 5 points (13 fichiers) en 2 h 30 d'agent, plan et deux relectures compris ; la 092 entière en 19,8 s.
+
+## Treize issues, une release et un push sur `main` par erreur (16 octobre 2026)
+
+Lot 10 de chiro-dvr : toutes les P1 et P2, clôture de la migration Rust, release 0.2.0 à la main à la fin, délégation
+des gestes git toute la journée. Quatre grappes, jusqu'à quatre agents, 15 PR, une QA d'un agent.
+
+- **`push.default = upstream` + branche créée depuis `origin/main` = push sur `main`.** `git checkout -b x
+  origin/main` pose l'amont `origin/main` ; `git push -u origin x` sans `:dst` pousse alors vers l'amont, et le
+  ruleset de `main` a accepté le commit. Toujours : `checkout -b x --no-track origin/main`, push par
+  `refs/heads/x:refs/heads/x`, `git branch --set-upstream-to`, `git ls-remote --heads origin x` avant `gh pr create`.
+  Relever `git config push.default` au relevé des alias du poste.
+- **Grouper par fichiers, encore.** #66, #83, #84 et #70 touchaient `previous.rs`, `texts/tests.rs` et le README :
+  réparties sur deux grappes pour aller vite, elles ont coûté quatre `git merge origin/main` résolus par les agents.
+  Une chaîne unique aurait été plus lente sur l'horloge et moins chère en tout.
+- **gpg expire** après une longue pause : faire déverrouiller avant chaque série de commits, pas une fois par jour.
+- **`git merge origin/main` refuse un arbre non commité** : commiter l'état de l'agent d'abord, puis merger, puis
+  l'agent résout sans git, puis `git add` + commit de fusion. `gh pr update-branch` échoue sur conflit.
+- **Reciblage d'une PR empilée** : GitHub ne relance pas la CI ; close/reopen la relance en 45 s.
+- **Agents sans écran** : une capture d'un Terminal, d'une notification ou du Finder ne se fait pas par un agent ;
+  rendre le texte par `magick`, laisser les vraies captures à l'utilisateur hors lot.
+- **Rien de technique dans les docs naturaliste** : règle écrite dans le CLAUDE.md du projet après que trois agents
+  y ont mis commandes et `<details>` ; un script `tools/docs-images.sh` porte la reproduction des captures.
+- **Mesurer sur la machine cible** : `/usr/bin/time` absent sur Rocky, `%M` de zsh en Mo ; un binaire `-dirty`
+  ne saute jamais une vidéo, poser `BATDETECT_VERSION` pour une QA de relance.
+- **Un clone local d'un autre dépôt n'est pas forcément à jour** : `git status` montrait « à jour » avec deux
+  commits de retard (pas de fetch) ; faire `git fetch` ou lire `origin` avant d'écrire une consigne dessus.
+- **`brew audit --strict` sur une formule avec `version`** est rouge par construction quand un script de bump lit
+  cette ligne ; le dire dans la consigne plutôt que d'en faire un critère.
+- **La QA de fin de lot en un agent** : 126 lignes en ~2 h, 1 KO réel trouvé et corrigé le jour même ; le cahier
+  grandit de 196 à 466 lignes et les sorties de QA (23 Go) se suppriment à la fin.

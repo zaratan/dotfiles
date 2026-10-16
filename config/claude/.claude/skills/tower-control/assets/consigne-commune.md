@@ -21,6 +21,8 @@ exacte.
 - **Aucune commande git qui écrit** : pas de `add`, `commit`, `push`, `stash`,
   `switch`, `checkout`, `reset`. C'est bloqué mécaniquement ; n'essaie pas de
   contourner. Quand ton travail est prêt, tu t'arrêtes et l'utilisateur commite.
+- **Un dépôt hors du worktree** (clone d'un autre dépôt désigné par la consigne) : avant d'y écrire,
+  `git fetch` puis comparer `HEAD` à `origin/<base>` ; `git status` seul ne montre pas un retard sans fetch.
 - **Ne dépasse pas l'issue.** Un autre bug, un nettoyage, une doc à retoucher : tu le
   notes dans le compte rendu, tu ne le fais pas.
 
