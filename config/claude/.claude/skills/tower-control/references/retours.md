@@ -778,3 +778,25 @@ des gestes git toute la journée. Quatre grappes, jusqu'à quatre agents, 15 PR,
   cette ligne ; le dire dans la consigne plutôt que d'en faire un critère.
 - **La QA de fin de lot en un agent** : 126 lignes en ~2 h, 1 KO réel trouvé et corrigé le jour même ; le cahier
   grandit de 196 à 466 lignes et les sorties de QA (23 Go) se suppriment à la fin.
+
+## Soixante issues en trois jours, des planches jugées à l'œil, une release en fin de lot (16 au 18 octobre 2026)
+
+Cinq grappes, jusqu'à cinq agents, 59 issues et 50 PR en ~38 h, 215 décisions, délégation des gestes git sur tout le lot, une release à la fin et une QA d'un agent sur la version publiée.
+
+- **Le guetteur accepte `idle` comme `done`.** herdr rend maintenant `idle` à la fin d'un tour ; un guetteur qui n'attendait que `done` a manqué deux fins d'agent, et l'utilisateur a dû dire « il attend ».
+- **`git merge-tree` : lire toutes ses lignes.** Un filtre `sed -n 2,4p` a caché la ligne CONFLIT, et une PR a été annoncée fusionnable. Lire `--name-only` en entier, ou chercher `CONFLIT|CONFLICT`.
+- **Un commit construit à la main n'est pas signé.** `git commit-tree` ignore `commit.gpgsign` : deux commits sans `-S` ont bloqué une PR verte sur un ruleset `required_signatures`, qui n'est passée qu'en contournement administrateur. Toujours `-S`, et vérifier `git cat-file commit <sha> | grep gpgsig` avant de pousser.
+- **Séparer une fusion de main du travail de l'agent** quand les deux sont mêlés sur disque : arbre de la fusion seule par `merge-tree --write-tree`, conflits résolus dans un index temporaire (`GIT_INDEX_FILE`), `commit-tree -S` pour la fusion puis pour le travail, `merge --quit`, `update-ref`. L'historique reste lisible ; vérifier que la fusion intermédiaire compile.
+- **zsh : `path` est `PATH`.** Une variable de boucle nommée `path` a vidé le `PATH` du shell ; et zsh ne découpe pas une variable en mots (`$=v` ou arguments littéraux).
+- **L'heure dans le fuseau de l'utilisateur.** Le serveur est en UTC, l'utilisateur voyage : des ETA en UTC ont été lues fausses. Convertir (`TZ=<zone> date`) ou dire « UTC ».
+- **Une planche dit quoi regarder.** Deux images côte à côte sans consigne ont été lues « je ne vois rien », et la tour l'a pris pour « aucune différence ». Pour chaque cas : la question, ce qui change, où regarder. Carrés autour des détections plutôt que points sur l'animal, image entière sans recadrage.
+- **Les verdicts d'une planche font une règle mesurable.** 34 cas jugés « même animal ? » ont donné 21 mieux, 5 pire ; l'agent a corrigé 3 des 5 sans toucher aux 21, et les 2 autres sont partis en issues. Demander « corrige les pires sans défaire les bons, sinon arrête-toi avec les chiffres ».
+- **Vérifier les chiffres d'un compte rendu avant de les répéter.** Un gain annoncé −30,8 % était −20,7 % ; la correction a été dite à l'utilisateur, qui a gardé le changement.
+- **Un texte dans la zone de saisie d'un agent** (suggestion grisée de Claude Code) n'est pas une réponse de l'utilisateur : deux fois, il ressemblait à un feu vert.
+- **Le délai « main vert » vaut entre deux merges, pas avant un lancement** : un agent peut partir de main dès le merge, le contenu est celui que la CI de la PR a validé.
+- **Une méta posée en « À faire »** veut dire « toutes ses sous-issues ouvertes dans le lot » ; les passer en « À faire » et laisser la méta pour les regrouper.
+- **Un fichier de plus de 30 Mo ne s'envoie pas à l'utilisateur** : découper par cas (2 cas par zip) ou donner une commande `scp` d'un seul zip ; demander lequel avant de produire.
+- **Un prototype peut ne vivre que dans un dossier ignoré** (`out/` d'un worktree, sans commit) : au ménage, chercher ce qui n'est nulle part ailleurs avant de retirer un worktree, et proposer de le mettre sur une branche.
+- **Une règle de forme change en cours de lot** : « un paragraphe par ligne » est devenu « coupure en fin de phrase, ~140 » par un commentaire de l'utilisateur sur l'issue, lu après le lancement. Relire les commentaires d'une issue juste avant de la lancer, pas seulement au groupement.
+- **Ordres de grandeur** : CI d'une PR ~8 min en médiane, quelques secondes pour des docs seules ; gardes lourdes d'un changement de suivi ~1 h 30 (mesure puis confirmation) ; release 9 min ; planche de 34 cas en 67 extraits, 387 Mo.
+- **Vérifier une copie avant de supprimer la source.** Au ménage, les scripts des dossiers temporaires de deux agents devaient être copiés puis les dossiers vidés, dans la même commande ; la copie n'avait rien pris (`find -size -1M` de GNU arrondit au Mo supérieur et ne garde que les fichiers vides : écrire `-size -1024k`), et les scripts de mesure sont perdus. Compter les fichiers copiés, puis supprimer dans une commande à part.

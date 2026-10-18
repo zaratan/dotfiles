@@ -45,6 +45,13 @@ pas mergée : la tour s'arrête et le dit.
   l'agent gpg par l'utilisateur dans un vrai terminal (`gpg --clearsign <<< test >/dev/null`) ; le `!` de la
   session n'est pas un terminal interactif, pinentry y expire, et deux commits sont partis dans le vide ainsi.
   Un commit qui échoue sur « gpg n'a pas pu signer » laisse l'index intact : le redire, attendre, relancer.
+- **Un commit construit à la main se signe aussi** : `git commit-tree` ignore `commit.gpgsign`, il faut `-S`.
+  Avant chaque push, `git cat-file commit <sha> | grep -c '^gpgsig'` sur chaque commit nouveau ; deux commits
+  sans signature ont bloqué une PR verte sur un ruleset `required_signatures`. Recette pour séparer une fusion
+  de base du travail d'un agent mêlés sur disque : arbre de la fusion par `git merge-tree --write-tree`,
+  conflits résolus dans un index temporaire (`GIT_INDEX_FILE`, `update-index --cacheinfo`, `write-tree`),
+  `commit-tree -S` pour la fusion puis pour le travail (`git add -A && git write-tree`), `git merge --quit`,
+  `git update-ref` de la branche ; compiler la fusion intermédiaire dans un worktree jetable.
 - **Avant le premier commit**, relire le format de l'utilisateur sur `git log` et sur ses PR mergées, et
   le reproduire (souvent un titre seul, à l'impératif, dans la langue du dépôt, sans corps). Pas de ligne
   d'attribution si ses commits n'en ont pas.
@@ -55,7 +62,8 @@ pas mergée : la tour s'arrête et le dit.
 
 - Une PR à la fois. Attendre sa CI, merger avec la méthode de ses merges précédents (merge commit, squash),
   puis attendre que **toutes** les exécutions du commit de merge sur la branche de base soient terminées et
-  vertes avant la PR suivante.
+  vertes avant la PR suivante. Cette attente ne vaut qu'entre deux merges : lancer un agent sur une branche
+  partie de la base n'attend pas, le contenu est celui que la CI de la PR a déjà validé.
 - Avant de proposer ou d'appliquer un ordre, comparer les horodatages des migrations des PR ouvertes : les
   instances refusent une migration plus ancienne que la dernière appliquée.
 - PR empilée : viser la branche de la PR du dessous tant qu'elle n'est pas mergée ; après son merge, GitHub

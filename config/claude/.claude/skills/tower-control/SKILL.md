@@ -208,6 +208,9 @@ comme contrainte. Les issues
 « méta » (une brique à 13 points) deviennent des parentes GitHub avec des sous-issues
 natives (`POST /repos/{o}/{r}/issues/{parent}/sub_issues`, id numérique de l'enfant) : la
 parente reste en Backlog sans points ni assigné, la tour ne dispatche que les sous-issues.
+**Une méta que l'utilisateur pose en « À faire »** veut dire « toutes ses sous-issues ouvertes
+dans le lot » : la tour les passe en « À faire » et les traite comme les autres ; la méta reste
+pour les regrouper.
 
 **Préparer les consignes** : `assets/consigne-commune.md` (règles, interdits,
 forme du compte rendu), complétée par la section propre au projet, plus une
@@ -246,6 +249,10 @@ un bind-mount du worktree tant que le dossier n'a pas le label `container_file_t
 d'agent herdr est global à la machine : le lanceur le préfixe par le dépôt des issues
 (`<méta>-<grappe>`), et c'est ce nom que la tour emploie dans `agent prompt`, `agent get` et
 le guetteur.
+
+**Relire les commentaires de l'issue juste avant de l'envoyer** (`gh issue view <N> --comments`),
+pas seulement son corps au groupement : un commentaire de l'utilisateur posté entre-temps a
+changé la règle d'une issue déjà lancée, et l'agent a dû refaire son passage.
 
 Envoyer à chaque agent **la consigne commune et la consigne de l'issue en un seul
 `agent prompt`** (les deux fichiers concaténés) : en deux envois, l'agent répond à la
@@ -447,6 +454,13 @@ elle survivra.
 Règles :
 
 - Lire le contexte (`herdr agent read`) avant de répondre.
+- **Une planche dit quoi regarder.** Pour chaque cas : la question posée, ce qui change entre
+  les deux images ou extraits, et où regarder ; carrés autour des détections plutôt que points sur
+  l'animal, image entière sans recadrage. Deux images côte à côte sans consigne ont été lues « je
+  ne vois rien », et la tour l'a pris à tort pour « aucune différence ».
+- **Les heures dans le fuseau de l'utilisateur.** Le serveur peut être en UTC pendant que
+  l'utilisateur voyage : une ETA se convertit (`TZ=<zone> date`) ou se dit « UTC ». Demander le
+  fuseau s'il n'est pas connu.
 - **Une demande de permission bloque l'agent comme une question.** La lire avant de
   répondre ; refuser un `rm` dont le chemin dépend d'une variable qui peut être vide, et
   demander `"${VAR:?}"/…` à la place.
@@ -557,6 +571,11 @@ parler à l'utilisateur.
 - Une fois tout mergé : `herdr workspace close` des sous-espaces créés par la tour,
   `git worktree remove` (jamais `--force` ; avant chacun, la PR de la branche est mergée et
   `git status --short` du worktree est vide), suppression des liens de mémoire.
+  **Avant de retirer un worktree, chercher le travail qui n'existe nulle part ailleurs** : un
+  `status` vide ne voit pas les dossiers ignorés (`out/`, `target/`), et un prototype d'exploration
+  n'a vécu que là, sans aucun commit. Lister ce qui n'est ni sorties ni build
+  (`find <wt>/out -maxdepth 2`), le dire à l'utilisateur, proposer de le mettre sur une branche,
+  et garder le worktree tant qu'il n'a pas répondu.
   **Rien d'autre** : pas de `git branch -D` sur les branches mergées, c'est une écriture git
   qui appartient à l'utilisateur.
 - **Libérer ce que l'utilisateur abandonne** : une issue encore assignée au login
