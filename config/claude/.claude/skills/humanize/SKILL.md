@@ -92,6 +92,7 @@ C'est Claude qui réécrit : se méfier d'abord des siens.
 
 - **Jargon inventé** pendant le travail : raccourcis forgés, termes jamais définis, composés à rallonge venus du plan. Écrire pour un lecteur qui n'a pas vu la session : le nom usuel, ou une définition à la première apparition.
 - **Renvois à un état passé** : « désormais », « contrairement à l'ancienne version », « comme on l'a vu », « previously X, now Y ». Le présent seul.
+- **« L'utilisateur » dans un document** : l'interlocuteur de l'agent n'est pas un personnage du texte (« l'utilisateur a jugé fausses les six pistes »). Dire le fait ou le choix sans lui (« Six pistes qui étaient fausses ne ressortent plus. »). Une personne nommée reste nommée si le texte parle d'elle.
 - **Raisonnement narré** : « Réfléchissons », « Let me think about this ».
 
 ### Assurance non vérifiée
@@ -114,6 +115,7 @@ C'est Claude qui réécrit : se méfier d'abord des siens.
 ## 2. Structure et rythme
 
 - **Longueur des phrases** : ce qui trahit n'est pas une moyenne, c'est l'absence de phrases très courtes et très longues. Compter : si presque toutes tiennent entre 12 et 25 mots, varier. Varier parce que le contenu l'appelle, pas pour battre un détecteur.
+- **Phrases soudées par des virgules (surtout en français)** : une idée, puis une incise, une précision entre parenthèses, une conséquence accrochée par « , et … », le tout en une phrase. Compter les virgules par phrase et les « ), » (parenthèse suivie d'une virgule) et comparer aux textes de l'utilisateur ; en français, au-delà d'environ une virgule par phrase, la phrase empile. Mesuré sur un blog humain contre une doc écrite par Claude : 0,3 contre 1,95 virgule par phrase, 0,5 contre 8,4 « ), » pour 1 000 mots, 59 % contre 19 % de phrases sans virgule ni subordonnée, à nombre de subordonnées égal. Casser en phrases d'une idée ; une précision qui compte devient sa propre phrase, une précision qui ne compte pas part. En anglais, les modèles mettent plutôt moins de virgules que les humains : là, c'est la ponctuation pauvre qui trahit (section 4).
 - **Paragraphes de même gabarit** : idée, explication, mini-conclusion, partout, de même longueur. Ouvrir un paragraphe par l'exemple, un autre par l'objection.
 - **Transitions trop lisses** entre les paragraphes.
 - **Une phrase par paragraphe**, ligne vide entre chaque (format LinkedIn). Ne pas confondre avec une source Markdown coupée en fin de phrase à l'intérieur d'un paragraphe.
@@ -144,7 +146,7 @@ C'est Claude qui réécrit : se méfier d'abord des siens.
 - **Remplacement uniforme** : un texte où chaque tiret est devenu une virgule ou un point, haché en phrases moyennes, est devenu un indice à son tour. Varier le signe.
 - **Ponctuation pauvre** : une page sans parenthèse, sans point-virgule, sans point d'exclamation. Une parenthèse quand elle sert.
 - **Deux-points de mise en scène** : « La clé : … », « Le verdict : spectaculaire. ».
-- **Point-virgule** : pas d'abus à chasser, les modèles en mettent plutôt moins que les humains. Signaler seulement « X ; en pratique, Y » qui remplace « mais » ou « parce que », en série.
+- **Point-virgule** : en anglais, les modèles en mettent plutôt moins que les humains. En français, une doc de Claude en met sept fois plus que l'auteur mesuré, qui fait deux phrases. Suivre le fichier de style. Si l'utilisateur n'en écrit pas, chaque point-virgule devient un point. Signaler aussi « X ; en pratique, Y » qui remplace « mais » ou « parce que ».
 - **Guillemets** : suivre la typographie de l'utilisateur et du document ; « » est la norme française, pas un indice. Ce qui trahit, c'est le mélange (“ ” et "…", ’ et ') dans un même texte, ou des “ ” anglais dans du français.
 - **Virgule avant « et » final** en français : calque de l'anglais. En anglais, la virgule d'Oxford est normale, ne pas la signaler.
 
