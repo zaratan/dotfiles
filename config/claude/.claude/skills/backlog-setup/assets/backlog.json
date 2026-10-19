@@ -8,9 +8,18 @@
       "labels": ["bug"],
       "points": 2,
       "priority": "P1",
-      "verified": false,
+      "verified": true,
       "subrepo": null,
-      "body": "**Constat.** `protectionCode` (`src/workbook.ts:186`) renvoie « NON » pour tout ce qui ne contient pas « oui », y compris une cellule vide.\n\n**Pourquoi c'est grave.** La valeur la plus lourde de sens de la fiche, imprimée à tort.\n\n**Piste.** Cellule vide → pastille retirée + anomalie « bloquant » dans le contrôle."
+      "body": "## Why ?\nQuand la cellule PROTECTION est vide, la fiche imprime « NON ». `protectionCode` (`src/workbook.ts:186`) renvoie « NON » pour tout ce qui ne contient pas « oui », vide compris. Sur le classeur de mars, 14 fiches sur 212 sont dans ce cas (compté avec `scripts/compter-vides.ts`). C'est la valeur qui pèse le plus sur la fiche : un « NON » à tort dit qu'une espèce protégée ne l'est pas.\n\n## What ?\nUne cellule vide ne produit plus de valeur : la pastille disparaît et le contrôle remonte une anomalie « bloquant » qui nomme la fiche. On ne devine pas la valeur à partir des autres colonnes, c'est au naturaliste de la saisir.\n\n## Must-Have\n- [ ] Une cellule PROTECTION vide n'imprime ni « OUI » ni « NON »\n- [ ] Le contrôle signale chaque fiche concernée en « bloquant »\n- [ ] Un test couvre la cellule vide et la cellule « oui » en minuscules\n\n## How ?\n- Règle de saisie : `docs/saisie.md`, section PROTECTION.\n- Décision du 12 mars avec le client : vide veut dire « pas encore saisi », pas « non »."
+    },
+    {
+      "key": "import-xls",
+      "title": "L'import XLS n'écrit aucune réponse depuis le changement de droits",
+      "labels": ["bug"],
+      "priority": "P0",
+      "parent": true,
+      "subrepo": null,
+      "body": "## Why ?\n…\n\n## What ?\nDécoupé en sous-issues : droits du rôle importeur, test de bout en bout de l'import.\n\n## Must-Have\n- [ ] Toutes les sous-issues fermées\n\n## How ?\n…"
     }
   ]
 }

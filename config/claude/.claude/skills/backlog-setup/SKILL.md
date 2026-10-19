@@ -1,6 +1,6 @@
 ---
 name: backlog-setup
-description: "Auditer un projet (code, docs du dépôt, sources externes, données réelles) et en tirer un backlog GitHub prêt à travailler : issues rédigées et chiffrées en planning poker, labels, GitHub Project avec statuts Backlog → À faire → En cours → Bloqué → Review → Fait, champs Points et Priorité, priorisation avec l'utilisateur, puis la méthode de travail qui passe la main à tower-control. À utiliser dès que l'utilisateur veut « se constituer un backlog », « lister ce qui ne va pas », « ouvrir les issues », « faire un board », « setup le projet sur GitHub », reprendre un projet ou un dépôt client, ou auditer avant de planifier — même s'il ne nomme pas le skill. Requiert gh avec le scope project."
+description: "Auditer un projet (code, docs du dépôt, sources externes, données réelles) et en tirer un backlog GitHub prêt à travailler : issues rédigées et chiffrées en planning poker, labels, GitHub Project avec statuts Backlog → À faire → En cours → Bloqué → Review → Fait, champs Points et Priorité, priorisation avec l'utilisateur, puis la méthode de travail qui passe la main à tower-control et tc-lot. À utiliser dès que l'utilisateur veut « se constituer un backlog », « lister ce qui ne va pas », « ouvrir les issues », « faire un board », « setup le projet sur GitHub », reprendre un projet ou un dépôt client, ou auditer avant de planifier — même s'il ne nomme pas le skill. Requiert gh avec le scope project."
 ---
 
 # Backlog setup
@@ -9,7 +9,7 @@ Partir d'un projet — le sien, ou celui d'un client — et arriver à un backlo
 peut dispatcher : des issues qui disent ce qui est cassé, pourquoi ça compte et par
 où commencer, un board qui suit l'avancement sans qu'on le tienne à la main, et une
 méthode de travail écrite là où elle survivra. `tower-control` prend le relais
-ensuite, lot par lot.
+ensuite, et `/tc-lot` dépile lot par lot.
 
 Ce skill dit **comment** faire chaque phase. Le jugement — ce qui est grave, ce qui
 passe en premier — se prend dans la session, avec l'utilisateur. Rien n'est créé sur
@@ -87,15 +87,20 @@ ajoute. C'est lui qui connaît le contexte client.
 
 ## 2. Rédiger et créer les issues
 
-Une issue par point retenu, dans la forme de `assets/issue.md` : constat (avec
-« vérifié » quand c'est le cas), pourquoi c'est grave, piste, complexité en planning
-poker. Les remarques mineures qui se rattachent à une issue existante deviennent des
+Une issue par point retenu, dans la forme de `assets/issue.md` : Why ?, What ?,
+Must-Have, How ?. Chaque issue a sa priorité proposée et ses points en planning poker
+(`13` quand on ne sait pas chiffrer), dans le JSON et jamais dans le corps. Les
+remarques mineures qui se rattachent à une issue existante deviennent des
 commentaires, pas des issues. Titre = le défaut en une phrase, pas la solution.
 
-Créer les labels puis les issues avec `scripts/board.ts` à partir d'un JSON
-(`assets/backlog.json` en donne la forme) : le script est idempotent, un point déjà
-créé n'est pas dupliqué. Les points sont un label `complexité: N` **et** le champ
-Points du board, pour pouvoir sommer par colonne.
+Chaque corps passe par `humanize` avant d'être montré, selon « Écrire sur GitHub »
+dans `references/conventions.md`. Écrire les issues dans un JSON (`assets/backlog.json`
+en donne la forme), puis `scripts/board.ts <json> --dry-run > <scratchpad>/backlog.txt` :
+le script valide tout avant d'écrire (priorité, points, quatre sections, une case au
+moins, titres uniques) et imprime chaque titre et corps tels qu'ils partiront.
+L'utilisateur relit ce fichier-là, pas une autre copie. Après son accord, le même
+script sans `--dry-run` crée labels et issues ; il est rejouable, une issue déjà créée
+n'est pas dupliquée et un champ déjà rempli sur le board n'est pas réécrit.
 
 ## 3. Le board
 
@@ -116,6 +121,9 @@ Proposer une grille P0 → P3 aux sens génériques de `references/conventions.m
 une affectation argumentée en une ligne par issue, groupée par priorité. Puis
 attendre : c'est l'utilisateur qui tranche, et il retouche presque toujours deux ou
 trois lignes. Ne rien appliquer avant. Les P0 du premier lot passent en « À faire ».
+Ses retouches se posent directement sur le board avec
+`~/.claude/skills/tower-control/assets/board-field.py` : rejouer `board.ts` ne
+réécrit pas un champ déjà rempli.
 
 ## 5. La méthode de travail
 
@@ -126,7 +134,7 @@ Avant le premier lot, sortir les règles de leur cachette :
 - la mémoire ne garde que ce qui n'a pas encore trouvé sa place — elle ne suit pas
   les worktrees, donc rien de structurel n'y reste.
 
-Puis préparer le relais à `tower-control` : `.claude/tower-control/config.sh`
+Puis préparer le relais à `tower-control` et `/tc-lot` : `.claude/tower-control/config.sh`
 (dépôt d'issues, projet, dossier des worktrees, amorçage), `lot-<login>.sh` (grappes), la section
 « Projet » de la consigne commune, et le journal du dépôt. Grouper les premières
 issues par fichiers touchés, pas par thème. Faire committer avant de lancer — le

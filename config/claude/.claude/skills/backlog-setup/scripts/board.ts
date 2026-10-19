@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
-// Crée labels, projet GitHub, statuts, champs et issues depuis un backlog JSON. Rejouable sans doublon.
+// Crée labels, projet GitHub, statuts, champs et issues depuis un backlog JSON.
+// Rejouable : rien n'est dupliqué, et un champ déjà rempli sur le board n'est jamais réécrit.
 // Usage : bun board.ts <backlog.json> [--dry-run]
 import { readFileSync } from "fs";
 import { spawnSync } from "child_process";
@@ -14,11 +15,12 @@ type BacklogIssue = {
   title: string;
   body: string;
   labels: string[];
-  points: number;
+  points?: number;
   priority: "P0" | "P1" | "P2" | "P3";
   status?: string;
   verified?: boolean;
   subrepo?: string | null;
+  parent?: boolean;
 };
 
 const STATUSES: { name: string; color: string; description: string; from?: string }[] = [
@@ -42,13 +44,9 @@ const LABELS: [string, string, string][] = [
   ["tests", "5319e7", "Couverture de test et CI"],
   ["documentation", "0075ca", "Documentation à corriger ou compléter"],
   ["vérifié", "c5def5", "Constat mesuré sur les données réelles ou les journaux"],
-  ["complexité: 1", "e6f2e6", "Planning poker : trivial"],
-  ["complexité: 2", "cce8cc", "Planning poker : simple"],
-  ["complexité: 3", "a8d8a8", "Planning poker : quelques heures"],
-  ["complexité: 5", "7fc47f", "Planning poker : une journée, plusieurs fichiers"],
-  ["complexité: 8", "4fa64f", "Planning poker : conception nécessaire"],
-  ["complexité: 13", "2e7d2e", "Planning poker : chantier, à découper"],
 ];
+const POINTS = [1, 2, 3, 5, 8, 13];
+const SECTIONS = ["## Why ?", "## What ?", "## Must-Have", "## How ?"];
 const DEFAULT_LABELS_TO_DROP = [
   "accessibility", "duplicate", "enhancement", "good first issue", "help wanted", "invalid",
   "question", "wontfix",
@@ -80,6 +78,34 @@ function gh(args: string[], { mutating = true } = {}): string {
   return r.stdout.trim();
 }
 const json = <T>(s: string): T => JSON.parse(s || "null") as T;
+
+const fullTitle = (issue: BacklogIssue) => (issue.subrepo ? `[${issue.subrepo}] ${issue.title}` : issue.title);
+const fullBody = (issue: BacklogIssue) => `${issue.subrepo ? `**Dépôt.** ${issue.subrepo}\n\n` : ""}${issue.body.trim()}`;
+const pointsLabel = (issue: BacklogIssue) => (issue.parent ? "parente" : String(issue.points));
+
+// ---- 0. validation, avant toute écriture
+const problems: string[] = [];
+const seenTitles = new Map<string, string>();
+for (const issue of backlog.issues) {
+  const refuse = (why: string) => problems.push(`  ${issue.key} : ${why}`);
+  const lines = issue.body.split("\n").map((l) => l.replace(/\s+/g, " ").trim());
+  if (!PRIORITIES.some((p) => p.name === issue.priority)) refuse(`priorité « ${issue.priority} » hors de P0 à P3`);
+  if (issue.parent && issue.points != null) refuse("une parente ne porte pas de points, ses sous-issues les portent");
+  if (!issue.parent && !POINTS.includes(issue.points as number))
+    refuse(`points « ${issue.points} » hors de ${POINTS.join(", ")} (13 quand on ne sait pas chiffrer)`);
+  if (issue.status && !STATUSES.some((s) => s.name === issue.status)) refuse(`statut « ${issue.status} » inconnu du board`);
+  for (const section of SECTIONS) if (!lines.includes(section)) refuse(`section « ${section} » absente du corps`);
+  if (!/^- \[ \] /m.test(issue.body)) refuse("Must-Have sans case à cocher");
+  if (/^\*\*Dépôt\.\*\*/m.test(issue.body)) refuse("« **Dépôt.** » est ajouté par le script d'après subrepo");
+  if (/^\*\*(Priorité|Complexité)/m.test(issue.body)) refuse("priorité et points vivent sur le board, pas dans le corps");
+  const other = seenTitles.get(fullTitle(issue));
+  if (other) refuse(`même titre que ${other}, une seule issue serait créée`);
+  seenTitles.set(fullTitle(issue), issue.key);
+}
+if (problems.length) {
+  console.error(`backlog refusé, rien n'a été écrit :\n${problems.join("\n")}`);
+  process.exit(2);
+}
 
 // ---- 1. labels
 console.log("Labels");
@@ -166,39 +192,38 @@ const optionId = (f: Field | undefined, name: string) => f?.options?.find((o) =>
 console.log("Issues");
 type Existing = { number: number; title: string; url: string };
 const existing = json<Existing[]>(gh(["issue", "list", "--repo", repo, "--state", "all", "--limit", "500", "--json", "number,title,url"], { mutating: false }) || "[]");
-type Item = { id: string; content?: { number?: number } };
+type Item = { id: string; content?: { number?: number } } & Record<string, unknown>;
 const items = () =>
   json<{ items: Item[] }>(gh(["project", "item-list", String(project!.number), "--owner", owner, "--limit", "500", "--format", "json"], { mutating: false }) || '{"items":[]}').items;
 let allItems = items();
+const isEmpty = (v: unknown) => v == null || v === "";
 
 let created = 0;
 let reused = 0;
 for (const issue of backlog.issues) {
-  const title = issue.subrepo ? `[${issue.subrepo}] ${issue.title}` : issue.title;
+  const title = fullTitle(issue);
+  const body = fullBody(issue);
   const labels = [
     ...issue.labels,
-    `complexité: ${issue.points}`,
     ...(issue.verified ? ["vérifié"] : []),
     ...(issue.subrepo ? [`dépôt: ${issue.subrepo}`] : []),
   ];
-  const head = issue.subrepo ? `**Dépôt.** ${issue.subrepo}\n\n` : "";
-  const body = `${head}${issue.body.trim()}\n\n---\n**Complexité (planning poker) : ${issue.points}**`;
 
   let found = existing.find((e) => e.title === title);
   if (found) reused++;
   else {
-    const url = gh(["issue", "create", "--repo", repo, "--title", title, "--body", body, "--label", labels.join(",")]);
-    found = { number: dryRun ? 0 : Number(url.split("/").pop()), title, url: url || "(dry-run)" };
-    existing.push(found);
     created++;
-  }
-  if (dryRun) {
-    console.log(`  ${issue.priority} ${issue.points}  ${title}`);
-    continue;
+    if (dryRun) {
+      console.log(`\n  + ${issue.priority} ${pointsLabel(issue)}  ${title}\n    labels : ${labels.join(", ")}\n\n${body.replace(/^/gm, "    ")}\n`);
+      continue;
+    }
+    const url = gh(["issue", "create", "--repo", repo, "--title", title, "--body", body, "--label", labels.join(",")]);
+    found = { number: Number(url.split("/").pop()), title, url };
+    existing.push(found);
   }
 
   let item = allItems.find((i) => i.content?.number === found!.number);
-  if (!item) {
+  if (!item && !dryRun) {
     try {
       item = json<Item>(gh(["project", "item-add", String(project.number), "--owner", owner, "--url", found.url, "--format", "json"]));
     } catch (e) {
@@ -206,16 +231,31 @@ for (const issue of backlog.issues) {
       allItems = items();
       item = allItems.find((i) => i.content?.number === found!.number);
     }
+    if (!item) throw new Error(`item du projet introuvable pour #${found.number}`);
   }
-  if (!item) throw new Error(`item du projet introuvable pour #${found.number}`);
-  const edit = (args: string[]) =>
-    gh(["project", "item-edit", "--project-id", project!.id, "--id", item!.id, ...args, "--format", "json", "--jq", ".id"]);
-  if (pointsField) edit(["--field-id", pointsField.id, "--number", String(issue.points)]);
-  const prioId = optionId(prioField, issue.priority);
-  if (prioId) edit(["--field-id", prioField!.id, "--single-select-option-id", prioId]);
-  const statusId = optionId(statusField, issue.status ?? "Backlog");
-  if (statusId) edit(["--field-id", statusField!.id, "--single-select-option-id", statusId]);
-  console.log(`  #${found.number}  ${issue.priority} ${issue.points}  ${title}`);
+
+  const wanted: { name: string; key: string; value: string | number | undefined; args: () => string[] | undefined }[] = [
+    { name: "Points", key: "points", value: issue.points, args: () => (pointsField ? ["--field-id", pointsField.id, "--number", String(issue.points)] : undefined) },
+    { name: "Priorité", key: "priorité", value: issue.priority, args: () => { const id = optionId(prioField, issue.priority); return id ? ["--field-id", prioField!.id, "--single-select-option-id", id] : undefined; } },
+    { name: "Status", key: "status", value: issue.status ?? "Backlog", args: () => { const id = optionId(statusField, issue.status ?? "Backlog"); return id ? ["--field-id", statusField!.id, "--single-select-option-id", id] : undefined; } },
+  ];
+  const notes: string[] = [];
+  for (const w of wanted) {
+    const current = item?.[w.key];
+    if (w.value == null) {
+      if (!isEmpty(current)) notes.push(`${w.name} : ${current} sur une parente, à vider à la main`);
+      continue;
+    }
+    if (!isEmpty(current)) {
+      if (String(current) !== String(w.value)) notes.push(`${w.name} : ${current} gardé (le JSON dit ${w.value})`);
+      continue;
+    }
+    notes.push(`${w.name} : ${w.value}`);
+    const args = w.args();
+    if (args && !dryRun)
+      gh(["project", "item-edit", "--project-id", project!.id, "--id", item!.id, ...args, "--format", "json", "--jq", ".id"]);
+  }
+  console.log(`  #${found.number}  ${title}${item ? "" : " (à ajouter au projet)"}${notes.length ? `\n      ${notes.join("\n      ")}` : ""}`);
 }
 
 console.log(`\n${created} issue(s) créée(s), ${reused} déjà présente(s).`);

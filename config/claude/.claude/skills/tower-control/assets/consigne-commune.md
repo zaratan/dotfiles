@@ -80,6 +80,7 @@ d'issue, et un fichier non suivi dans le sous-dépôt finit dans un `git add .` 
 **Fait** — deux phrases.
 **Fichiers** — liste.
 **Tests ajoutés** — noms.
+**Must-Have** — chaque case de l'issue : faite ou pas, avec la preuve (commande, chiffre). Ne coche rien sur GitHub.
 **Vérifications** — chaque vérification du projet : vert/rouge, chiffres avant/après.
 **Diff** — pour une retouche courte (moins de 30 lignes), le diff lui-même.
 **Décisions prises seul** — chacune en une ligne, pour que l'utilisateur puisse les contredire.
