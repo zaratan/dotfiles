@@ -24,6 +24,8 @@ if [[ -x $_mise_bin ]]; then
 fi
 unset _mise_bin _mise_comp
 
+autoload -Uz compinit && compinit
+
 source $ZSH/oh-my-zsh.sh
 
 if [ -e "$HOME/.aliases" ]; then

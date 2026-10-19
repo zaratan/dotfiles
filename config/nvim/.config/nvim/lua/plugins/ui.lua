@@ -1,3 +1,5 @@
+local on_lumiel = vim.uv.os_gethostname() == "lumiel"
+
 return {
   {
     "craftzdog/solarized-osaka.nvim",
@@ -5,16 +7,35 @@ return {
     priority = 1000,
     opts = {},
     config = function(_, opts)
-      vim.o.termguicolors = true
-      vim.o.background = "dark"
       require("solarized-osaka").setup(opts)
-      vim.cmd.colorscheme("solarized-osaka")
+      if not on_lumiel then
+        vim.o.termguicolors = true
+        vim.o.background = "dark"
+        vim.cmd.colorscheme("solarized-osaka")
+      end
+    end,
+  },
+  {
+    "sainnhe/gruvbox-material",
+    lazy = false,
+    priority = 1000,
+    config = function()
+      if on_lumiel then
+        vim.o.termguicolors = true
+        vim.o.background = "dark"
+        vim.g.gruvbox_material_background = "medium"
+        vim.g.gruvbox_material_foreground = "material"
+        vim.cmd.colorscheme("gruvbox-material")
+      end
     end,
   },
   {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = function()
+      if on_lumiel then
+        return { options = { theme = "gruvbox-material" } }
+      end
       -- The stock theme puts section b (branch/diff) on a light background
       -- (base0), which makes the diff green/red unreadable.
       local theme = require("lualine.themes.solarized-osaka")
