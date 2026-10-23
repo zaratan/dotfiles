@@ -69,6 +69,11 @@ Les chemins `assets/…` et `references/…` sont ceux de `~/.claude/skills/towe
     un chemin d'or pour chaque fonction livrée par le lot qui en mérite un, après accord de
     l'utilisateur. Puis ranger les worktrees `qa-<k>` comme les autres. Comme ils n'ont pas de
     PR, la condition se réduit à un `git status --short` vide.
+  - **En deux temps quand une chaîne finit tard** : la zone du cahier que la dernière chaîne ne touche
+    pas se joue avant son dernier merge, sur la base du moment, et la zone qu'elle touche après. Une
+    heure gagnée sur un lot, aucun KO manqué. **`git fetch` avant d'amorcer un worktree de QA** : le
+    lanceur lit `origin/<base>` dans les références locales, et un merge arrivé entre-temps manque
+    (un worktree amorcé sur l'avant-dernier `main`, avancé à la main).
   - **Pour une commande plutôt qu'une application web**, la passe joue la vraie commande sur des **copies** des données
     (une commande qui écrit à côté de ses entrées ne doit jamais toucher les originaux), avec des chemins d'argent
     (entrées, options, langue et terminal, relances, pannes simulées) et des contrôles transverses : code de sortie,

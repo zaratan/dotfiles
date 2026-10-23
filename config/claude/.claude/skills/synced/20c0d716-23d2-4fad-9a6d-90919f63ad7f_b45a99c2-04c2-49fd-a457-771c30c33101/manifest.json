@@ -1,5 +1,5 @@
 {
-  "lastUpdated": 1791990547350,
+  "lastUpdated": 1792644761997,
   "skills": [
     {
       "skillId": "computer-use",
@@ -69,7 +69,7 @@
       "name": "skill-creator",
       "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy.",
       "source": "anthropic-example",
-      "updatedAt": "2026-09-14T19:41:01.499089Z"
+      "updatedAt": "2026-10-21T20:47:56.610025Z"
     },
     {
       "skillId": "pptx",
@@ -99,6 +99,14 @@
       "source": "plugin",
       "updatedAt": "2026-06-19T09:06:17.583471Z",
       "backingPluginId": "plugin_01BV8GC9fyUiZtw8AHyAY1AB"
+    },
+    {
+      "skillId": "skill_012czH8dwBAVVpmETwofDiXc",
+      "name": "dirfyn-test",
+      "description": "Test d'intégration Dirfyn. À utiliser quand l'utilisateur dit « test dirfyn » ou demande un test Dirfyn.",
+      "source": "plugin",
+      "updatedAt": "2026-10-22T04:21:27.188487Z",
+      "backingPluginId": "plugin_01DB7uHfF24bfD9grmUDtrr5"
     }
   ]
 }

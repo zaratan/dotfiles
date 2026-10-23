@@ -139,6 +139,9 @@ un bind-mount du worktree tant que le dossier n'a pas le label `container_file_t
 d'agent herdr est global à la machine : le lanceur le préfixe par le dépôt des issues
 (`<méta>-<grappe>`), et c'est ce nom que la tour emploie dans `agent prompt`, `agent get` et
 le guetteur.
+La sonde de port libre doit aussi interroger docker (`docker ps --format '{{.Ports}}'`) : `ss` ne voit pas
+un port qu'un conteneur publie, et un worktree a reçu le PostgreSQL d'un autre, puis deux fois les mêmes
+ports d'images (20/10/2026).
 
 **Relire les commentaires de l'issue juste avant de l'envoyer** (`gh issue view <N> --comments`),
 pas seulement son corps au groupement : un commentaire de l'utilisateur posté entre-temps a

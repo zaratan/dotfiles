@@ -92,7 +92,7 @@ for name in "${!GRAPPES[@]}"; do
   # Juste après l'amorçage, le prompt n'est pas toujours détecté (agent_pane_busy) : on réessaie.
   # Le nom d'un agent herdr est global à la machine : préfixé par le dépôt des issues pour ne pas
   # heurter une grappe homonyme d'un autre projet. Un refus laisse les autres grappes partir.
-  agent="$(basename "$REPO")-$name"
+  agent="$(basename "$REPO" | tr 'A-Z' 'a-z')-$name"
   started=0
   for attempt in 1 2 3 4 5; do
     if herdr agent start "$agent" --kind claude --pane "$pane" --timeout 60000 -- \

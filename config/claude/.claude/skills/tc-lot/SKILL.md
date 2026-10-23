@@ -33,10 +33,30 @@ Relire le fichier de l'étape en cours après un résumé automatique du context
 
 ## Règles de lot pendant le cycle
 
+**Le board se tient au fil de l'eau** : « En cours » quand l'agent reçoit sa consigne, « Review » quand
+la PR s'ouvre. Une tour l'a oublié toute une matinée, l'utilisateur l'a vu avant elle.
+
+**Une chaîne sérielle sur les mêmes fichiers coûte une fusion par issue** dès qu'une autre branche touche
+ces fichiers en parallèle (sept fusions sur quatre motifs plus une branche voisine, deux heures de chemin
+critique). Soit tout va dans une seule chaîne, soit les fusions se confient à l'agent qui connaît un des
+deux côtés, dans un worktree jetable amorcé (`git worktree add` plus l'amorçage du projet), la tour
+commitant, avec la fiche « ## Fusion » de la fusion précédente comme modèle. Deux agents qui créent une
+migration de semence le même jour copient le même identifiant d'un fichier voisin : la consigne dit « un
+identifiant se tire de la base », et la fusion le vérifie par `up`, `down`, `up` avec le compte des lignes.
+
 **Une grappe enchaîne ses issues dans le même worktree.** Après le commit de l'une, la
 tour crée la branche de la suivante et lui envoie sa consigne (« Branches et retard »
 de `cycle.md`). Un hors-périmètre dont le fichier est dans la grappe va en bloc
 « reliquats » dans la consigne suivante.
+
+**Les e2e en local sont à la tour**, pas aux agents : avant chaque push, la tour joue les specs de la
+zone touchée dans le worktree de la branche (le dépôt dit comment, un script ou une recette), et la CI de
+la PR joue la suite complète. Un agent ne lance jamais la suite, sauf quand l'issue porte sur elle. Deux
+agents sur une pile aux ports fixes ont testé les serveurs l'un de l'autre, et l'un a tué le run de l'autre.
+
+**Compacter l'agent entre deux issues** : après le commit de l'une et avant la consigne de la suivante,
+`herdr agent prompt <agent> "/compact"`, puis relever le remplissage sur sa ligne d'état. Un agent arrivé
+à 79 % sur sa seconde issue voit le résumé automatique tomber au milieu du travail.
 
 **Chaque issue fermée par un merge du lot porte le label `lot: <n>`**, `<n>` étant le numéro du
 dossier `lot-<n>/`. On retrouve ainsi ce qu'un lot a livré (`gh issue list --repo "$ISSUES_REPO"

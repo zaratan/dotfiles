@@ -151,6 +151,13 @@ le travail naît d'un besoin utilisateur plutôt que d'un backlog, **interviewer
 d'abord** (`AskUserQuestion`, quatre questions par tour, état mesuré de la commande en
 main), et donner la trame de décisions aux agents comme contrainte.
 
+**Avant de montrer des textes rédigés par des agents, le lecteur froid.** Des agents
+neufs, sans le contexte de la session ni accès au code, lisent chaque texte. Ils le
+résument en une phrase et citent tout ce qui les arrête. Un texte qui échoue repart à
+son auteur, avec un vocabulaire commun pour les mots internes, puis il est relu à
+froid. Sur 87 textes passés par humanize, 30 restaient incompréhensibles hors de la
+session.
+
 ## Écrire sur GitHub
 
 Tout ce que la tour écrit sur GitHub suit `~/.claude/skills/backlog-setup/references/conventions.md` :
@@ -218,7 +225,9 @@ quatre options au plus ; « coche ce que tu refuses » n'est pas lisible.
 - **Tout geste git d'écriture de la tour passe par `git -C <chemin absolu>`**, jamais par un
   `cd <worktree> &&` en tête de chaîne : une fois, le `cd` n'a pas pris dans le shell de l'outil,
   `git add` a échoué sur un chemin inexistant et un `push` a visé le dépôt des issues, refusé
-  parce que la référence n'existait pas. Rien d'écrit, par chance.
+  parce que la référence n'existait pas. Rien d'écrit, par chance. Dans un shell zsh, écrire
+  `${VAR}:…` et jamais `$VAR:…` : `:r`, `:a` sont des modificateurs d'historique, et
+  `refs/heads/$BR:refs/heads/$BR` a visé une référence tronquée, deux fois le même jour.
 - Avant toute opération git qui change d'arbre dans un dossier où vivent des fichiers
   non suivis (rebase, checkout, abort), en copier une sauvegarde hors du dépôt.
 - **Les scripts et captures de la tour vont dans son scratchpad, jamais dans le cwd d'un

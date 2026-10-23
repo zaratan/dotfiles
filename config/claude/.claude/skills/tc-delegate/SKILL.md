@@ -41,8 +41,9 @@ pas mergée : la tour s'arrête et le dit.
 
 ### Format
 
-- **Signature gpg** : avant le premier commit délégué, et après une longue pause, faire déverrouiller
-  l'agent gpg par l'utilisateur dans un vrai terminal (`gpg --clearsign <<< test >/dev/null`) ; le `!` de la
+- **Signature** : avant le premier commit délégué, lire `git config gpg.format`. En `ssh`, la clé signe
+  sans rien demander : commiter directement, ne pas parler de gpg. En gpg, faire déverrouiller l'agent gpg par l'utilisateur dans un vrai terminal
+  (`gpg --clearsign <<< test >/dev/null`), avant le premier commit et après une longue pause ; le `!` de la
   session n'est pas un terminal interactif, pinentry y expire, et deux commits sont partis dans le vide ainsi.
   Un commit qui échoue sur « gpg n'a pas pu signer » laisse l'index intact : le redire, attendre, relancer.
 - **Un commit construit à la main se signe aussi** : `git commit-tree` ignore `commit.gpgsign`, il faut `-S`.
@@ -60,6 +61,23 @@ pas mergée : la tour s'arrête et le dit.
 
 ### Merger
 
+- **Les PR s'ouvrent dès le push, leurs CI tournent en parallèle, seul le merge est sérialisé** (un
+  verrou pris juste avant `gh pr merge`, relâché après). Une file où chaque PR attend la précédente de bout
+  en bout coûte douze minutes par PR pour rien.
+- **Avant tout merge dont la base a bougé depuis la CI de la PR** : fusionner la base dans la branche,
+  régénérer les relevés figés par un instantané (registre de textes), rejouer les gates et la suite e2e sur
+  l'arbre fusionné, pousser, puis merger. Deux PR vertes se sont cassées l'une l'autre (un test e2e écrit
+  sur un parcours à cinq étapes, mergé après la PR qui en ajoutait une sixième), la base est restée rouge
+  cinquante minutes.
+- **Une PR poussée pendant que sa base est en conflit ne reçoit aucune CI, même après le merge de sa base**
+  (`mergeable` reste `UNKNOWN`, rollup vide, close/reopen sans effet) : pousser un commit neuf, la fusion
+  de la base, pour la relancer.
+- **Le hook pre-push joue l'arbre de travail, pas le commit poussé** : quand le worktree est déjà passé à
+  l'issue suivante, il rejoue les gates sur le travail en cours de l'agent et rougit. Pousser avec
+  `--no-verify` quand le commit a ses gates et ses e2e, et l'écrire dans le journal.
+- Avant d'attendre une CI, lire `gh pr view <N> --json mergeable` : une PR `CONFLICTING` n'a aucune CI,
+  GitHub ne la lance pas et ne le dit pas (rollup vide, close/reopen sans effet). Fusionner la base dans la
+  branche d'abord, revérifier, pousser.
 - Une PR à la fois. Attendre sa CI, merger avec la méthode de ses merges précédents (merge commit, squash),
   puis attendre que **toutes** les exécutions du commit de merge sur la branche de base soient terminées et
   vertes avant la PR suivante. Cette attente ne vaut qu'entre deux merges : lancer un agent sur une branche
