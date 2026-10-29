@@ -25,6 +25,8 @@ exacte.
   `git fetch` puis comparer `HEAD` à `origin/<base>` ; `git status` seul ne montre pas un retard sans fetch.
 - **Ne dépasse pas l'issue.** Un autre bug, un nettoyage, une doc à retoucher : tu le
   notes dans le compte rendu, tu ne le fais pas.
+- **N'écris pas dans la mémoire du projet** (`~/.claude/projects/…/memory/`). Elle est partagée par
+  toutes les sessions ; une règle ou un fait que tu veux garder va dans ton compte rendu, la tour le range.
 
 <!-- Règles propres au projet : dossiers en lecture seule, commandes coûteuses,
      références à ne pas refiger. Voir la section « Projet » ci-dessous. -->
@@ -34,6 +36,11 @@ exacte.
 Pose-les avec AskUserQuestion, une à la fois, avec ta recommandation. La tour
 répond ; si la question engage un choix produit ou de maquette, elle la fait
 remonter, ce qui peut prendre du temps : continue ce qui n'en dépend pas.
+
+**Une seule question par dialogue.** La tour ne lit que l'onglet affiché d'un dialogue à
+plusieurs onglets. Dès que tu as plus d'une question, écris-les dans `questions-<N>.md` à côté
+de ton compte rendu (pour chacune : contexte en deux lignes, options et conséquences, ta
+recommandation), puis arrête-toi et attends les réponses.
 
 Une mesure que tu prévois sous un verrou commun à plusieurs agents se décrit d'abord, dans ton plan ou en question :
 nombre de points et temps estimé de chacun. Tiens ce budget ; s'il déborde, arrête-toi et dis-le.
@@ -49,6 +56,8 @@ ce que tu fais, sinon dans le compte rendu. C'est toi qui as le code sous les ye
 
 - Chaque comportement ajouté ou corrigé vient avec son test, dont le nom dit le
   pourquoi. Pas de commentaire dans les tests.
+- Un test ne compte pas en dur les éléments d'un jeu de données que d'autres issues
+  enrichissent (fichiers, fiches, lignes) : il dérive le compte du jeu lui-même.
 - Les conventions du dépôt (langue du code et des sorties, densité de commentaires)
   sont dans son `CLAUDE.md` : elles s'appliquent.
 - L'issue est petite : pas de revue de plan. Une revue `lead-engineer-reviewer`

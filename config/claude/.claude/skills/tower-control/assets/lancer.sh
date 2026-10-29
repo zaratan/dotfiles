@@ -12,6 +12,11 @@ CONFIG="$REPO/.claude/tower-control/config.sh"
 test -f "$CONFIG" || { echo "config absente : $CONFIG" >&2; exit 2; }
 # shellcheck source=/dev/null
 source "$CONFIG"
+# Déclarés avant le fichier de lot : un `REPO_BASE[_]=…` y créerait sinon un tableau indexé.
+declare -p REPO_PATH >/dev/null 2>&1 || declare -A REPO_PATH=()
+declare -p REPO_BASE >/dev/null 2>&1 || declare -A REPO_BASE=()
+declare -p REPO_BOOTSTRAP >/dev/null 2>&1 || declare -A REPO_BOOTSTRAP=()
+declare -p REPO_CHECK >/dev/null 2>&1 || declare -A REPO_CHECK=()
 
 GH_LOGIN=$(gh api user -q .login) && test -n "$GH_LOGIN" || { echo "login GitHub introuvable : gh auth status" >&2; exit 2; }
 LOT="$REPO/.claude/tower-control/lot-$GH_LOGIN.sh"
@@ -28,10 +33,6 @@ fi
 test "${HERDR_ENV:-}" = 1 || { echo "pas dans herdr" >&2; exit 2; }
 : "${WORKTREES_DIR:?}" "${MODEL:=claude-opus-5-5}" "${BOOTSTRAP_TIMEOUT:=900000}"
 declare -p GRAPPES >/dev/null 2>&1 && [ ${#GRAPPES[@]} -gt 0 ] || { echo "GRAPPES manquant : l'écrire dans $LOT" >&2; exit 2; }
-declare -p REPO_PATH >/dev/null 2>&1 || declare -A REPO_PATH=()
-declare -p REPO_BASE >/dev/null 2>&1 || declare -A REPO_BASE=()
-declare -p REPO_BOOTSTRAP >/dev/null 2>&1 || declare -A REPO_BOOTSTRAP=()
-declare -p REPO_CHECK >/dev/null 2>&1 || declare -A REPO_CHECK=()
 
 # Sans dépôt nommé dans la grappe, le code est le dépôt des issues lui-même.
 repo_of() { case "$1" in *" "*) echo "${1%% *}" ;; *) echo "" ;; esac; }

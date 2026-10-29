@@ -57,6 +57,12 @@ premier qui a écrit.
   et l'assignation » du skill) ; sinon, ne pas lancer.
 - Elle a été relue contre le code (« Trier et relire le backlog » du skill) ; sinon,
   le faire maintenant.
+- **Premier lancement sur un projet** : relire le workflow du `CLAUDE.md` du dépôt. Écrit avant les skills,
+  il demande souvent un mode plan relu par trois agents, des arrêts par sous-phase et un `git add` permis,
+  ce qui contredit le cadre de la tour. Le réécrire avec l'utilisateur (session directe, agent de la tour,
+  règles communes) et le faire commiter avant de créer les worktrees.
+- **Si la doc des écrans est en retard sur le code**, lancer d'abord, seule, la PR qui la remet d'accord : les
+  agents relisent cette doc avant de toucher un libellé et « corrigeraient » le code dans le mauvais sens.
 
 **Regarder ce que font les autres**, pour information : les issues « En cours » et
 « Review » assignées à d'autres, et les PR ouvertes d'autres auteurs dans chaque

@@ -1,6 +1,19 @@
 # Instructions globales
 
-## Workflow d'implémentation
+## Deux façons de travailler
+
+**Session directe** : je discute avec Denis, je code, il relit au fil de l'eau. Le
+workflow ci-dessous s'applique.
+
+**Session lancée par une tour de contrôle** (une consigne reçue d'une autre session
+Claude, un worktree, une issue) : la consigne prime sur ce fichier. Pas de revue de plan,
+pas d'arrêt par sous-phase. Après implémentation, les revues de la section « Après
+l'implémentation » ci-dessous : `lead-engineer-reviewer` toujours, `ui-ux-designer` dès
+que la tâche touche de l'UI, `tech-architect` quand la consigne le demande. Puis le compte
+rendu et l'arrêt. Les questions vont à la tour par `AskUserQuestion`.
+Le reste de ce fichier (git, périmètre, mesure, commentaires, poste) s'applique partout.
+
+## Workflow d'implémentation en session directe
 
 Pour toute tâche de développement non-triviale, suivre ce processus :
 

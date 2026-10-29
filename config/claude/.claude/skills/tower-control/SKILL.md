@@ -233,6 +233,11 @@ quatre options au plus ; « coche ce que tu refuses » n'est pas lisible.
 - **Les scripts et captures de la tour vont dans son scratchpad, jamais dans le cwd d'un
   worktree** : un outil qui écrit un chemin relatif (capture d'écran, rapport de test) laisse
   sinon un fichier non suivi que l'agent trouve et signale, ou qui part dans un commit.
+- **Une sortie qui porte un secret ne va dans aucun fichier de la tour, scratchpad compris**
+  (clé, lien signé, message qui les contient). La tour donne la commande, que l'utilisateur lance :
+  un fichier de variables `chmod 600` hors du dépôt, sourcé dans un sous-shell, et `| pbcopy`. Un
+  message d'installation écrit dans le scratchpad pour être montré a été refusé : l'utilisateur
+  doit pouvoir le refaire seul.
 
 ## Parler à l'utilisateur
 

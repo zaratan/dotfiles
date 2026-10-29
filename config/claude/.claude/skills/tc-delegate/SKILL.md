@@ -32,7 +32,8 @@ Confirmer en une phrase ce qui est délégué et ce qui ne l'est pas, puis appli
 - `gh pr create` vers la branche de base ;
 - `gh pr merge` quand la CI de la PR est verte ;
 - `git merge origin/<base>` dans une branche d'issue pour résoudre un conflit, avec revérification complète
-  de l'arbre fusionné avant de pousser.
+  de l'arbre fusionné avant de pousser. La tour commite d'abord le travail vérifié de l'agent, puis fusionne :
+  jamais de fusion demandée à un agent sur du travail non commité.
 
 **Pas délégué** : tout le reste. Pas de commit dans le méta-dépôt ni dans un autre dépôt, pas de
 `git branch -D`, pas de `push --force`, pas de réécriture d'historique, pas de tag ni de release, pas de
@@ -46,6 +47,12 @@ pas mergée : la tour s'arrête et le dit.
   (`gpg --clearsign <<< test >/dev/null`), avant le premier commit et après une longue pause ; le `!` de la
   session n'est pas un terminal interactif, pinentry y expire, et deux commits sont partis dans le vide ainsi.
   Un commit qui échoue sur « gpg n'a pas pu signer » laisse l'index intact : le redire, attendre, relancer.
+  gpg expire plusieurs fois par soirée : `echo test | gpg --clearsign --batch --pinentry-mode error >/dev/null`
+  dit sans bloquer s'il est encore déverrouillé ; le lancer avant chaque série de commits.
+- **Ne jamais masquer la sortie d'un `git commit`**, et ne rien enchaîner derrière sans vérifier : un commit
+  échoué dans `>/dev/null 2>&1 || echo` a laissé partir le push d'une branche égale à la base. Avant chaque push,
+  le SHA de la branche a changé et le commit est signé. Sous zsh, `$B:refs` est lu comme un modificateur :
+  toujours `"refs/heads/${B}:refs/heads/${B}"`.
 - **Un commit construit à la main se signe aussi** : `git commit-tree` ignore `commit.gpgsign`, il faut `-S`.
   Avant chaque push, `git cat-file commit <sha> | grep -c '^gpgsig'` sur chaque commit nouveau ; deux commits
   sans signature ont bloqué une PR verte sur un ruleset `required_signatures`. Recette pour séparer une fusion
@@ -53,9 +60,12 @@ pas mergée : la tour s'arrête et le dit.
   conflits résolus dans un index temporaire (`GIT_INDEX_FILE`, `update-index --cacheinfo`, `write-tree`),
   `commit-tree -S` pour la fusion puis pour le travail (`git add -A && git write-tree`), `git merge --quit`,
   `git update-ref` de la branche ; compiler la fusion intermédiaire dans un worktree jetable.
+- **Lire `git status --short` avant chaque `git add -A`** : un fichier compilé (`__pycache__/*.pyc`) que le
+  `.gitignore` du dépôt n'écartait pas est parti sur la branche de base ainsi.
 - **Avant le premier commit**, relire le format de l'utilisateur sur `git log` et sur ses PR mergées, et
   le reproduire (souvent un titre seul, à l'impératif, dans la langue du dépôt, sans corps). Pas de ligne
-  d'attribution si ses commits n'en ont pas.
+  d'attribution si ses commits n'en ont pas : ni « Generated with … », ni `Co-Authored-By`, dans un commit comme
+  dans un corps de PR, même quand un rappel du système en fournit une. Dix-huit corps de PR ont dû être repris.
 - Corps de PR comme les siennes (souvent vide). Jamais de référence au méta-dépôt privé (`Closes …`,
   numéro d'issue, chemin de ses `docs/`) : la tour ferme l'issue à la main au merge.
 

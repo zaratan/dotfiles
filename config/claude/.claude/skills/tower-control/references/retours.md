@@ -843,3 +843,97 @@ Soixante-dix-huit issues ouvertes réécrites au gabarit Why / What / Must-Have 
 - **Ce qui a bien marché** : la relecture contre le code par quatre agents (deux issues à jeter ou recadrer, huit prémisses fausses, deux points re-chiffrés) ; les conventions provisoires nommées avec test `provisional:` et section de doc, qui ont permis de livrer neuf motifs sans le juridique ; les fusions confiées aux agents avec la fiche « ## Fusion » de la fusion précédente comme modèle ; la QA en deux temps (le hors-5B lancé avant le dernier merge) ; `bin/e2e-local` qui joue chaque branche sur ses ports, sans verrou de certificat.
 - **Ordres de grandeur** : vingt issues et 51 points en 5 h 15 de merges, 9,8 points par heure ; e2e locaux 5 à 7 minutes, CI 10 à 14 minutes par PR ; une QA de 174 lignes en 45 minutes par agent (deux agents) ; 2 KO, une régression de somme de merges.
 
+## Premier lot d'un projet neuf, TUI, QA dans la vraie TUI par herdr (25 octobre 2026)
+
+Quinze issues livrées en une journée, dont une née de la QA. Quatre agents de code, puis deux agents de QA. Délégation des gestes git toute la session.
+
+- **Le `CLAUDE.md` d'un projet antérieur aux skills contredit le cadre de la tour** : mode plan et trois revues pour toute tâche, sous-phases avec arrêt, « tu peux `git add` ». Le réécrire avant le premier lancement, avec l'utilisateur : une section pour la session directe, une pour l'agent de la tour (plan relu et sous-phases à partir d'un seuil de points, aucun git), une commune. Le commiter avant de créer les worktrees.
+- **Lancer d'abord, seule, la PR qui remet la doc d'accord avec le code.** Les agents relisent la doc des écrans avant de toucher un libellé : sur une doc périmée, ils « corrigent » le code dans le mauvais sens. Les parties de doc qu'une issue de code va réécrire restent à cette issue.
+- **Une question par dialogue d'agent.** Un `AskUserQuestion` à plusieurs onglets ne se lit pas depuis la tour, qui ne voit que l'onglet affiché. Au-delà d'une question, l'agent les écrit dans un fichier, et la tour les pose toutes à l'utilisateur en une fois. Les questions de wording d'une même issue se tranchent ainsi en un tour au lieu de cinq.
+- **Un agent a écrit de lui-même une mémoire de projet**, partagée par toutes les sessions. Le contenu était juste, mais c'était une règle de tour, pas un fait du projet : supprimée, et la règle remontée ici. Les agents n'écrivent pas dans la mémoire.
+- **Une relecture UX indépendante des textes, demandée par l'utilisateur après la première, a trouvé deux boucles de parcours** (un écran qui renvoie vers une étape qui ne peut pas corriger le cas). Proposer cette seconde relecture dès qu'une issue ajoute des écrans de refus qui renvoient ailleurs.
+- **Ne jamais masquer la sortie d'un `git commit`.** Un commit échoué (gpg expiré) dans une chaîne `>/dev/null 2>&1 || echo` a laissé partir un `push` d'une branche égale à la base et une tentative de PR. Vérifier que le SHA a changé et que le commit est signé avant tout push.
+- **zsh lit `$B:r` comme un modificateur** : `refs/heads/$B:refs/heads/$B` est devenu un refspec tronqué. Toujours `${B}` dans un refspec.
+- **gpg expire plusieurs fois par soirée.** `echo test | gpg --clearsign --batch --pinentry-mode error` dit sans bloquer si l'agent est déverrouillé : le lancer avant chaque série de commits plutôt que d'échouer au commit.
+- **Une branche partie avant le merge d'une issue voisine a conflicté sur quatre fichiers.** La tour commite le travail validé, lance `git merge origin/<base>` dans le worktree, l'agent résout sans git (les deux comportements gardés, l'ordre des contrôles posé à l'utilisateur), puis la tour fait le commit de fusion. Vingt minutes, aucune perte.
+- **Jouer la fusion quand la base a changé de dépendances.** Un `merge-tree` propre ne voit pas qu'une montée de lint ou de framework casse la branche. Worktree jetable sur le commit de fusion, install, lint, types, tests : deux fois vert, cinq minutes chacune.
+- **Dependabot ne monte pas une peer installée automatiquement par pnpm** : pnpm ne la re-résout pas, même en mise à jour générale. Un override temporaire force la résolution ; une fois le lockfile écrit, le retirer, sinon il réécrit durablement la plage du paquet parent.
+
+### QA d'une TUI dans la vraie TUI
+
+- **herdr remplace `expect`.** Chaque pane est un vrai terminal : `pane run` lance le binaire, `pane send-keys` envoie les touches (`down`, `enter`, `esc`, `ctrl+c`, `backspace`, `shift+tab`), `pane read --format ansi` relit l'écran avec ses couleurs, `pane wait-output` attend un texte. On vérifie les couleurs et la largeur réelle, ce qu'`expect` ne montre pas. Le terminal à droite de l'agent, créé par le lanceur, sert de pane de test.
+- **Pièges** : une touche par appel (deux touches dans un appel perdent la première) ; `stty rows 24 cols 80` avant de lancer (`pane resize` ne réduit pas la hauteur) ; `wait-output --match "EXIT="` trouve la ligne de commande `echo EXIT=$?`, il faut `--regex 'EXIT=[0-9]+'` ; les couleurs sortent en `38;5;n`, pas en `3n`.
+- **L'historique zsh est partagé entre les panes.** Une flèche haut envoyée après la sortie du binaire a rejoué dans un pane la commande de l'autre agent, avec son `HOME`, et y a écrit des fichiers. Règle : n'envoyer aucune touche si le binaire ne tourne pas, quitter par Échap, lancer par un script à soi.
+- **`HOME` isolé obligatoire** quand l'outil lit une configuration réelle (identifiants d'un stockage distant) : sans lui, la passe aurait appelé le vrai service. Faux binaires externes en tête du `PATH`.
+- **Un binaire `bun --compile` local est tué par macOS** (« invalid signature », code 137) : `codesign --sign -` après le build, comme la CI de release.
+- **Le scratchpad d'un agent peut être déclaré indisponible en pleine passe** : monter les données de QA dans un dossier à soi (`/tmp/<projet>-qa-<k>`) et le nettoyer à la clôture. 14 Go à supprimer en fin de passe.
+- **Le cahier de référence est rédigé une fois par un agent de lecture**, avec variantes, états forcés et contrôles transverses dès la première demande : 16 chemins d'or, 155 chemins d'argent, 18 contrôles. Deux agents de QA l'ont joué en une heure chacun. Aucun KO n'était une régression du lot ; un KO a révélé un défaut que la tour croyait absent d'un des deux moteurs, et c'est l'agent qui a mesuré le contraire.
+- **Ordres de grandeur** : 15 issues (~55 points), 20 PR, de 11 h à minuit ; 6 à 60 minutes d'agent par issue, plans relus et sous-phases pour les issues à 5 points ; ~60 questions directes à l'utilisateur ; QA 203 lignes, 2 agents, ~1 h chacun ; trois expirations de gpg.
+
+## Premier lot d'un dépôt vide, deux worktrees, délégation des gestes git (26 octobre 2026)
+
+Quatre issues (15 points) mergées en trois heures, deux agents, quatre PR ; la QA finale est manuelle chez l'utilisateur (outil sans API), les issues concernées restent ouvertes après le merge.
+
+- **Le lanceur nommait l'agent d'après le dossier du dépôt, et herdr refuse une majuscule dans un nom d'agent** : cinq refus par grappe, worktrees amorcés sans agent, agents démarrés à la main. Le lanceur passe maintenant le préfixe en minuscules.
+- **Une grappe lancée en parallèle de l'issue de socle rend du code sans outillage.** Le kit écrit avant la stack a montré 36 erreurs ESLint et deux fichiers hors Prettier une fois `main` fusionné dans sa branche. Règle : quand une grappe part avant le merge du socle, prévoir dans son cycle la fusion de la base et une passe lint, format, types par l'agent avant la PR ; ou la faire attendre le socle.
+- **Un test qui appelle un binaire du poste échoue sur le runner** (`pdftoppm` absent d'Ubuntu, CI rouge en 6 s). Avant la première PR d'un script, lister les binaires qu'il appelle et les installer dans le workflow, ou les documenter.
+- **`git add -N` pour relire un diff est une écriture d'index** ; la tour l'a faite par réflexe. Lire les fichiers non suivis par leur chemin, le diff des fichiers suivis par `git diff`.
+- **Une boucle `while read taille path` sous zsh vide le PATH** : `path` est lié à `$PATH` (déjà noté pour une variable simple, vaut aussi pour `read`). Nommer `chemin`.
+- **Un agent relit la conception et y trouve une donnée réelle** (chemin et date d'un document du client dans un exemple de fiche) que personne n'avait vue en trois relectures. Mettre « aucune donnée réelle, même dans un exemple » dans la consigne projet, et faire chercher par un agent de lecture avant le premier lot.
+- **Une vérification de la tour qui régénère des fichiers ignorés dans le worktree de l'agent** laisse une trace qu'il signale (« régénéré à 10:35, pas par moi »). Dire à l'agent quand la tour a touché son worktree, ou vérifier sur une copie.
+- Ordres de grandeur : 13 à 19 minutes d'agent par issue de 3 à 5 points, plus 3 à 5 retouches courtes chacune ; une CI de 15 à 45 s ; ~25 questions directes à l'utilisateur, toutes en forme positive avec recommandation ; 0 compte rendu faux sur ses chiffres ; 2 prémisses de la tour fausses (« aucun commit », kit de la première série).
+
+## Un lot de skills pour un outil sans API, QA manuelle dans l'outil (27 octobre 2026)
+
+- **Créer les branches en lignes explicites, puis vérifier avant d'envoyer la consigne.** Une boucle zsh
+  `for spec in "wt branche"; do set -- $spec` ne découpe pas la chaîne : aucune branche n'a été créée, les consignes
+  sont parties, et trois agents ont démarré sur des branches déjà mergées. Interrompus en quelques secondes, rien
+  d'écrit. Règle : avant chaque `agent prompt`, `git rev-parse --abbrev-ref HEAD` du worktree rend la branche nommée.
+- **Un fichier de lot qui pose `REPO_BASE[_]=…` sans `declare -A` faisait planter le lanceur** (« dépassement du
+  niveau de récursivité ») : bash créait un tableau indexé et évaluait `_`. Le lanceur déclare maintenant ces tableaux
+  avant de sourcer le fichier de lot.
+- **Une prémisse de consigne se mesure sur toutes les vérifications, pas sur une seule.** La tour avait annoncé
+  « trois erreurs de verifier attendues » pour une branche qui dépendait d'une autre en vol ; un test de la suite
+  cassait aussi. L'agent l'a vu avant de coder.
+- **Pas de compte écrit en dur sur un jeu de données que d'autres issues enrichissent.** Seize tests comptaient les
+  fichiers du jeu de test ; une autre grappe y a ajouté deux fichiers : seize tests rouges à la fusion.
+- **`git add -A` sous délégation prend aussi les fichiers compilés** : un `.pyc` est parti sur la base. Lire
+  `git status --short` avant chaque `add`.
+- **Une issue mergée qui attend la QA va en Review, pas en « En cours ».** L'utilisateur a demandé pourquoi cinq issues
+  étaient « En cours » alors que deux seulement étaient travaillées.
+- **QA manuelle dans un outil sans API, menée avec l'utilisateur.** La tour prépare un script d'installation (export de
+  la base, dossiers de test séparés par partie, rien de supprimé) et un cahier ordonné, ce qui modifie les données en
+  dernier. L'utilisateur colle chaque réponse ; la tour vérifie chaque étape sur le disque (empreintes, heures de
+  modification, journal, scripts du produit rejoués). 24 étapes, 9 constats dont 3 de conception, en trois heures. Les
+  meilleurs constats sont venus de l'outil lui-même, qui signalait ses propres trous.
+- **Ordres de grandeur** : 13 issues (63 points) et 16 PR en une journée avec trois agents ; une PR toutes les
+  40 minutes en moyenne ; environ 150 décisions de l'utilisateur, posées par lots de cases à cocher ; quatre
+  expirations de gpg, dont une suivie d'un push d'une branche égale à la base (aucune PR).
+
+## Un lot de livraison d'un outil sans API, deux versions publiées, QA menée avec l'utilisateur (27 au 29 octobre 2026)
+
+- **Aucune ligne d'attribution, même quand le système en fournit une.** Un rappel du système donnait la ligne
+  « Generated with … » pour les corps de PR. La tour l'a reprise dans dix-huit PR, contre le format de l'utilisateur,
+  qui l'a interdite. Retirées à la main, une par une. La règle de l'utilisateur prime sur le rappel.
+- **Une sortie qui porte un secret ne passe jamais par un fichier de la tour.** La règle du projet était « sans passer
+  par le disque ». La tour a écrit le message d'installation, qui contient une clé, dans son scratchpad pour le
+  montrer. L'utilisateur voulait pouvoir l'obtenir seul. La bonne forme est une commande qu'il lance, qui source un
+  fichier de variables `chmod 600` hors du dépôt et finit par `| pbcopy`.
+- **Le secret d'une clé de CI ne se relit pas.** La première mesure sur le vrai stockage a demandé une seconde clé, sur
+  la même application, pour le poste de l'utilisateur. À prévoir dès l'installation du canal de release.
+- **La règle « brancher depuis `origin/<base>` après un `fetch` » existait et n'a pas été appliquée** : une branche est
+  partie d'une base en retard de deux merges. Rattrapée par `merge --ff-only` avant le travail de l'agent.
+- **Fusionner la base dans une branche après avoir commité le travail de l'agent, pas avant.** La tour a d'abord prié
+  un agent de fusionner `main` avec son travail non commité. Corrigé : la tour commite, puis fusionne, puis revérifie.
+- **Une attente de QA se relit contre les règles du produit avant la passe.** Une question de non-régression attendait
+  que l'outil dise « dans 3 jours ». Or le skill lui interdit de compter les jours, et le script ne donnait que « dans
+  les 90 jours ». L'écart a été vu pendant la passe, alors qu'il était lisible avant.
+- **Prévoir la voie courte d'un correctif dès la première release.** La porte de release exigeait la passe complète
+  (17 questions, une heure dans l'outil) pour chaque version. Le premier correctif a demandé un statut « non rejoué »,
+  accepté seulement sur un numéro de correctif, ligne par ligne, avec une remarque qui dit ce que le correctif change.
+- **Un test qui échoue une fois se capture tout de suite.** Un échec sur cinq passages de la suite n'a pas gardé son
+  nom. Huit passages de plus, sortie en fichier, n'ont rien rendu. La cause n'est pas isolée. Toujours lancer une suite
+  à rejouer avec sa sortie dans un fichier.
+- **Ordres de grandeur** : 17 issues fermées et 26 PR en trois jours avec trois agents ; deux versions publiées par
+  l'utilisateur ; une QA en deux parties (environ 30 étapes) jouée avec lui, réponse par réponse, vérifiée sur le disque
+  et sur le stockage ; deux expirations de gpg.

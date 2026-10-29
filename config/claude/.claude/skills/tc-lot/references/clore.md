@@ -28,6 +28,11 @@ Les chemins `assets/…` et `references/…` sont ceux de `~/.claude/skills/towe
       l'issue, à défaut de l'Attendu de sa consigne.
   - **Une ligne vaut par son résultat**, pas par l'absence d'erreur : réponses écrites et
     comptées, score affiché avec sa valeur, mail arrivé dans la boîte de test.
+  - **Chaque attente du cahier se relit contre les règles du produit avant la passe** : une
+    question attendait que l'outil compte des jours, ce que son skill lui interdit, et l'écart
+    n'a été vu qu'en pleine passe. Une suite de tests à rejouer se lance avec sa sortie dans un
+    fichier : un échec vu une fois sur cinq passages n'a pas gardé son nom, et ne s'est plus
+    reproduit.
   - **Les agents** : deux ou trois agents de QA, un par zone du cahier. Chacun a son worktree
     temporaire `wt/qa-<k>` sur `origin/<base>` (grappes `qa-<k>` dans le fichier de lot, branche
     locale `qa/lot-<n>-<k>` jamais poussée), sa pile locale et l'app en mode production. Il
@@ -79,6 +84,16 @@ Les chemins `assets/…` et `references/…` sont ceux de `~/.claude/skills/towe
     (entrées, options, langue et terminal, relances, pannes simulées) et des contrôles transverses : code de sortie,
     sortie standard contre sortie d'erreur, rien d'écrit hors des dossiers de sortie ni dans le dossier temporaire,
     pic de mémoire. Un seul agent suffit quand tout passe par le même verrou de mesure.
+  - **Pour une TUI**, la passe se joue dans la vraie TUI par herdr, dans le terminal que le lanceur ouvre à droite
+    de l'agent : `pane run` lance le binaire, `pane send-keys` envoie les touches **une par appel** (`down`, `enter`,
+    `esc`, `ctrl+c`, `backspace`, `shift+tab`), `pane read --format ansi` relit l'écran avec ses couleurs (`38;5;n`),
+    `pane wait-output --regex` attend un texte (`--match "EXIT="` trouverait la ligne de commande elle-même).
+    `stty rows 24 cols 80` avant de lancer. L'historique zsh est partagé entre les panes : une flèche haut envoyée
+    après la sortie du binaire a rejoué la commande d'un autre agent ; ne rien envoyer si le binaire ne tourne pas,
+    quitter par Échap, lancer par un script. `HOME` isolé et faux binaires externes en tête du `PATH` dès que
+    l'outil lit une configuration réelle (identifiants d'un service distant). Un binaire `bun --compile` local se
+    signe (`codesign --sign -`) ou macOS le tue (137). Les données de la passe vont dans un dossier à soi
+    (`/tmp/<projet>-qa-<k>`), supprimé à la clôture.
 - **Mesurer le dossier des comptes rendus et les dossiers temporaires des agents** (planches, maquettes des
   sous-agents de revue) : 9,7 Go et 2 Go s'y étaient accumulés en un lot. Proposer la liste à supprimer.
 - Ranger chaque worktree selon « Ranger un worktree » de `references/cycle.md`.

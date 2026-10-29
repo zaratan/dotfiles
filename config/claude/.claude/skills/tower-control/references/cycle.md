@@ -29,8 +29,11 @@ qu'elle a constaté elle-même, selon la recette de « Écrire sur GitHub » dan
 passe humanize ni accord, qu'elle dit dans son point à l'utilisateur. Ce que l'agent
 affirme et que la tour n'a pas revu reste décoché.
 
-L'issue passe en Review quand toutes les cases sont cochées. Une case ouverte la garde
-En cours, ou la passe en Bloqué si elle attend un tiers. Abandonner une case est une
+L'issue passe en Review quand toutes les cases sont cochées, ou quand sa PR est mergée et que
+ses cases ouvertes n'attendent plus que la QA ou une autre issue. « En cours » ne garde que ce
+qu'un agent a entre les mains : cinq issues « En cours » dont deux seulement travaillées ont
+fait demander à l'utilisateur ce qui se passait. Une case qui attend un tiers passe l'issue en
+Bloqué. Abandonner une case est une
 décision de l'utilisateur : la retirer de la Must-Have et l'écrire dans le How. Sur une
 issue d'avant ce gabarit, sans Must-Have, la tour rédige l'Attendu de la consigne comme
 avant, chiffré, et ne coche rien.
@@ -154,7 +157,10 @@ push sans refspec explicite y part). Elle part de **`origin/<branche de base>`
 après un `fetch`**, pas du HEAD local : d'autres worktrees ont pu merger entre-temps, et une
 branche partie du HEAD local ne « prend » jamais ces changements toute seule. Faire
 `git branch --unset-upstream` aussitôt, sinon un `push` nu irait sur la branche de
-base. On n'empile sur le HEAD local que si la PR précédente n'est pas encore mergée.
+base. **Avant d'envoyer la consigne, `git rev-parse --abbrev-ref HEAD` du worktree doit
+rendre la branche qu'elle nomme** : une boucle zsh `for s in "wt branche"; do set -- $s` ne
+découpe pas la chaîne, aucune branche n'a été créée, et trois agents sont partis sur des branches
+déjà mergées. Créer les branches en lignes explicites, une par worktree. On n'empile sur le HEAD local que si la PR précédente n'est pas encore mergée.
 Jamais `git pull` sur la branche de base, même en avance rapide : `fetch`, puis
 `origin/<base>` ou `git show`, suffisent à la tour.
 

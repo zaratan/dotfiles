@@ -9,6 +9,7 @@ pnpm = "latest"
 "npm:@prisma/language-server" = "latest"
 "npm:eslint_d" = "latest"
 "npm:prettier" = "latest"
+"github:basecamp/hey-cli" = "latest"
 
 [settings]
 # Also read .ruby-version, .nvmrc, .python-version in projects
