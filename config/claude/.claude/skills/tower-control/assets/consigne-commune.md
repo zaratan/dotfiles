@@ -102,3 +102,7 @@ Puis tu t'arrêtes. Tu ne commences rien d'autre.
 ## Projet
 
 <!-- Section fournie par le dépôt : .claude/tower-control/consigne-projet.md -->
+
+Une commande qui lance un serveur (dev, start, script de démarrage) ne rend jamais la main : lance-la en
+arrière-plan, attends la ligne « Ready » de son journal, et ne chaîne rien derrière elle avec `&&`. Pour
+remettre la base au seed, prends la commande du projet qui ne lance pas de serveur.

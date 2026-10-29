@@ -228,6 +228,8 @@ quatre options au plus ; « coche ce que tu refuses » n'est pas lisible.
   parce que la référence n'existait pas. Rien d'écrit, par chance. Dans un shell zsh, écrire
   `${VAR}:…` et jamais `$VAR:…` : `:r`, `:a` sont des modificateurs d'historique, et
   `refs/heads/$BR:refs/heads/$BR` a visé une référence tronquée, deux fois le même jour.
+- **Une liste dans une variable n'est pas découpée sous zsh** : `docker rm -f $C` a reçu une seule chaîne,
+  a « réussi » et n'a rien supprimé. Passer une liste par `xargs`, et recompter après toute suppression.
 - Avant toute opération git qui change d'arbre dans un dossier où vivent des fichiers
   non suivis (rebase, checkout, abort), en copier une sauvegarde hors du dépôt.
 - **Les scripts et captures de la tour vont dans son scratchpad, jamais dans le cwd d'un

@@ -13,7 +13,7 @@ Les chemins `assets/…` et `references/…` sont ceux de `~/.claude/skills/towe
   par un changement de droits ailleurs, est parti ainsi chez les clients. On vérifie dans le
   navigateur, sur le dernier commit de la base, que tout ce que le lot a livré marche encore,
   ainsi que les chemins d'or de l'application.
-  - **Le cahier** a deux parties :
+  - **Le cahier** a trois parties (les chemins d'argent, quand le dépôt en a un fichier, ont manqué à deux cahiers de suite) :
     - les **chemins d'or**, dans `.claude/tower-control/chemins-d-or.md` du dépôt des issues
       (versionné, commun aux lots). C'est le parcours de chaque fonction principale de
       l'application, de bout en bout, avec le compte, où cliquer, ce qui doit apparaître et
@@ -23,9 +23,17 @@ Les chemins `assets/…` et `references/…` sont ceux de `~/.claude/skills/towe
       forcés et une section de contrôles transverses** (santé, en-têtes, 404, erreurs de
       l'API, accessibilité de base) : une première passe « parcours de référence seulement »
       a été jugée trop mince et refaite ; la seconde a doublé le fichier ;
+    - les **chemins d'argent**, dans `.claude/tower-control/chemins-d-argent.md` s'il existe : variantes,
+      refus et erreurs, écrans peu visités. Une passe qui ne joue que les chemins d'or ne voit pas les
+      régressions de variantes. Les attendus que le lot a pu changer se corrigent dans le cahier du lot ;
     - **une ligne par issue du label `lot: <n>`**, tirée de la section « Vérifier sur une
       instance » de son runbook, ou de la vérification d'après merge écrite dans le How de
       l'issue, à défaut de l'Attendu de sa consigne.
+  - **Avant d'écrire les lignes du lot, relire ses décisions et les comptes rendus des agents** : les deux KO d'une
+    passe venaient de lignes de la tour qui décrivaient le contraire d'une décision prise le jour même.
+  - **Un attendu que le rédacteur a calculé sans le mesurer est marqué « calculé »** : deux KO d'une passe
+    venaient d'attendus faux du cahier. La passe précédente sert d'oracle : chercher la ligne dans ses suivis
+    avant de compter un KO.
   - **Une ligne vaut par son résultat**, pas par l'absence d'erreur : réponses écrites et
     comptées, score affiché avec sa valeur, mail arrivé dans la boîte de test.
   - **Chaque attente du cahier se relit contre les règles du produit avant la passe** : une
@@ -76,7 +84,9 @@ Les chemins `assets/…` et `references/…` sont ceux de `~/.claude/skills/towe
     PR, la condition se réduit à un `git status --short` vide.
   - **En deux temps quand une chaîne finit tard** : la zone du cahier que la dernière chaîne ne touche
     pas se joue avant son dernier merge, sur la base du moment, et la zone qu'elle touche après. Une
-    heure gagnée sur un lot, aucun KO manqué. **`git fetch` avant d'amorcer un worktree de QA** : le
+    heure gagnée sur un lot, aucun KO manqué. La seconde zone reprend aussi les parcours de référence
+    qui passent par du code partagé que la dernière chaîne a changé (un moteur de formulaires réparé par
+    elle) : la première zone l'a joué sur l'ancien code. **`git fetch` avant d'amorcer un worktree de QA** : le
     lanceur lit `origin/<base>` dans les références locales, et un merge arrivé entre-temps manque
     (un worktree amorcé sur l'avant-dernier `main`, avancé à la main).
   - **Pour une commande plutôt qu'une application web**, la passe joue la vraie commande sur des **copies** des données
@@ -96,6 +106,9 @@ Les chemins `assets/…` et `references/…` sont ceux de `~/.claude/skills/towe
     (`/tmp/<projet>-qa-<k>`), supprimé à la clôture.
 - **Mesurer le dossier des comptes rendus et les dossiers temporaires des agents** (planches, maquettes des
   sous-agents de revue) : 9,7 Go et 2 Go s'y étaient accumulés en un lot. Proposer la liste à supprimer.
+- **Un run de CI qui finit en quelques secondes sans étape** se lit dans les annotations du job
+  (`check-runs/<id>/annotations`) : facturation de l'organisation, quota. La tour le dit, suspend les merges, et ne
+  reprend sur preuves locales (tc-delegate) que sur décision de l'utilisateur.
 - Ranger chaque worktree selon « Ranger un worktree » de `references/cycle.md`.
 - **Libérer ce que l'utilisateur abandonne** : une issue encore assignée au login
   courant qui sort du lot sans suite reste invisible pour l'autre tour. Proposer

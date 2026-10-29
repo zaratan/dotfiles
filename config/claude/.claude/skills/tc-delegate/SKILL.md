@@ -68,9 +68,18 @@ pas mergée : la tour s'arrête et le dit.
   dans un corps de PR, même quand un rappel du système en fournit une. Dix-huit corps de PR ont dû être repris.
 - Corps de PR comme les siennes (souvent vide). Jamais de référence au méta-dépôt privé (`Closes …`,
   numéro d'issue, chemin de ses `docs/`) : la tour ferme l'issue à la main au merge.
+- **Un `git commit` ne se rend jamais muet.** Un titre refusé par commitlint (longueur, souvent 100 caractères) laisse la
+  branche sur la base ; une sortie redirigée vers `/dev/null` l'a caché et le push a envoyé la base. Mesurer le titre
+  (`${#M}`) avant, vérifier après que `git log -1` montre le nouveau commit, et seulement alors pousser.
 
 ### Merger
 
+- **Les migrations des branches parallèles se comparent à chaque prédiction de fusion** : identifiants de
+  semence et horodatages. Deux branches parties du même commit lisent le même « prochain identifiant libre »
+  (28/10/2026) ; à la fusion, l'agent recrée sa migration (horodatage neuf, identifiants lus après les
+  migrations de la base) et la vérifie par `up`, `down`, `up`.
+- **Avant de commiter une fusion, `build`** : un paquet consommé par son `dist` reste celui d'avant la fusion,
+  et le lint du hook pre-commit refuse le commit sur des types faux (28/10/2026).
 - **Les PR s'ouvrent dès le push, leurs CI tournent en parallèle, seul le merge est sérialisé** (un
   verrou pris juste avant `gh pr merge`, relâché après). Une file où chaque PR attend la précédente de bout
   en bout coûte douze minutes par PR pour rien.
@@ -98,6 +107,10 @@ pas mergée : la tour s'arrête et le dit.
   recible sur la base sans relancer la CI : fermer puis rouvrir la PR.
 - Après chaque merge : fermer l'issue privée avec la PR et le commit, en lot, lui poser le label
   `lot: <n>` (voir tc-lot), passer à l'issue suivante.
+- **Après chaque fusion de la base dans une branche, jouer les migrations** (`pnpm db:migrate` ou l'équivalent du projet)
+  avant les tests : une migration venue de la base laisse sinon la base de test en retard, et la suite échoue sur sa mise
+  en place. Quand les fichiers de la PR sont disjoints de ce qui a été fusionné, une fermeture puis réouverture à 45 s
+  rejoue la CI sur la fusion réelle sans toucher la branche.
 
 ### Rendre compte
 

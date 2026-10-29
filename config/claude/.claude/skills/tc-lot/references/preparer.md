@@ -45,6 +45,12 @@ passées ainsi en une PR, à la demande de l'utilisateur, sur une CI de quinze m
 **Contrôler la couverture** : chaque issue du lot est dans exactement une grappe (`comm` entre la
 liste « À faire » assignée et la somme des grappes) ; une issue décidée et jamais lancée a été
 retrouvée en fin de lot par la colonne du board.
+**Relire les commandes de la consigne contre ses propres règles** : un gate `pnpm format` qui réécrit tout le dépôt
+contredisait « le formateur seulement sur les fichiers touchés » (lot du 27/10). Écrire la commande de vérification
+(`format:check`), et vérifier dans le `package.json` ce que fait chaque gate cité. **Jouer chaque commande de
+vérification avant de l'écrire** : un spec d'intégration lancé sans sa config ne jouait aucun test (lot du 28/10).
+**Relire chaque texte d'issue créé pour le lot contre la consigne commune** : un corps d'issue demandait des renvois
+au dépôt privé que la consigne interdit, l'agent a suivi l'issue (29 renvois retirés en retouche).
 
 **Ordonner chaque grappe** du plus simple au plus discutable, et mettre en dernier
 ce qui finira « Bloqué » sur une décision externe.

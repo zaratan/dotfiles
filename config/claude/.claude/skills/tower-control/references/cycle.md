@@ -63,6 +63,15 @@ défaut d'un merge commit GitHub cite le numéro de PR et le propriétaire (« M
 
 ## Attendre
 
+**Un guetteur par consigne envoyée, recadrage compris** : après un `esc` + `prompt` qui change le périmètre d'une
+issue, le guetteur précédent a déjà rendu la main, et un compte rendu a attendu une heure. Sous zsh, `set -- $p` ne
+découpe pas une chaîne (`${=p}`) : trois consignes sont parties vers des agents inexistants.
+
+**Après chaque `herdr agent prompt`, lire le terminal de l'agent** (`herdr agent read`) et y voir la consigne
+arrivée : un message envoyé pendant que l'agent attendait la fin d'un shell s'est perdu, et l'agent est resté
+trente minutes sur une commande bloquée. **Avant de lancer un guetteur sur une section, la compter dans le
+fichier** (`grep -c '^## <section>'`) : une section déjà présente a fait attendre un guetteur sans fin.
+
 **Attendre sans surveiller, un guetteur par agent** : `assets/guetter.sh <agent>
 <compte rendu attendu> [section]`, lancé en arrière-plan (`run_in_background`). Il rend la
 main dès que l'agent est `blocked` (question ou demande de permission) ; quand le compte
@@ -192,6 +201,9 @@ Les règles de décision (ce que la tour tranche seule, ce qui remonte à l'util
 où ranger la réponse) sont dans « Les questions » du skill. En plus, pour les agents :
 
 - Lire le contexte (`herdr agent read`) avant de répondre.
+- **Un agent `blocked` sur une question refuse `agent prompt`** (`agent_blocked`) : fermer la question par
+  `agent send-keys <nom> esc`, vérifier qu'il est `done`, puis envoyer la réponse en message, avec le texte de
+  l'option choisie.
 - **Une demande de permission bloque l'agent comme une question.** La lire avant de
   répondre ; refuser un `rm` dont le chemin dépend d'une variable qui peut être vide, et
   demander `"${VAR:?}"/…` à la place.

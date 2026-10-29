@@ -20,6 +20,9 @@ Worktree : `wt/qa-<k>`, sur `<base>` @ `<sha du dernier merge du lot>`. N'en cha
    reset et de démarrage du projet>`.
 2. L'app en mode production, pas en mode dev : `<commande de build puis de start>`. Le mode dev
    compile chaque page au premier passage et masque des erreurs que la production montre.
+   Une commande qui lance un serveur (dev, start, script de démarrage) ne rend jamais la main : lance-la
+   en arrière-plan, puis attends la ligne « Ready » de son journal, jamais la fin du shell. Pour remettre
+   la base au seed, prends la commande qui ne lance pas de serveur.
 3. Les données du cahier : `<comptes de test, fichiers d'import, commandes de préparation sur la
    base locale>`. Ne touche à aucune autre base que celle de ton worktree.
 4. Le navigateur : `<comment lancer le Chromium headless du projet et où mettre les captures>`.
