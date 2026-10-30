@@ -29,14 +29,23 @@ pour l'utilisateur. C'est le rôle de la tour.
 - Un lot (colonne « À faire », grappes, QA, clôture) passe par `/tc-lot`, que seul
   l'utilisateur peut taper. Si on demande à la tour de dispatcher un lot, répondre
   « tape /tc-lot » plutôt que de l'improviser.
-- `references/retours.md` est le journal des itérations précédentes (800 lignes) :
-  y chercher le sujet qui coince, pas le lire en entier en mode tour.
+- `references/retours-entrants.md` : les leçons des lots passés qu'aucun skill ne porte
+  encore. En mode tour, y chercher le sujet qui coince. `references/retours-archive.md`
+  ne se lit pas.
+- `.claude/tower-control/tour.md` du dépôt des issues, s'il existe : ce que la tour a
+  appris sur ce projet (pièges de pile, chemins, méthode). Elle le lit au démarrage et
+  c'est le seul fichier de leçons où elle écrit pendant un lot.
 
 ## Au démarrage
 
 **Vérifier l'environnement** : `gh auth status` avec le scope `project`, un board
 GitHub Projects avec les statuts Backlog → À faire → En cours → Bloqué → Review →
 Fait, et le workflow « item closed → Fait » actif.
+
+**Vérifier que les skills sont à jour** : `d=$(dirname "$(readlink -f
+~/.claude/skills/tower-control)") && git -C "$d" fetch -q && git -C "$d" status -sb -- .`.
+Modifiés, en avance ou en retard : le dire avant de lire la suite. Deux machines éditent le
+même dépôt, et neuf fichiers de skills sont restés un lot entier non commités sur l'une.
 
 **Relever les alias du poste** (`type df du grep sed`) : une commande lancée par la
 tour ou écrite pour un agent tombe sur `duf`, `dust`, `ugrep` ; écrire `/bin/df`,
@@ -252,7 +261,8 @@ une autre laissait invisible. Sans agent, la ligne « À toi » suffit.
 
 ## En fin de session
 
-Proposer à l'utilisateur ce qui vaut pour tout projet et mérite d'aller dans
-`references/retours.md` (ce qui a coincé et la règle qui en sort, sans nom de projet
-ni numéro d'issue), et l'endroit de ce skill qui le contredit ou l'omet. Appliquer
-après son accord. Un lot a sa propre clôture (`/tc-lot`).
+Proposer à l'utilisateur ce qui vaut pour tout projet (ce qui a coincé et la règle qui
+en sort) et, après son accord, l'écrire dans `~/.claude/tower-control/entrants/<date>-<projet>-<sujet>.md`,
+en ajout seul. Ce qui ne vaut que pour ce projet va dans son `tour.md`. La tour n'écrit
+jamais dans `~/.claude/skills/` : la promotion se fait depuis une session dotfiles
+(« Clore le lot » de `/tc-lot`). Un lot a sa propre clôture.

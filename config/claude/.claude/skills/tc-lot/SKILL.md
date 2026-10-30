@@ -14,8 +14,9 @@ plus loin.
 Les chemins `assets/…` et `references/…` sans autre précision sont ceux de
 `~/.claude/skills/tower-control/` ; ceux de ce skill s'écrivent `tc-lot/references/…`.
 
-Lire `references/retours.md` en entier avant de préparer : c'est le journal des lots
-précédents, et la raison d'être de ces skills est de s'améliorer à chaque lot.
+Lire `references/retours-entrants.md` et le `tour.md` du projet avant de préparer : les
+leçons qu'aucun skill ne porte encore, et celles propres au projet.
+`references/retours-archive.md` ne se lit pas.
 
 ## Les étapes
 

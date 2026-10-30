@@ -120,14 +120,20 @@ Les chemins `assets/…` et `references/…` sont ceux de `~/.claude/skills/towe
   login. Deux clôtures en parallèle conflictent à cet endroit sans la ligne
   `.claude/tower-control/journal.md merge=union` du `.gitattributes` ; si elle
   manque, la proposer.
-- **Remonter dans `references/retours.md`** ce qui vaut pour tout projet :
-  ce qui a coincé et la règle qui en sort, ce qui a bien marché, les ordres de
-  grandeur — sans nom de projet ni numéro d'issue, titre de section compris.
-- **Puis confronter les skills aux leçons du lot** : pour chaque leçon, l'endroit de
-  `tower-control` (`SKILL.md`, `references/`, `assets/`) ou de `tc-lot` qui la contredit
-  ou l'omet. Proposer
-  les retouches à l'utilisateur (AskUserQuestion en forme positive, une recommandation
-  par retouche) et les appliquer après son accord. Deux lots ont rempli `retours.md`
-  sans toucher au skill, qui disait encore l'inverse sur l'attente ; l'utilisateur a dû
-  le demander. C'est cette étape qui fait que le lot suivant se passe mieux ; ne pas la
-  sauter parce que le lot est fini.
+- **Écrire les leçons du lot** dans `~/.claude/tower-control/entrants/<date>-<projet>-lot-<n>.md`
+  (`mkdir -p` au besoin ; hors de tout dépôt : la tour peut y écrire, alors que `~/.claude/skills/`
+  lui est refusé par le classificateur). Ce qui a coincé et la règle qui en sort, ce qui a bien
+  marché, les ordres de grandeur aux colonnes de `references/ordres-de-grandeur.md`. Les noms de
+  projet y sont permis, ils tombent à la promotion. Ce qui ne vaut que pour ce projet va dans
+  `.claude/tower-control/tour.md` du dépôt des issues.
+- **Promouvoir, depuis une session dotfiles** que l'utilisateur ouvre sur la machine du lot :
+  chaque leçon d'un fichier d'entrants reçoit une destination et une seule, puis le fichier passe
+  dans `entrants/traites/`. Une leçon entre dans un skill si elle a été vue sur deux projets, si un
+  script peut la porter, ou si elle a déjà coûté une écriture git ; sinon `references/cas.md`
+  (situations rares : mesures partagées, TUI, hôte Linux…), `retours-entrants.md` (pas encore
+  tranchée) ou le `tour.md` du projet. Avant d'écrire : `grep -rni <mots> ~/.claude/skills/tower-control
+  ~/.claude/skills/tc-*` ; si la règle existe, la fusionner dans la rédaction en place, jamais une
+  seconde puce. Budget : `SKILL.md` 200 lignes, chaque `references/*.md` 180 ; au-delà, rien n'entre
+  sans qu'une règle sorte ou fusionne. Deux lots ont rempli le journal des leçons sans toucher au
+  skill, qui disait encore l'inverse sur l'attente : c'est cette étape qui fait que le lot suivant
+  se passe mieux.

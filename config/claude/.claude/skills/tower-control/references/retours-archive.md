@@ -1,4 +1,9 @@
-# Leçons des lots passés
+# Archive des leçons, du 30 septembre au 29 octobre 2026
+
+Ne pas lire en mode tour. Ce fichier est figé, rien ne s'y ajoute. Les leçons en attente sont dans
+`retours-entrants.md`, les chiffres dans `ordres-de-grandeur.md`, le reste a sa place dans les skills.
+Il sera supprimé quand `couverture.md` aura prouvé que chaque ligne a une destination.
+
 
 Générales, valables pour tout projet. À relire avant chaque lot. Le journal détaillé
 de chaque lot — issues, chiffres, décisions — vit dans le dépôt concerné, dans

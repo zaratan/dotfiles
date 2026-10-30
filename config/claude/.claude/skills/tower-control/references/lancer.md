@@ -78,7 +78,7 @@ question d'agent.
 
 **Si plusieurs agents mesurent sur la même machine**, poser un verrou commun avant de
 lancer (une commande par verrou, règle écrite dans un `MESURES.md` du dossier
-des worktrees, seuil d'espace disque avant tout balayage) ; voir `references/retours.md`.
+des worktrees, seuil d'espace disque avant tout balayage).
 Le verrou a deux niveaux : `lourd`, partagé (vidéos entières, construction de zéro, tests
 lents, deux agents peuvent le tenir ensemble), et `chrono`, exclusif (un temps publié attend
 que tout le lourd soit fini) ; un script Python `fcntl.flock` fait les deux et reste compatible
