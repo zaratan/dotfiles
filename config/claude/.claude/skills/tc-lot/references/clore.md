@@ -7,6 +7,8 @@ Les chemins `assets/…` et `references/…` sont ceux de `~/.claude/skills/towe
   cet ordre (« Merger » de tc-delegate) : le dire à l'utilisateur dès que deux PR en portent.
 - **Passe de QA de fin de lot**, une fois tout mergé et avant de dire le lot livrable :
   `tc-lot/references/qa.md` (cahier, agents, suivi, KO, deux temps, commande ou TUI).
+- **Passe SOLID / DRY / KISS, en parallèle de la QA**, dès le dernier merge : `tc-lot/references/audit.md`.
+  Lecture seule, aucun changement de code ; des constats mesurés, confrontés au Backlog, puis des issues.
 - **Mesurer le dossier des comptes rendus et les dossiers temporaires des agents** (planches, maquettes des
   sous-agents de revue) : 9,7 Go et 2 Go s'y étaient accumulés en un lot. Proposer la liste à supprimer.
 - **Un run de CI qui finit en quelques secondes sans étape** se lit dans les annotations du job

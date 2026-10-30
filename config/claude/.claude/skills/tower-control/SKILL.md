@@ -178,8 +178,9 @@ Tout ce que la tour écrit sur GitHub suit `~/.claude/skills/backlog-setup/refer
   cocher une case de la Must-Have n'en est pas une, c'est un geste mécanique.
 
 **Une issue créée en chemin va dans la colonne Backlog, explicitement** (`item-add`
-laisse le statut vide) : c'est l'utilisateur qui trie. Elle est créée dans le même
-script que ses champs, avec la priorité et les points proposés avec le texte. Pour la
+laisse le statut vide) : c'est l'utilisateur qui trie. Elle est créée avec ses champs par
+`assets/appliquer-issues.py` (un fichier par issue, en-tête titre / labels / priorité /
+points / parente / jalon, `--dry-run` d'abord), la priorité et les points proposés avec le texte. Pour la
 forme, le gabarit fait foi ; une issue existante du dépôt ne sert qu'à relever les
 labels propres au projet et le jalon. En méta-dépôt, écrire soi-même ce que `board.ts`
 ajoute : `**Dépôt.** <nom>` en tête du corps, le préfixe `[<nom>]` du titre et le label
