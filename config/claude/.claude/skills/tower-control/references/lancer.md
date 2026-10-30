@@ -108,10 +108,14 @@ n'en dépend pas, répondre, réécrire la consigne et l'issue, puis lancer.
 
 ## Préparer les consignes
 
-`assets/consigne-commune.md` (règles, interdits, forme du compte rendu), complétée
-par la section propre au projet, plus une consigne courte par issue sur le modèle de
-`assets/consigne-issue.md` : son Attendu reprend la Must-Have de l'issue. Les
-montrer à l'utilisateur avant tout lancement.
+Une consigne courte par issue sur le modèle de `assets/consigne-issue.md` (son Attendu reprend
+la Must-Have), dans `lot-<n>/` du dépôt des issues. Ce que l'agent reçoit est assemblé par
+`assets/consigne.sh <dépôt> <fichier> [--lot <fragment>]` : la consigne commune **du skill**
+(règles, interdits, forme du compte rendu), `consigne-projet.md` du dépôt, le fragment de lot s'il
+y en a un, le fragment « shells », puis la consigne. Jamais une copie de la consigne commune dans le
+projet : une copie par lot avait pris 28 lignes de retard en trois lots. Le fichier assemblé reste
+dans `envoyees/` : c'est la trace de ce que l'agent a lu. Montrer les consignes à l'utilisateur
+avant tout lancement.
 
 **Faire committer** ce qui doit être dans les worktrees (un `CLAUDE.md` retouché,
 par exemple) : les branches partent de la branche de base commitée, pas de l'arbre
@@ -153,8 +157,8 @@ ports d'images.
 pas seulement son corps au groupement : un commentaire de l'utilisateur posté entre-temps a
 changé la règle d'une issue déjà lancée, et l'agent a dû refaire son passage.
 
-Envoyer à chaque agent **la consigne commune et la consigne de l'issue en un seul
-`agent prompt`** (les deux fichiers concaténés) : en deux envois, l'agent répond à la
-première par « quelle issue ? » et la seconde reste derrière sa question.
+Envoyer à chaque agent le fichier assemblé **en un seul `agent prompt "$(command cat
+<envoyee>)"`** : en deux envois, l'agent répond au cadre par « quelle issue ? » et la consigne
+reste derrière sa question ; la substitution de commande protège apostrophes et backticks.
 
 Passer les issues lancées en « En cours » sur le board (« Poser un champ » du skill).

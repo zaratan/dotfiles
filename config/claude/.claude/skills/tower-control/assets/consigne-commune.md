@@ -28,9 +28,6 @@ exacte.
 - **N'écris pas dans la mémoire du projet** (`~/.claude/projects/…/memory/`). Elle est partagée par
   toutes les sessions ; une règle ou un fait que tu veux garder va dans ton compte rendu, la tour le range.
 
-<!-- Règles propres au projet : dossiers en lecture seule, commandes coûteuses,
-     références à ne pas refiger. Voir la section « Projet » ci-dessous. -->
-
 ## Questions
 
 Pose-les avec AskUserQuestion, une à la fois, avec ta recommandation. La tour
@@ -101,8 +98,5 @@ Puis tu t'arrêtes. Tu ne commences rien d'autre.
 
 ## Projet
 
-<!-- Section fournie par le dépôt : .claude/tower-control/consigne-projet.md -->
+<!-- Section fournie par le dépôt : .claude/tower-control/consigne-projet.md, insérée par consigne.sh -->
 
-Une commande qui lance un serveur (dev, start, script de démarrage) ne rend jamais la main : lance-la en
-arrière-plan, attends la ligne « Ready » de son journal, et ne chaîne rien derrière elle avec `&&`. Pour
-remettre la base au seed, prends la commande du projet qui ne lance pas de serveur.

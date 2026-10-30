@@ -133,7 +133,7 @@ avec le texte avant et après), avant de dire « prêt à commiter ». Un utilis
 traite plusieurs sujets fusionne sans relire ce qu'un résumé lui signale en prose.
 
 **Une retouche que la tour tire d'un compte rendu ou d'une revue se vérifie dans le code avant l'envoi** : lire le
-passage cité. Trois retouches fausses sont parties ainsi en un lot (des valeurs « déjà rendues » qui ne l'étaient pas,
+passage cité, puis l'écrire sur `assets/consigne-retouche.md` et l'assembler par `consigne.sh … --retouche`. Trois retouches fausses sont parties ainsi en un lot (des valeurs « déjà rendues » qui ne l'étaient pas,
 un attribut dit inutile qui servait à un lint, un chemin de cache dont la forme changeait la version de l'entrée) ;
 les agents les ont arrêtées. Au merge d'une issue, proposer de retirer sa planche lourde (vidéos, images).
 

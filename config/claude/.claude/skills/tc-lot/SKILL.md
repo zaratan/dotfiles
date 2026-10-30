@@ -41,7 +41,7 @@ la PR s'ouvre. Une tour l'a oublié toute une matinée, l'utilisateur l'a vu ava
 ces fichiers en parallèle (sept fusions sur quatre motifs plus une branche voisine, deux heures de chemin
 critique). Soit tout va dans une seule chaîne, soit les fusions se confient à l'agent qui connaît un des
 deux côtés, dans un worktree jetable amorcé (`git worktree add` plus l'amorçage du projet), la tour
-commitant, avec la fiche « ## Fusion » de la fusion précédente comme modèle. Deux agents qui créent une
+commitant, sur le gabarit `assets/consigne-fusion.md`. Deux agents qui créent une
 migration de semence le même jour copient le même identifiant d'un fichier voisin : la consigne dit « un
 identifiant se tire de la base », et la fusion le vérifie par `up`, `down`, `up` avec le compte des lignes.
 

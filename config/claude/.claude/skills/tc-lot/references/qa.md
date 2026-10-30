@@ -37,7 +37,8 @@ Les tests de chaque PR ne voient pas une régression qui naît de la somme des m
   temporaire `wt/qa-<k>` sur `origin/<base>` (grappes `qa-<k>` dans le fichier de lot, branche
   locale `qa/lot-<n>-<k>` jamais poussée), sa pile locale et l'app en mode production. Il
   utilise le Chromium headless du projet, avec un onglet par compte. Consigne :
-  `assets/consigne-qa.md`, seule, sans la consigne commune. Ils ne corrigent rien.
+  `assets/consigne-qa.md` rempli par agent, assemblé par `consigne.sh … --qa`, sans la consigne commune.
+  Ils ne corrigent rien.
 - **Suivi en direct** : chaque agent ajoute une ligne à `travail/qa-<n>-<k>-suivi.md` par ligne
   jouée, avec le détail de chaque KO. La tour lit ces fichiers pendant la passe (un point toutes
   les 15 minutes si l'utilisateur le demande). Elle n'attend pas le rapport final pour agir sur un
