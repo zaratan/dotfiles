@@ -234,11 +234,14 @@ quatre options au plus ; « coche ce que tu refuses » n'est pas lisible.
 - **Tout geste git d'écriture de la tour passe par `git -C <chemin absolu>`**, jamais par un
   `cd <worktree> &&` en tête de chaîne : une fois, le `cd` n'a pas pris dans le shell de l'outil,
   `git add` a échoué sur un chemin inexistant et un `push` a visé le dépôt des issues, refusé
-  parce que la référence n'existait pas. Rien d'écrit, par chance. Dans un shell zsh, écrire
-  `${VAR}:…` et jamais `$VAR:…` : `:r`, `:a` sont des modificateurs d'historique, et
-  `refs/heads/$BR:refs/heads/$BR` a visé une référence tronquée, deux fois le même jour.
-- **Une liste dans une variable n'est pas découpée sous zsh** : `docker rm -f $C` a reçu une seule chaîne,
-  a « réussi » et n'a rien supprimé. Passer une liste par `xargs`, et recompter après toute suppression.
+  parce que la référence n'existait pas. Rien d'écrit, par chance.
+- **Le shell de l'outil Bash est zsh**, quatre pièges qui ont chacun coûté un incident :
+  `${VAR}:…` et jamais `$VAR:…` (`:r`, `:a` sont des modificateurs d'historique, un refspec a été
+  tronqué deux fois le même jour) ; une variable ne se découpe pas en mots (`docker rm -f $C` a
+  reçu une seule chaîne et n'a rien supprimé, `set -- $p` n'a créé aucune branche : `${=v}`, `xargs`,
+  ou des lignes explicites, puis recompter) ; `path` est lié à `$PATH` (une boucle `for path` ou
+  `read taille path` vide le PATH, exit 127 : nommer `chemin`) ; l'historique est partagé entre
+  les panes herdr (une flèche haut rejoue la commande d'un autre agent).
 - Avant toute opération git qui change d'arbre dans un dossier où vivent des fichiers
   non suivis (rebase, checkout, abort), en copier une sauvegarde hors du dépôt.
 - **Les scripts et captures de la tour vont dans son scratchpad, jamais dans le cwd d'un
@@ -246,7 +249,7 @@ quatre options au plus ; « coche ce que tu refuses » n'est pas lisible.
   sinon un fichier non suivi que l'agent trouve et signale, ou qui part dans un commit.
 - **Une sortie qui porte un secret ne va dans aucun fichier de la tour, scratchpad compris**
   (clé, lien signé, message qui les contient). La tour donne la commande, que l'utilisateur lance :
-  un fichier de variables `chmod 600` hors du dépôt, sourcé dans un sous-shell, et `| pbcopy`. Un
+  un fichier de variables `chmod 600` hors du dépôt, sourcé dans un sous-shell, et `| pbcopy` (`wl-copy` sur Linux). Un
   message d'installation écrit dans le scratchpad pour être montré a été refusé : l'utilisateur
   doit pouvoir le refaire seul.
 

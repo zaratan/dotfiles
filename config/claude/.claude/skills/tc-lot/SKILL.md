@@ -55,12 +55,8 @@ zone touchée dans le worktree de la branche (le dépôt dit comment, un script 
 la PR joue la suite complète. Un agent ne lance jamais la suite, sauf quand l'issue porte sur elle. Deux
 agents sur une pile aux ports fixes ont testé les serveurs l'un de l'autre, et l'un a tué le run de l'autre.
 
-**Compacter l'agent entre deux issues** : après le commit de l'une et avant la consigne de la suivante,
-`herdr agent prompt <agent> "/compact"`, puis relever le remplissage sur sa ligne d'état. Un agent arrivé
-à 79 % sur sa seconde issue voit le résumé automatique tomber au milieu du travail.
-Après le `/compact`, lire l'écran de l'agent avant la consigne suivante : la boîte « Teach auto mode about your
-environment? » y apparaît et avale le prompt suivant (deux consignes perdues ainsi au lot du 27/10). La fermer par
-`esc`, sans rien accepter, puis envoyer.
+**Entre deux issues d'une grappe, relever le contexte de l'agent et compacter s'il le faut** : « Enchaîner une
+tâche » de `cycle.md`.
 
 **Chaque issue fermée par un merge du lot porte le label `lot: <n>`**, `<n>` étant le numéro du
 dossier `lot-<n>/`. On retrouve ainsi ce qu'un lot a livré (`gh issue list --repo "$ISSUES_REPO"

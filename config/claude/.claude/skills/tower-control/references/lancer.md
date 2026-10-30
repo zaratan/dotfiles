@@ -34,10 +34,10 @@ Avec un méta-dépôt, deux conséquences de plus de `config.sh` :
 `GRAPPES` (une grappe : un worktree nommé et sa branche, `"<dépôt> <branche>"` en
 méta-dépôt), c'est la tour qui l'écrit, et git l'ignore (`.claude/tower-control/lot-*.sh`
 dans le `.gitignore` du dépôt des issues ; si la ligne manque, la proposer). Une issue
-traitée hors lot y a sa grappe comme les autres. Si le fichier n'a pas de ligne
-`declare -A GRAPPES=(…)`, l'écrire avec cette grappe ; sinon ajouter
-`GRAPPES[<nom>]="<branche>"` **après** elle, sans toucher aux grappes d'un lot en vol
-(placée avant, elle est effacée ; sans `declare`, `demarrer-prod.sh` échoue). Lancer
+traitée hors lot y a sa grappe comme les autres : ajouter `GRAPPES[<nom>]="<branche>"`
+**après** la ligne `declare -A GRAPPES=(…)` si elle existe (placée avant, elle est effacée),
+sans toucher aux grappes d'un lot en vol ; les tableaux sont déclarés par `config-lib.sh`
+avant la lecture du fichier (`config.example.sh` donne les deux formes). Lancer
 `lancer.sh <chemin du dépôt des issues> <nom>`, qui ne démarre que celle-là.
 
 Le fichier de lot peut aussi corriger un chemin de poste, élément par élément
@@ -147,7 +147,7 @@ d'agent herdr est global à la machine : le lanceur le préfixe par le dépôt d
 le guetteur.
 La sonde de port libre doit aussi interroger docker (`docker ps --format '{{.Ports}}'`) : `ss` ne voit pas
 un port qu'un conteneur publie, et un worktree a reçu le PostgreSQL d'un autre, puis deux fois les mêmes
-ports d'images (20/10/2026).
+ports d'images.
 
 **Relire les commentaires de l'issue juste avant de l'envoyer** (`gh issue view <N> --comments`),
 pas seulement son corps au groupement : un commentaire de l'utilisateur posté entre-temps a

@@ -1,4 +1,4 @@
-# herdr — ce qui a été vérifié (herdr 0.9.2, 30 septembre 2026)
+# herdr — ce qui a été vérifié (0.9.2 le 30 septembre 2026, complété jusqu'à 0.9.5 fin octobre)
 
 Le binaire fait foi : `herdr <groupe>` sans sous-commande imprime l'aide du groupe.
 Ne jamais lancer `herdr` nu depuis un agent (ça ouvre le TUI). Les commandes de
@@ -58,8 +58,7 @@ commande tapée**, où le marqueur figure en clair. Utiliser un marqueur calcul�
 s'écrit pas tel quel : `echo AMORCE-$((2*100))-FIN` et attendre `AMORCE-200-FIN`.
 Vérifier ensuite l'effet (`ls node_modules`) plutôt que croire le marqueur.
 
-Le shell de l'outil Bash de Claude Code est **zsh** : `set -- $var` ne découpe pas
-les mots. Écrire les boucles avec `${a%% *}` / `${a##* }` ou des commandes explicites.
+Le shell de l'outil Bash de Claude Code est zsh : ses pièges sont dans « Git et fichiers » du skill.
 
 ## Démarrer et piloter un agent
 

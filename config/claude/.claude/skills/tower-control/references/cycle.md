@@ -64,8 +64,7 @@ défaut d'un merge commit GitHub cite le numéro de PR et le propriétaire (« M
 ## Attendre
 
 **Un guetteur par consigne envoyée, recadrage compris** : après un `esc` + `prompt` qui change le périmètre d'une
-issue, le guetteur précédent a déjà rendu la main, et un compte rendu a attendu une heure. Sous zsh, `set -- $p` ne
-découpe pas une chaîne (`${=p}`) : trois consignes sont parties vers des agents inexistants.
+issue, le guetteur précédent a déjà rendu la main, et un compte rendu a attendu une heure.
 
 **Après chaque `herdr agent prompt`, lire le terminal de l'agent** (`herdr agent read`) et y voir la consigne
 arrivée : un message envoyé pendant que l'agent attendait la fin d'un shell s'est perdu, et l'agent est resté
@@ -146,6 +145,16 @@ fichier:ligne), ou nouvelle issue. Jamais seulement listé. Une issue créée en
 et un commentaire suivent « Écrire sur GitHub » du skill. Avant d'attacher un point à
 une issue existante, relire ce qu'elle produit : la tour a annoncé des extraits vidéo
 d'une issue qui ne sort que des tableaux.
+
+## Enchaîner une tâche
+
+Avant d'envoyer une nouvelle tâche à un agent qui en a déjà fait une (issue suivante de la grappe,
+retouche longue, fusion), relever son contexte sur sa ligne d'état. **Au-delà de 50 %, compacter
+d'abord** : `herdr agent prompt <agent> "/compact"`, attendre `done`, relire le remplissage. Un agent
+à 79 % sur sa seconde issue a vu le résumé automatique tomber au milieu du travail ; un agent compacté
+entre deux issues (79 % → 0 %) n'a rien perdu, la consigne suivante se suffit. Après le `/compact`,
+lire l'écran avant d'envoyer : la boîte « Teach auto mode about your environment? » y apparaît et
+avale le prompt suivant (deux consignes perdues ainsi) ; la fermer par `esc`, sans rien accepter.
 
 ## Branches et retard
 

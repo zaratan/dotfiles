@@ -1,32 +1,19 @@
 #!/usr/bin/env bash
-# Démarre l'app d'un worktree comme en production (build puis start), au premier plan : à lancer en arrière-plan
-# par la tour pour revérifier un écran, puis arrêter par le port. La recette est propre au projet :
-# REPO_PROD_START[<dépôt>] dans config.sh (ou PROD_START en dépôt unique), exécutée dans le worktree.
+# demarrer-prod.sh <dépôt des issues> <grappe> [--print] : démarre l'app du worktree comme en production, au premier
+# plan (la tour le lance en arrière-plan puis arrête par le port). Recette : REPO_PROD_START[<dépôt>] ou PROD_START.
 set -euo pipefail
 
 REPO="${1:?usage: demarrer-prod.sh <dépôt des issues> <grappe> [--print]}"
 GRAPPE="${2:?usage: demarrer-prod.sh <dépôt des issues> <grappe> [--print]}"
-CONFIG="$REPO/.claude/tower-control/config.sh"
-test -f "$CONFIG" || { echo "config absente : $CONFIG" >&2; exit 2; }
-# shellcheck source=/dev/null
-source "$CONFIG"
-GH_LOGIN=$(gh api user -q .login)
-LOT="$REPO/.claude/tower-control/lot-$GH_LOGIN.sh"
-# shellcheck source=/dev/null
-[ -f "$LOT" ] && source "$LOT"
+# shellcheck source=config-lib.sh
+source "$(dirname "$0")/config-lib.sh"
 
 : "${WORKTREES_DIR:?}"
 WT="$WORKTREES_DIR/$GRAPPE"
 test -d "$WT" || { echo "worktree absent : $WT" >&2; exit 2; }
 
-spec="${GRAPPES[$GRAPPE]:-}"
-case "$spec" in *" "*) r="${spec%% *}" ;; *) r="" ;; esac
-if [ -n "$r" ]; then
-  declare -p REPO_PROD_START >/dev/null 2>&1 || { echo "REPO_PROD_START absent de $CONFIG" >&2; exit 2; }
-  cmd="${REPO_PROD_START[$r]:-}"
-else
-  cmd="${PROD_START:-}"
-fi
+r=$(tc_repo_of "${GRAPPES[$GRAPPE]:-}")
+cmd=$(tc_prod_start_of "$r")
 test -n "$cmd" || { echo "aucune recette de démarrage pour ${r:-ce dépôt} dans $CONFIG" >&2; exit 2; }
 
 if [ "${3:-}" = "--print" ]; then

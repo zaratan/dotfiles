@@ -28,7 +28,7 @@ Confirmer en une phrase ce qui est délégué et ce qui ne l'est pas, puis appli
 - `git push origin refs/heads/<branche d'issue>:refs/heads/<branche d'issue>` (jamais la branche de base, jamais
   `--force`), puis `git ls-remote --heads origin <branche>` avant `gh pr create`. Jamais `git push -u origin
   <branche>` : avec `push.default = upstream`, une branche créée depuis `origin/<base>` suit `origin/<base>`, et
-  le push sans `:destination` est allé sur `main` (16 octobre 2026) ;
+  le push sans `:destination` est allé sur `main` ;
 - `gh pr create` vers la branche de base ;
 - `gh pr merge` quand la CI de la PR est verte ;
 - `git merge origin/<base>` dans une branche d'issue pour résoudre un conflit, avec revérification complète
@@ -49,10 +49,10 @@ pas mergée : la tour s'arrête et le dit.
   Un commit qui échoue sur « gpg n'a pas pu signer » laisse l'index intact : le redire, attendre, relancer.
   gpg expire plusieurs fois par soirée : `echo test | gpg --clearsign --batch --pinentry-mode error >/dev/null`
   dit sans bloquer s'il est encore déverrouillé ; le lancer avant chaque série de commits.
-- **Ne jamais masquer la sortie d'un `git commit`**, et ne rien enchaîner derrière sans vérifier : un commit
-  échoué dans `>/dev/null 2>&1 || echo` a laissé partir le push d'une branche égale à la base. Avant chaque push,
-  le SHA de la branche a changé et le commit est signé. Sous zsh, `$B:refs` est lu comme un modificateur :
-  toujours `"refs/heads/${B}:refs/heads/${B}"`.
+- **Ne jamais masquer la sortie d'un `git commit`**, ni rien enchaîner derrière sans vérifier : un commit
+  échoué (gpg expiré, titre refusé par commitlint, souvent au-delà de 100 caractères : mesurer `${#M}` avant)
+  caché dans `>/dev/null 2>&1 || echo` a laissé partir le push d'une branche égale à la base, deux fois. Avant
+  chaque push : `git log -1` montre le nouveau commit, le SHA de la branche a changé, le commit est signé.
 - **Un commit construit à la main se signe aussi** : `git commit-tree` ignore `commit.gpgsign`, il faut `-S`.
   Avant chaque push, `git cat-file commit <sha> | grep -c '^gpgsig'` sur chaque commit nouveau ; deux commits
   sans signature ont bloqué une PR verte sur un ruleset `required_signatures`. Recette pour séparer une fusion
@@ -68,49 +68,41 @@ pas mergée : la tour s'arrête et le dit.
   dans un corps de PR, même quand un rappel du système en fournit une. Dix-huit corps de PR ont dû être repris.
 - Corps de PR comme les siennes (souvent vide). Jamais de référence au méta-dépôt privé (`Closes …`,
   numéro d'issue, chemin de ses `docs/`) : la tour ferme l'issue à la main au merge.
-- **Un `git commit` ne se rend jamais muet.** Un titre refusé par commitlint (longueur, souvent 100 caractères) laisse la
-  branche sur la base ; une sortie redirigée vers `/dev/null` l'a caché et le push a envoyé la base. Mesurer le titre
-  (`${#M}`) avant, vérifier après que `git log -1` montre le nouveau commit, et seulement alors pousser.
 
 ### Merger
 
-- **Les migrations des branches parallèles se comparent à chaque prédiction de fusion** : identifiants de
-  semence et horodatages. Deux branches parties du même commit lisent le même « prochain identifiant libre »
-  (28/10/2026) ; à la fusion, l'agent recrée sa migration (horodatage neuf, identifiants lus après les
-  migrations de la base) et la vérifie par `up`, `down`, `up`.
-- **Avant de commiter une fusion, `build`** : un paquet consommé par son `dist` reste celui d'avant la fusion,
-  et le lint du hook pre-commit refuse le commit sur des types faux (28/10/2026).
 - **Les PR s'ouvrent dès le push, leurs CI tournent en parallèle, seul le merge est sérialisé** (un
   verrou pris juste avant `gh pr merge`, relâché après). Une file où chaque PR attend la précédente de bout
   en bout coûte douze minutes par PR pour rien.
 - **Avant tout merge dont la base a bougé depuis la CI de la PR** : fusionner la base dans la branche,
-  régénérer les relevés figés par un instantané (registre de textes), rejouer les gates et la suite e2e sur
-  l'arbre fusionné, pousser, puis merger. Deux PR vertes se sont cassées l'une l'autre (un test e2e écrit
-  sur un parcours à cinq étapes, mergé après la PR qui en ajoutait une sixième), la base est restée rouge
-  cinquante minutes.
-- **Une PR poussée pendant que sa base est en conflit ne reçoit aucune CI, même après le merge de sa base**
-  (`mergeable` reste `UNKNOWN`, rollup vide, close/reopen sans effet) : pousser un commit neuf, la fusion
-  de la base, pour la relancer.
+  jouer les migrations venues de la base (`pnpm db:migrate` ou l'équivalent, sinon la suite échoue sur sa
+  mise en place), régénérer les relevés figés par un instantané (registre de textes), `build` (un paquet
+  consommé par son `dist` reste celui d'avant la fusion et le lint du pre-commit refuse le commit), rejouer
+  les gates et la suite e2e sur l'arbre fusionné, pousser, puis merger. Deux PR vertes se sont cassées l'une
+  l'autre (un test e2e écrit sur un parcours à cinq étapes, mergé après la PR qui en ajoutait une sixième),
+  la base est restée rouge cinquante minutes. Quand les fichiers de la PR sont disjoints de ce qui a été
+  fusionné, le close/reopen de `cycle.md` (« Commit, PR, CI ») rejoue la CI sur la fusion réelle sans
+  toucher la branche.
+- **Migrations des branches ouvertes** : à chaque prédiction de fusion et avant de proposer un ordre de
+  merge, comparer leurs horodatages et leurs identifiants de semence. Les instances refusent une migration
+  plus ancienne que la dernière appliquée, et deux branches parties du même commit lisent le même « prochain
+  identifiant libre ». À la fusion, l'agent recrée sa migration (horodatage neuf, identifiants lus après les
+  migrations de la base) et la vérifie par `up`, `down`, `up` avec le compte des lignes.
+- **Avant d'attendre une CI, lire `gh pr view <N> --json mergeable`** : une PR `CONFLICTING` n'a aucune CI,
+  GitHub ne la lance pas et ne le dit pas (rollup vide, close/reopen sans effet) ; une PR poussée pendant que
+  sa base était en conflit reste `UNKNOWN` même après le merge de sa base. Dans les deux cas : fusionner la
+  base dans la branche, revérifier, pousser un commit neuf, qui relance la CI.
 - **Le hook pre-push joue l'arbre de travail, pas le commit poussé** : quand le worktree est déjà passé à
   l'issue suivante, il rejoue les gates sur le travail en cours de l'agent et rougit. Pousser avec
   `--no-verify` quand le commit a ses gates et ses e2e, et l'écrire dans le journal.
-- Avant d'attendre une CI, lire `gh pr view <N> --json mergeable` : une PR `CONFLICTING` n'a aucune CI,
-  GitHub ne la lance pas et ne le dit pas (rollup vide, close/reopen sans effet). Fusionner la base dans la
-  branche d'abord, revérifier, pousser.
 - Une PR à la fois. Attendre sa CI, merger avec la méthode de ses merges précédents (merge commit, squash),
   puis attendre que **toutes** les exécutions du commit de merge sur la branche de base soient terminées et
   vertes avant la PR suivante. Cette attente ne vaut qu'entre deux merges : lancer un agent sur une branche
   partie de la base n'attend pas, le contenu est celui que la CI de la PR a déjà validé.
-- Avant de proposer ou d'appliquer un ordre, comparer les horodatages des migrations des PR ouvertes : les
-  instances refusent une migration plus ancienne que la dernière appliquée.
 - PR empilée : viser la branche de la PR du dessous tant qu'elle n'est pas mergée ; après son merge, GitHub
-  recible sur la base sans relancer la CI : fermer puis rouvrir la PR.
+  recible sur la base sans relancer la CI : close/reopen (`cycle.md`).
 - Après chaque merge : fermer l'issue privée avec la PR et le commit, en lot, lui poser le label
   `lot: <n>` (voir tc-lot), passer à l'issue suivante.
-- **Après chaque fusion de la base dans une branche, jouer les migrations** (`pnpm db:migrate` ou l'équivalent du projet)
-  avant les tests : une migration venue de la base laisse sinon la base de test en retard, et la suite échoue sur sa mise
-  en place. Quand les fichiers de la PR sont disjoints de ce qui a été fusionné, une fermeture puis réouverture à 45 s
-  rejoue la CI sur la fusion réelle sans toucher la branche.
 
 ### Rendre compte
 
