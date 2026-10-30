@@ -16,11 +16,11 @@ Les chemins `assets/…` et `references/…` sont ceux de `~/.claude/skills/towe
 - **Libérer ce que l'utilisateur abandonne** : une issue encore assignée au login
   courant qui sort du lot sans suite reste invisible pour l'autre tour. Proposer
   `--remove-assignee @me` ; une issue en Review reste à son auteur jusqu'au merge.
-- **Écrire le journal du lot dans le dépôt**, `.claude/tower-control/journal.md` :
-  issues traitées, décisions prises par l'utilisateur, prémisses corrigées, ce qui
-  reste à faire. C'est du projet, ça reste dans le projet. Le journal est commun :
-  chaque lot y est une section ajoutée en fin de fichier, titrée avec sa date et le
-  login. Deux clôtures en parallèle conflictent à cet endroit sans la ligne
+- **Écrire le journal du lot dans le dépôt**, `.claude/tower-control/journal.md`, sur le gabarit
+  `tc-lot/assets/journal-lot.md` : la table des issues et la ligne d'ordres de grandeur sortent de
+  `assets/journal.sh <dépôt> <n>`, la tour écrit décisions, prémisses, coincé, QA, reste. C'est du
+  projet, ça reste dans le projet. Le journal est commun : chaque lot y est une section ajoutée en
+  fin de fichier. Deux clôtures en parallèle conflictent à cet endroit sans la ligne
   `.claude/tower-control/journal.md merge=union` du `.gitattributes` ; si elle
   manque, la proposer.
 - **Écrire les leçons du lot** dans `~/.claude/tower-control/entrants/<date>-<projet>-lot-<n>.md`

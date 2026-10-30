@@ -35,7 +35,11 @@ Relire le fichier de l'étape en cours après un résumé automatique du context
 ## Règles de lot pendant le cycle
 
 **Le board se tient au fil de l'eau** : « En cours » quand l'agent reçoit sa consigne, « Review » quand
-la PR s'ouvre. Une tour l'a oublié toute une matinée, l'utilisateur l'a vu avant elle.
+la PR s'ouvre. Une tour l'a oublié toute une matinée, l'utilisateur l'a vu avant elle. En même temps,
+`ISSUES[<grappe>]=<N>` dans le fichier de lot : c'est ce que `avancement.sh` affiche.
+
+**Chaque message suit `tc-lot/assets/point.md`** : heure locale, tableau des agents, « À toi » ; le
+tableau des étapes sur « ETA ? ».
 
 **Une chaîne sérielle sur les mêmes fichiers coûte une fusion par issue** dès qu'une autre branche touche
 ces fichiers en parallèle (sept fusions sur quatre motifs plus une branche voisine, deux heures de chemin

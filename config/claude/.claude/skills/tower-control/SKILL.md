@@ -255,12 +255,11 @@ quatre options au plus ; « coche ce que tu refuses » n'est pas lisible.
 
 ## Parler à l'utilisateur
 
-Résumer court : ce qui est fait, les chiffres vérifiés, ce qui reste ouvert. **Quand
-des agents sont en vol, chaque message de la tour, quel que soit son sujet, finit par
-un tableau d'une ligne par agent** (issue, état, ce qu'il fait ou attend) **et une
-ligne « À toi : … »** (commit, PR, merge, verdict, ou « rien ») : avec trois agents en
-vol, l'utilisateur a dû demander deux fois où en était une branche qu'un message sur
-une autre laissait invisible. Sans agent, la ligne « À toi » suffit.
+Résumer court : ce qui est fait, les chiffres vérifiés, ce qui reste ouvert. Chaque message
+commence par l'heure locale de l'utilisateur et finit par une ligne « À toi : … » (commit,
+PR, merge, verdict, ou « rien ») ; dès qu'un agent est en vol, le tableau des agents est entre
+les deux, et le tableau des étapes sort sur « ETA ? ». Le gabarit et `avancement.sh` sont
+dans `~/.claude/skills/tc-lot/assets/point.md`.
 
 ## En fin de session
 

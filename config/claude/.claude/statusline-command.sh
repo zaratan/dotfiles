@@ -78,6 +78,10 @@ rst=$'\033[0m'
 cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd // empty')
 model=$(echo "$input" | jq -r '.model.display_name // empty')
 used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
+session_id=$(echo "$input" | jq -r '.session_id // empty')
+if [ -n "$session_id" ]; then
+  mkdir -p "$HOME/.claude/tower-control/ctx" && printf '%s\n' "$used_pct" > "$HOME/.claude/tower-control/ctx/$session_id"
+fi 2>/dev/null
 wall_ms=$(echo "$input" | jq -r '.cost.total_duration_ms // 0')
 api_ms=$(echo "$input" | jq -r '.cost.total_api_duration_ms // 0')
 agent=$(echo "$input" | jq -r '.agent.name // empty')
