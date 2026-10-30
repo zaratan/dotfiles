@@ -5,8 +5,8 @@ set -euo pipefail
 
 REPO=${1:?usage: journal.sh <dépôt des issues> <numéro de lot>}
 LOT_N=${2:?numéro de lot manquant}
-# shellcheck source=config-lib.sh
-source "$(dirname "$0")/config-lib.sh"
+# shellcheck source=../../tc-commun/config-lib.sh
+source "$(dirname "$0")/../../tc-commun/config-lib.sh"
 : "${ISSUES_REPO:?}" "${PROJECT_OWNER:?}" "${PROJECT_NUMBER:?}"
 
 issues=$(gh issue list --repo "$ISSUES_REPO" --state all --label "lot: $LOT_N" --limit 200 --json number,title,state)

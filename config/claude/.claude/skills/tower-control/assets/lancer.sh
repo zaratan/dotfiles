@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # lancer.sh <dépôt des issues> [grappe…] : crée un worktree herdr par grappe, l'amorce, lie la mémoire et y démarre
-# un agent Claude. Sans grappe nommée, toutes celles du fichier de lot. Configuration : config.example.sh.
+# un agent Claude. Sans grappe nommée, toutes celles du fichier de lot. Configuration : tc-commun/config.example.sh.
 set -euo pipefail
 
 REPO="${1:?usage: lancer.sh <chemin du dépôt qui porte les issues> [grappe…]}"
 ONLY=("${@:2}")
-# shellcheck source=config-lib.sh
-source "$(dirname "$0")/config-lib.sh"
+# shellcheck source=../../tc-commun/config-lib.sh
+source "$(dirname "$0")/../../tc-commun/config-lib.sh"
 
 test "${HERDR_ENV:-}" = 1 || { echo "pas dans herdr" >&2; exit 2; }
 : "${WORKTREES_DIR:?}" "${MODEL:=claude-opus-5-5}" "${BOOTSTRAP_TIMEOUT:=900000}"

@@ -1,6 +1,6 @@
 # shellcheck shell=bash disable=SC2034
 # Exemple de .claude/tower-control/config.sh : les faits du projet, versionné quand le dépôt est privé.
-# Lu par config-lib.sh, donc par lancer.sh et demarrer-prod.sh. REPO (chemin du dépôt des issues) est posé avant.
+# Lu par config-lib.sh, donc par tous les scripts de tower-control/assets/. REPO (chemin du dépôt des issues) est posé avant.
 
 # Dépôt unique : issues, board et code au même endroit.
 ISSUES_REPO="owner/monprojet"

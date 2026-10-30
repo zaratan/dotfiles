@@ -7,8 +7,8 @@
 set -euo pipefail
 
 REPO=${1:?usage: ranger.sh <dépôt des issues> <grappe> [--dry-run]}; GRAPPE=${2:?grappe manquante}; DRY=${3:-}
-# shellcheck source=config-lib.sh
-source "$(dirname "$0")/config-lib.sh"
+# shellcheck source=../../tc-commun/config-lib.sh
+source "$(dirname "$0")/../../tc-commun/config-lib.sh"
 : "${WORKTREES_DIR:?}"
 spec=${GRAPPES[$GRAPPE]:?grappe inconnue dans $LOT : $GRAPPE}
 r=$(tc_repo_of "$spec"); branche=$(tc_branch_of "$spec"); code=$(tc_path_of "$r")

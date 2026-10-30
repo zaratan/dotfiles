@@ -68,7 +68,7 @@ de lot, filtre le board et signe le journal. Vérifier qu'il peut être assigné
 dans un méta-dépôt privé, la seconde personne n'est pas toujours collaboratrice.
 
 **Lire `.claude/tower-control/config.sh`** du dépôt qui porte les issues, écrit par
-`backlog-setup`. Il dit où sont les issues (`ISSUES_REPO`, `PROJECT_NUMBER`) et,
+`tc-setup`. Il dit où sont les issues (`ISSUES_REPO`, `PROJECT_NUMBER`) et,
 dans le cas d'un **méta-dépôt**, décrit chaque sous-dépôt : chemin (`REPO_PATH`),
 branche de base (`REPO_BASE`), amorçage (`REPO_BOOTSTRAP`) et contrôle d'amorçage
 (`REPO_CHECK`), tous indexés par le nom du sous-dépôt. Quand le dépôt des issues
@@ -190,9 +190,9 @@ qui a sa réponse dans les sources (la tour répond et cite), ce qui se tranche 
 
 ## Écrire sur GitHub
 
-Tout ce que la tour écrit sur GitHub suit `~/.claude/skills/backlog-setup/references/conventions.md` :
+Tout ce que la tour écrit sur GitHub suit `~/.claude/skills/tc-commun/conventions.md` :
 
-- **le gabarit d'issue** (`backlog-setup/assets/issue.md`) : Why ?, What ?, Must-Have,
+- **le gabarit d'issue** (`~/.claude/skills/tc-commun/issue.md`) : Why ?, What ?, Must-Have,
   How ? ; la Must-Have ne liste que ce que la PR livre ;
 - **une priorité et des points sur le board à chaque création**, `13` quand on ne sait
   pas chiffrer ; une parente a une priorité, pas de points ;
@@ -202,7 +202,7 @@ Tout ce que la tour écrit sur GitHub suit `~/.claude/skills/backlog-setup/refer
 
 **Une issue créée en chemin va dans la colonne Backlog, explicitement** (`item-add`
 laisse le statut vide) : c'est l'utilisateur qui trie. Elle est créée avec ses champs par
-`assets/appliquer-issues.py` (un fichier par issue, en-tête titre / labels / priorité /
+`~/.claude/skills/tc-commun/appliquer-issues.py` (un fichier par issue, en-tête titre / labels / priorité /
 points / parente / jalon, `--dry-run` d'abord), la priorité et les points proposés avec le texte.
 Les renvois d'un fichier à un autre (nom de fichier, préfixe court) se remplacent par les numéros
 après la création, par expression régulière, puis on vérifie qu'il n'en reste aucun. Pour la

@@ -7,8 +7,8 @@ set -euo pipefail
 
 CMD=${1:?usage: board.sh lire <dépôt> | assigner <dépôt> <N>}
 REPO=${2:?dépôt des issues manquant}
-# shellcheck source=config-lib.sh
-source "$(dirname "$0")/config-lib.sh"
+# shellcheck source=../../tc-commun/config-lib.sh
+source "$(dirname "$0")/../../tc-commun/config-lib.sh"
 : "${ISSUES_REPO:?}" "${PROJECT_OWNER:?}" "${PROJECT_NUMBER:?}"
 
 case "$CMD" in

@@ -5,8 +5,8 @@ set -euo pipefail
 
 REPO="${1:?usage: demarrer-prod.sh <dépôt des issues> <grappe> [--print]}"
 GRAPPE="${2:?usage: demarrer-prod.sh <dépôt des issues> <grappe> [--print]}"
-# shellcheck source=config-lib.sh
-source "$(dirname "$0")/config-lib.sh"
+# shellcheck source=../../tc-commun/config-lib.sh
+source "$(dirname "$0")/../../tc-commun/config-lib.sh"
 
 : "${WORKTREES_DIR:?}"
 WT="$WORKTREES_DIR/$GRAPPE"

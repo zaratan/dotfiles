@@ -57,7 +57,7 @@ Backlog → À faire → En cours → Bloqué → Review → Fait.
 
 ## Forme d'une issue
 
-Voir `assets/issue.md`. Le titre nomme le défaut, pas la solution (« PROTECTION
+Voir `issue.md`, à côté. Le titre nomme le défaut, pas la solution (« PROTECTION
 vide imprime NON », pas « Gérer PROTECTION vide »). Le corps a quatre sections :
 Why ?, What ?, Must-Have, How ?. Le Why dit si le constat est vérifié et comment. Le
 pointeur `fichier:ligne` est cliquable, mais périme vite : le Why doit tenir sans lui.

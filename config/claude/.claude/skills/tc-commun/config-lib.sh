@@ -1,8 +1,8 @@
 # shellcheck shell=bash
 # À sourcer depuis un script bash, après avoir posé REPO (chemin du dépôt qui porte les issues) :
-#   REPO=…; source "$(dirname "$0")/config-lib.sh"
+#   REPO=…; source "$(dirname "$0")/../../tc-commun/config-lib.sh"   # depuis <skill>/assets/
 # Charge .claude/tower-control/config.sh puis lot-<login GitHub>.sh, pose GH_LOGIN, LOT, CONFIG et les
-# tableaux REPO_PATH, REPO_BASE, REPO_BOOTSTRAP, REPO_CHECK, REPO_PROD_START, GRAPPES, ISSUES. Voir config.example.sh.
+# tableaux REPO_PATH, REPO_BASE, REPO_BOOTSTRAP, REPO_CHECK, REPO_PROD_START, GRAPPES, ISSUES. Voir config.example.sh, à côté.
 # Sourcé au niveau du script, pas dans une fonction : un `declare -A` d'un fichier sourcé dans une fonction y resterait local.
 [ "${BASH_VERSINFO[0]:-0}" -ge 4 ] || { echo "bash 4 requis (tableaux associatifs) ; /bin/bash du Mac est en 3.2, utiliser /usr/bin/env bash" >&2; exit 2; }
 : "${REPO:?REPO doit être posé avant de sourcer config-lib.sh}"

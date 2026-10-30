@@ -1,9 +1,9 @@
 ---
-name: backlog-setup
-description: "Auditer un projet (code, docs du dépôt, sources externes, données réelles) et en tirer un backlog GitHub prêt à travailler : issues rédigées et chiffrées en planning poker, labels, GitHub Project avec statuts Backlog → À faire → En cours → Bloqué → Review → Fait, champs Points et Priorité, priorisation avec l'utilisateur, puis la méthode de travail qui passe la main à tower-control et tc-lot. À utiliser dès que l'utilisateur veut « se constituer un backlog », « lister ce qui ne va pas », « ouvrir les issues », « faire un board », « setup le projet sur GitHub », reprendre un projet ou un dépôt client, ou auditer avant de planifier — même s'il ne nomme pas le skill. Requiert gh avec le scope project."
+name: tc-setup
+description: "Auditer un projet (code, docs du dépôt, sources externes, données réelles) et en tirer un backlog GitHub prêt à travailler : issues rédigées et chiffrées en planning poker, labels, GitHub Project avec statuts Backlog → À faire → En cours → Bloqué → Review → Fait, champs Points et Priorité, priorisation avec l'utilisateur, puis la méthode de travail qui passe la main à tower-control et tc-lot, et la mise en place d'un projet pour la tour (.claude/tower-control/config.sh, consigne-projet.md, board aux six colonnes). À utiliser dès que l'utilisateur veut « se constituer un backlog », « lister ce qui ne va pas », « ouvrir les issues », « faire un board », « setup le projet sur GitHub », « préparer le projet pour la tour », reprendre un projet ou un dépôt client, ou auditer avant de planifier — même s'il ne nomme pas le skill. Requiert gh avec le scope project."
 ---
 
-# Backlog setup
+# tc-setup
 
 Partir d'un projet — le sien, ou celui d'un client — et arriver à un backlog qu'on
 peut dispatcher : des issues qui disent ce qui est cassé, pourquoi ça compte et par
@@ -15,7 +15,7 @@ Ce skill dit **comment** faire chaque phase. Le jugement — ce qui est grave, c
 passe en premier — se prend dans la session, avec l'utilisateur. Rien n'est créé sur
 GitHub avant qu'il ait relu la liste.
 
-Lire `references/conventions.md` (forme des issues, labels, priorités, points,
+Lire `~/.claude/skills/tc-commun/conventions.md` (forme des issues, labels, priorités, points,
 statuts) avant de rédiger quoi que ce soit, et `references/github-projects.md` avant
 de toucher à un projet GitHub.
 
@@ -56,7 +56,7 @@ dans son `.gitignore`, et `.claude/tower-control/journal.md merge=union` dans so
 `.gitattributes`, pour que deux lots clos en parallèle ne conflictent pas.
 Le lanceur de `tower-control` lit tout ça ; sans ces
 tableaux il suppose un dépôt unique qui part de `main`. Le modèle complet est en
-commentaire à la fin de `tower-control/assets/lancer.sh`.
+`~/.claude/skills/tc-commun/config.example.sh`.
 
 ## 1. Auditer
 
@@ -87,14 +87,14 @@ ajoute. C'est lui qui connaît le contexte client.
 
 ## 2. Rédiger et créer les issues
 
-Une issue par point retenu, dans la forme de `assets/issue.md` : Why ?, What ?,
+Une issue par point retenu, dans la forme de `~/.claude/skills/tc-commun/issue.md` : Why ?, What ?,
 Must-Have, How ?. Chaque issue a sa priorité proposée et ses points en planning poker
 (`13` quand on ne sait pas chiffrer), dans le JSON et jamais dans le corps. Les
 remarques mineures qui se rattachent à une issue existante deviennent des
 commentaires, pas des issues. Titre = le défaut en une phrase, pas la solution.
 
 Chaque corps passe par `humanize` avant d'être montré, selon « Écrire sur GitHub »
-dans `references/conventions.md`. Écrire les issues dans un JSON (`assets/backlog.json`
+dans `tc-commun/conventions.md`. Écrire les issues dans un JSON (`assets/backlog.json`
 en donne la forme), puis `scripts/board.ts <json> --dry-run > <scratchpad>/backlog.txt` :
 le script valide tout avant d'écrire (priorité, points, quatre sections, une case au
 moins, titres uniques) et imprime chaque titre et corps tels qu'ils partiront.
@@ -117,7 +117,7 @@ par une regex sur le corps.
 
 ## 4. Prioriser, avec l'utilisateur
 
-Proposer une grille P0 → P3 aux sens génériques de `references/conventions.md`, et
+Proposer une grille P0 → P3 aux sens génériques de `tc-commun/conventions.md`, et
 une affectation argumentée en une ligne par issue, groupée par priorité. Puis
 attendre : c'est l'utilisateur qui tranche, et il retouche presque toujours deux ou
 trois lignes. Ne rien appliquer avant. Les P0 du premier lot passent en « À faire ».

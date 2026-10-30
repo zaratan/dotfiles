@@ -79,9 +79,9 @@ check "ranger imprime la ligne de lot" "$(echo "$out" | grep -c 'GRAPPES\[g\]')"
 
 # --- appliquer-issues.py --dry-run (aucun appel à gh)
 : > "$FAKE/journal"
-out=$(python3 -I "$ASSETS/appliquer-issues.py" o 1 o/r "$ASSETS/tests/issues" --dry-run); check "appliquer dry-run" "$?" 0
+out=$(python3 -I "$ASSETS/../../tc-commun/appliquer-issues.py" o 1 o/r "$ASSETS/tests/issues" --dry-run); check "appliquer dry-run" "$?" 0
 check "appliquer dry-run annonce la création préfixée" "$(echo "$out" | grep -c 'créer « \[app\] Le compteur')" 1
 check "appliquer dry-run n'appelle pas gh" "$(wc -l < "$FAKE/journal" | tr -d ' ')" 0
-out=$(python3 -I "$ASSETS/appliquer-issues.py" o 1 o/r "$ASSETS/tests/issues-fausse" --dry-run 2>&1); check "appliquer refuse 4 points" "$?" 1
+out=$(python3 -I "$ASSETS/../../tc-commun/appliquer-issues.py" o 1 o/r "$ASSETS/tests/issues-fausse" --dry-run 2>&1); check "appliquer refuse 4 points" "$?" 1
 
 echo "$ok OK, $ko KO"; [ "$ko" = 0 ]

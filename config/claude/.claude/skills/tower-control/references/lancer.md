@@ -39,8 +39,8 @@ fichier recréé, `mise trust` et `gh auth`, et des worktrees sur les branches e
 (« Pièges » de `references/herdr.md`). Une issue
 traitée hors lot y a sa grappe comme les autres : ajouter `GRAPPES[<nom>]="<branche>"`
 **après** la ligne `declare -A GRAPPES=(…)` si elle existe (placée avant, elle est effacée),
-sans toucher aux grappes d'un lot en vol ; les tableaux sont déclarés par `config-lib.sh`
-avant la lecture du fichier (`config.example.sh` donne les deux formes). Lancer
+sans toucher aux grappes d'un lot en vol ; les tableaux sont déclarés par `tc-commun/config-lib.sh`
+avant la lecture du fichier (`tc-commun/config.example.sh` donne les deux formes). Lancer
 `lancer.sh <chemin du dépôt des issues> <nom>`, qui ne démarre que celle-là.
 
 Le fichier de lot peut aussi corriger un chemin de poste, élément par élément

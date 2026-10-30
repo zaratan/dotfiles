@@ -4,8 +4,8 @@
 set -euo pipefail
 
 REPO=${1:?usage: cas.sh <dépôt des issues>}
-# shellcheck source=config-lib.sh
-source "$(dirname "$0")/config-lib.sh"
+# shellcheck source=../../tc-commun/config-lib.sh
+source "$(dirname "$0")/../../tc-commun/config-lib.sh"
 
 depots=("$REPO"); for p in "${REPO_PATH[@]}"; do depots+=("$p"); done
 [ "$(uname -s)" != Linux ] || echo "- Hôte Linux : references/cas.md « Hôte Linux »"

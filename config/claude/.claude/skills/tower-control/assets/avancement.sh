@@ -7,8 +7,8 @@ set -euo pipefail
 
 REPO=${1:?usage: avancement.sh <dépôt des issues> [--board]}
 BOARD=${2:-}
-# shellcheck source=config-lib.sh
-source "$(dirname "$0")/config-lib.sh"
+# shellcheck source=../../tc-commun/config-lib.sh
+source "$(dirname "$0")/../../tc-commun/config-lib.sh"
 command -v herdr >/dev/null || { echo "herdr absent du PATH" >&2; exit 2; }
 list=$(herdr agent list) || { echo "herdr ne répond pas" >&2; exit 2; }
 

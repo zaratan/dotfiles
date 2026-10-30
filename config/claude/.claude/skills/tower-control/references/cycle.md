@@ -25,7 +25,7 @@ La Must-Have de l'issue est le contrat entre la tour, l'agent et l'utilisateur. 
 consigne la reprend comme Attendu ; le compte rendu de l'agent la reprend case par
 case, avec la preuve. Après sa vérification indépendante, la tour coche sur l'issue ce
 qu'elle a constaté elle-même, selon la recette de « Écrire sur GitHub » dans
-`~/.claude/skills/backlog-setup/references/conventions.md` : un geste mécanique, sans
+`~/.claude/skills/tc-commun/conventions.md` : un geste mécanique, sans
 passe humanize ni accord, qu'elle dit dans son point à l'utilisateur. Ce que l'agent
 affirme et que la tour n'a pas revu reste décoché.
 
