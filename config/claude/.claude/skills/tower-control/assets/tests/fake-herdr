@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Faux herdr : l'état vient de $FAKE/etats (une ligne consommée par appel) ou de $FAKE/etat ; l'écran de $FAKE/ecran ;
+# chaque commande est journalisée dans $FAKE/journal. Un agent nommé « zz » est introuvable.
+echo "$*" >> "$FAKE/journal"
+case "$1 $2" in
+  "agent get")
+    [ "$3" = zz ] && { echo '{"error":"agent_not_found"}'; exit 1; }
+    if [ -s "$FAKE/etats" ]; then st=$(head -1 "$FAKE/etats"); tail -n +2 "$FAKE/etats" > "$FAKE/etats.tmp"; mv "$FAKE/etats.tmp" "$FAKE/etats"; [ -s "$FAKE/etats" ] || echo "$st" > "$FAKE/etat"; else st=$(cat "$FAKE/etat"); fi
+    echo "{\"result\":{\"agent\":{\"agent_status\":\"$st\"}}}" ;;
+  "agent read") cat "$FAKE/ecran" 2>/dev/null ;;
+  "agent prompt") echo "prompt $3 $4" >> "$FAKE/journal"; echo '{"result":"agent_prompted"}' ;;
+  "agent send-keys") echo "send-keys $3 $4" >> "$FAKE/journal"; echo '{}' ;;
+  "worktree list") echo '{"result":{"worktrees":[]}}' ;;
+  *) echo '{}' ;;
+esac

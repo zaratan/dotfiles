@@ -84,9 +84,8 @@ fichiers du disque à l'`--abort`.
 
 ## Le board et l'assignation
 
-Lire le board avec une limite explicite (`gh project item-list … --limit 500
---format json` ; sans elle la lecture s'arrête à 30 items, sans erreur) et avec
-`(.assignees // [])` : la clé est absente quand personne n'est assigné.
+Lire le board par `assets/board.sh lire <dépôt>` : il pose la limite (sans elle `gh` s'arrête à 30
+items, sans erreur) et le repli sur `.assignees` absent quand personne n'est assigné.
 
 - **assignée au login courant** : la tour peut la traiter ;
 - **assignée à quelqu'un d'autre** : ignorée. La tour ne la groupe pas, ne la déplace
@@ -100,11 +99,10 @@ Lire le board avec une limite explicite (`gh project item-list … --limit 500
 - **co-assignée dès la lecture** : la signaler, ne pas la lancer sans réponse.
 
 L'assignation n'est pas un verrou : GitHub accepte plusieurs assignés, et deux tours
-qui lisent le board en même temps s'assignent toutes les deux. Relire aussitôt
-(`gh issue view <N> --repo "$ISSUES_REPO" --json assignees`) et vérifier que le
-login y figure, seul. S'il n'y est pas, l'assignation n'a pas pris : ne pas lancer.
-Si quelqu'un d'autre y figure, se retirer (`--remove-assignee @me`), ne pas lancer,
-et le dire. Si les deux tours se retirent, l'issue redevient libre et sera reproposée.
+qui lisent le board en même temps s'assignent toutes les deux. `assets/board.sh assigner <dépôt> <N>`
+assigne, relit, et se retire si quelqu'un d'autre y figure (code 3 : ne pas lancer, le dire) ou si
+l'assignation n'a pas pris (code 4). Si les deux tours se retirent, l'issue redevient libre et sera
+reproposée.
 
 **Poser un champ** : `gh project item-edit <n> --owner <o> --url <issue> --field
 Status --value "En cours"` (la forme par URL et nom de champ évite les identifiants de

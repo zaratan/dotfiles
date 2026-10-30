@@ -8,6 +8,7 @@
 : "${REPO:?REPO doit être posé avant de sourcer config-lib.sh}"
 CONFIG="$REPO/.claude/tower-control/config.sh"
 test -f "$CONFIG" || { echo "config absente : $CONFIG" >&2; exit 2; }
+# shellcheck disable=SC2034
 declare -A REPO_PATH=() REPO_BASE=() REPO_BOOTSTRAP=() REPO_CHECK=() REPO_PROD_START=() GRAPPES=() ISSUES=()
 # shellcheck source=/dev/null
 source "$CONFIG"

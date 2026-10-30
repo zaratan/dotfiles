@@ -25,10 +25,10 @@ Confirmer en une phrase ce qui est délégué et ce qui ne l'est pas, puis appli
 **Délégué**, seulement pour les branches d'issue créées par la tour dans ses worktrees :
 - `git add` et `git commit` du travail **vérifié par la tour** (compte rendu relu, vérifications relancées,
   décisions de l'agent posées à l'utilisateur et acceptées) ;
-- `git push origin refs/heads/<branche d'issue>:refs/heads/<branche d'issue>` (jamais la branche de base, jamais
-  `--force`), puis `git ls-remote --heads origin <branche>` avant `gh pr create`. Jamais `git push -u origin
-  <branche>` : avec `push.default = upstream`, une branche créée depuis `origin/<base>` suit `origin/<base>`, et
-  le push sans `:destination` est allé sur `main` ;
+- le push par `~/.claude/skills/tower-control/assets/pousser.sh <worktree> origin/<base>` : il refuse une tête
+  égale à la base ou un commit non signé quand le dépôt signe, pousse par refspec explicite (jamais `-u`, jamais la
+  base, jamais `--force` : avec `push.default = upstream`, un `push -u` d'une branche créée depuis `origin/<base>`
+  est allé sur `main`), et relit la branche sur origin avant `gh pr create` ;
 - `gh pr create` vers la branche de base ;
 - `gh pr merge` quand la CI de la PR est verte ;
 - `git merge origin/<base>` dans une branche d'issue pour résoudre un conflit, avec revérification complète

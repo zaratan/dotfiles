@@ -157,8 +157,8 @@ ports d'images.
 pas seulement son corps au groupement : un commentaire de l'utilisateur posté entre-temps a
 changé la règle d'une issue déjà lancée, et l'agent a dû refaire son passage.
 
-Envoyer à chaque agent le fichier assemblé **en un seul `agent prompt "$(command cat
-<envoyee>)"`** : en deux envois, l'agent répond au cadre par « quelle issue ? » et la consigne
-reste derrière sa question ; la substitution de commande protège apostrophes et backticks.
+Envoyer à chaque agent le fichier assemblé **en un seul envoi, par `assets/envoyer.sh <agent>
+<envoyee>`** : en deux envois, l'agent répond au cadre par « quelle issue ? » et la consigne reste
+derrière sa question. Le script vérifie que l'agent a bien pris le texte (« Attendre » de `cycle.md`).
 
 Passer les issues lancées en « En cours » sur le board (« Poser un champ » du skill).

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Faux gh : login « moi » ; assignés depuis $FAKE/assignees ; PR mergée depuis $FAKE/merged ; journal dans $FAKE/journal.
+echo "$*" >> "$FAKE/journal"
+case "$*" in
+  "api user -q .login") echo moi ;;
+  *"issue view"*assignees*) echo "$(cat "$FAKE/assignees")" | tr ' ' '\n' | grep -v '^$' | paste -sd' ' - ;;
+  *"issue edit"*) : ;;
+  *"pr list"*merged*) n=$(cat "$FAKE/merged" 2>/dev/null); [ -z "$n" ] || echo "$n" ;;
+  *) echo '[]' ;;
+esac

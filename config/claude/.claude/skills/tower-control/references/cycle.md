@@ -66,10 +66,11 @@ défaut d'un merge commit GitHub cite le numéro de PR et le propriétaire (« M
 **Un guetteur par consigne envoyée, recadrage compris** : après un `esc` + `prompt` qui change le périmètre d'une
 issue, le guetteur précédent a déjà rendu la main, et un compte rendu a attendu une heure.
 
-**Après chaque `herdr agent prompt`, lire le terminal de l'agent** (`herdr agent read`) et y voir la consigne
-arrivée : un message envoyé pendant que l'agent attendait la fin d'un shell s'est perdu, et l'agent est resté
-trente minutes sur une commande bloquée. **Avant de lancer un guetteur sur une section, la compter dans le
-fichier** (`grep -c '^## <section>'`) : une section déjà présente a fait attendre un guetteur sans fin.
+**Envoyer par `assets/envoyer.sh <agent> <fichier>`**, jamais par un `agent prompt` nu : il refuse un agent
+bloqué, vérifie le passage à `working`, ferme par `esc` la boîte ou le panneau qui avale un texte et renvoie
+une fois. Douze consignes se sont perdues ainsi, herdr répondant `agent_prompted`. **Avant de lancer un
+guetteur sur une section, la compter dans le fichier** (`grep -c '^## <section>'`) : une section déjà
+présente a fait attendre un guetteur sans fin.
 
 **Attendre sans surveiller, un guetteur par agent** : `assets/guetter.sh <agent>
 <compte rendu attendu> [section]`, lancé en arrière-plan (`run_in_background`). Il rend la
@@ -168,35 +169,26 @@ dans le worktree de l'agent, ce sont des écritures d'index et l'arbre obtenu es
 rebase sans conflit a déjà cassé `tsc` deux fois, et un `merge-tree` propre a caché un
 conflit sémantique (un test qui compte des fichiers qu'une autre branche ajoute).
 
-**Une branche par issue, et d'où elle part.** Après le commit de l'utilisateur, la
-tour crée la branche suivante dans le même worktree (`git switch -c <b> --no-track origin/<base>` —
-c'est la tour qui le fait, l'agent en est interdit ; sans `--no-track`, la branche suit la base et un
-push sans refspec explicite y part). Elle part de **`origin/<branche de base>`
-après un `fetch`**, pas du HEAD local : d'autres worktrees ont pu merger entre-temps, et une
-branche partie du HEAD local ne « prend » jamais ces changements toute seule. Faire
-`git branch --unset-upstream` aussitôt, sinon un `push` nu irait sur la branche de
-base. **Avant d'envoyer la consigne, `git rev-parse --abbrev-ref HEAD` du worktree doit
-rendre la branche qu'elle nomme** : une boucle zsh `for s in "wt branche"; do set -- $s` ne
-découpe pas la chaîne, aucune branche n'a été créée, et trois agents sont partis sur des branches
-déjà mergées. Créer les branches en lignes explicites, une par worktree. On n'empile sur le HEAD local que si la PR précédente n'est pas encore mergée.
-Jamais `git pull` sur la branche de base, même en avance rapide : `fetch`, puis
+**Une branche par issue, créée par `assets/branche-suivante.sh <worktree> <branche> <base>`** après
+le commit de la précédente : c'est la tour qui le fait (l'agent en est interdit), sur demande de
+l'utilisateur ou sous délégation. Le script part de `origin/<base>` après un `fetch` (le HEAD local ne
+« prend » jamais les merges des autres worktrees), refuse un arbre sale, crée sans amont (une branche
+qui suit la base a déjà poussé sur `main`) et vérifie que HEAD porte bien le nom demandé (trois agents
+sont partis sur des branches jamais créées). On n'empile sur la branche précédente que si sa PR n'est
+pas encore mergée. Jamais `git pull` sur la branche de base, même en avance rapide : `fetch`, puis
 `origin/<base>` ou `git show`, suffisent à la tour.
 
-**Avant de passer en Review, mesurer le retard.** Jamais `git diff origin/<base>` à deux
-voies pour lire une branche : ce qui a été fusionné entre-temps y apparaît comme un retrait,
-et la tour a annoncé un retrait qui n'existait pas ; lire `git diff $(git merge-base HEAD
-origin/<base>) HEAD`. Puis `git fetch` et
-`git rev-list --left-right --count origin/<base>...HEAD`, et prédire le rebase sans
-toucher aux branches : `tree=$(git write-tree); tmp=$(git commit-tree $tree -p HEAD
--m x); git merge-tree --write-tree origin/<base> $tmp` (un commit sans référence
-n'est pas de l'historique). Le point à l'utilisateur dit « N commits derrière, rebase sans
-conflit » ou nomme les fichiers en conflit. Le rebase lui-même est une écriture git :
-il se fait sur sa demande explicite, ou par lui. Un rebase sans conflit n'est pas un rebase
-vert : `check` complet avant de pousser, et la tour revérifie après. **La prédiction se refait
-juste avant le merge**, sur l'`origin/<base>` du moment : un `merge-tree` propre à l'ouverture
-de la PR a été suivi de trois merges, et la PR était sale sur cinq fichiers à son tour. Dès
-qu'elle est sale, lancer la fusion dans le worktree de l'agent (sous délégation, `git merge
-origin/<base>` ; sinon la demander) et le laisser résoudre.
+**Avant de passer en Review, mesurer le retard : `assets/retard.sh <worktree> origin/<base>`.** Il lit la
+branche depuis la base de fusion (un `git diff origin/<base>` à deux voies montre les merges des autres
+comme des retraits, et la tour en a annoncé un faux), compte le retard, et prédit la fusion sur un index
+temporaire qui inclut le travail non commité (`git write-tree` seul lit l'index et ne verrait jamais le
+diff de l'agent), sans toucher aux branches. Le point à l'utilisateur dit « N derrière, sans conflit » ou
+nomme les fichiers. Le rebase ou la fusion est une écriture git : sur sa demande, ou sous délégation.
+Sans conflit textuel n'est pas vert : `check` complet avant de pousser, et quand des fichiers sont partagés,
+jouer la fusion dans un worktree jetable. **La prédiction se refait juste avant le merge**, sur
+l'`origin/<base>` du moment : un `merge-tree` propre à l'ouverture de la PR a été suivi de trois merges,
+et la PR était sale sur cinq fichiers à son tour. Dès qu'elle est sale, lancer la fusion dans le worktree
+de l'agent (`assets/consigne-fusion.md`) et le laisser résoudre.
 
 ## Les questions des agents
 
@@ -233,14 +225,11 @@ parler à l'utilisateur.
 
 ## Ranger un worktree
 
-Une fois la PR mergée et la grappe sans issue suivante : `herdr workspace close` du
-sous-espace créé par la tour, `git worktree remove` (jamais `--force` ; avant chacun,
-la PR de la branche est mergée et `git status --short` du worktree est vide),
-suppression du lien de mémoire, et retrait de sa grappe du fichier de lot.
-**Avant de retirer un worktree, chercher le travail qui n'existe nulle part ailleurs** : un
-`status` vide ne voit pas les dossiers ignorés (`out/`, `target/`), et un prototype d'exploration
-n'a vécu que là, sans aucun commit. Lister ce qui n'est ni sorties ni build
-(`find <wt>/out -maxdepth 2`), le dire à l'utilisateur, proposer de le mettre sur une branche,
-et garder le worktree tant qu'il n'a pas répondu.
-**Rien d'autre** : pas de `git branch -D` sur les branches mergées, c'est une écriture git
+Une fois la PR mergée et la grappe sans issue suivante : `assets/ranger.sh <dépôt> <grappe> --dry-run`,
+puis sans `--dry-run` quand l'utilisateur est d'accord. Il refuse tant que la PR n'est pas mergée, que
+`git status --short` n'est pas vide, ou qu'un fichier ignoré hors build subsiste (un prototype n'a vécu
+que dans un `out/` sans commit ; une retouche non commitée a été perdue par un `--force`) : le dire à
+l'utilisateur, proposer une branche, garder le worktree tant qu'il n'a pas répondu. Puis il ferme le
+sous-espace herdr, retire le worktree sans `--force`, le lien mémoire, et imprime la ligne du fichier de
+lot à retirer. **Rien d'autre** : pas de `git branch -D` sur les branches mergées, c'est une écriture git
 qui appartient à l'utilisateur.
