@@ -2,7 +2,7 @@
 # retard.sh <worktree> <base> : ce que la branche porte, son retard sur la base, et la prédiction de la fusion, sans
 # toucher aux branches ni à l'index. Le travail non commité compte : l'arbre prédit vient d'un index temporaire
 # (`git write-tree` seul lirait l'index, et la prédiction d'avant Review ne verrait jamais le diff de l'agent).
-# Lecture seule, hors le `git fetch`.
+# Le `commit-tree` sans référence n'est pas de l'historique : rien n'est écrit dans les branches ni l'index de l'agent.
 set -euo pipefail
 
 WT=${1:?usage: retard.sh <worktree> <base, ex. origin/main>}; BASE=${2:?base manquante, ex. origin/main}

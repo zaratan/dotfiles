@@ -2,19 +2,24 @@
 
 Les chemins `assets/…` et `references/…` sont ceux de `~/.claude/skills/tower-control/`.
 
-- Proposer l'ordre de merge qui minimise les conflits (les grappes qui partagent un
-  fichier en dernier, l'une après l'autre). Les migrations des PR ouvertes peuvent imposer
-  cet ordre (« Merger » de tc-delegate) : le dire à l'utilisateur dès que deux PR en portent.
+- Proposer l'ordre de merge qui minimise les conflits : la plus grosse branche d'abord, les grappes
+  qui partagent un fichier en dernier, l'une après l'autre ; quand plusieurs merges arrivent sur la
+  base, une branche ouverte ne la fusionne qu'une fois, après le dernier. Les migrations des PR
+  ouvertes peuvent imposer cet ordre (« Merger » de tc-delegate) : le dire dès que deux PR en portent.
 - **Passe de QA de fin de lot**, une fois tout mergé et avant de dire le lot livrable :
   `tc-lot/references/qa.md` (cahier, agents, suivi, KO, deux temps, commande ou TUI).
 - **Passe SOLID / DRY / KISS, en parallèle de la QA**, dès le dernier merge : `tc-lot/references/audit.md`.
   Lecture seule, aucun changement de code ; des constats mesurés, confrontés au Backlog, puis des issues.
 - **Mesurer le dossier des comptes rendus et les dossiers temporaires des agents** (planches, maquettes des
-  sous-agents de revue) : 9,7 Go et 2 Go s'y étaient accumulés en un lot. Proposer la liste à supprimer.
+  sous-agents de revue) : 9,7 Go et 2 Go s'y étaient accumulés en un lot. Proposer la liste à supprimer. Ce
+  qui doit survivre se copie et se compte d'abord ; la suppression vient dans une commande à part : une copie
+  vide a fait perdre les scripts de mesure de deux agents.
 - **Un run de CI qui finit en quelques secondes sans étape** se lit dans les annotations du job
   (`check-runs/<id>/annotations`) : facturation de l'organisation, quota. La tour le dit, suspend les merges, et ne
   reprend sur preuves locales (tc-delegate) que sur décision de l'utilisateur.
 - Ranger chaque worktree selon « Ranger un worktree » de `references/cycle.md`.
+- **Si le lot se livre sur des instances** (migrations, déploiements) : « Livraison sur des instances » de
+  `references/cas.md` avant d'écrire la livraison.
 - **Libérer ce que l'utilisateur abandonne** : une issue encore assignée au login
   courant qui sort du lot sans suite reste invisible pour l'autre tour. Proposer
   `--remove-assignee @me` ; une issue en Review reste à son auteur jusqu'au merge.

@@ -40,6 +40,6 @@ echo "|---|---|---|---|---|"
 printf '%s' "$rows" | sort | cut -f2-
 
 total_pts=$(echo "$items" | jq -r --argjson ns "$(echo "$issues" | jq -c '[.[].number]')" '[.items[] | select(.content.number as $n | $ns | index($n)) | .points // 0] | add // 0')
-first=$(printf '%s' "$rows" | sort | head -1 | cut -f1); last=$(printf '%s' "$rows" | sort | /usr/bin/grep -v '^9999' | tail -1 | cut -f1)
+first=$(printf '%s' "$rows" | sort | head -1 | cut -f1); last=$(printf '%s' "$rows" | sort | grep -v '^9999' | tail -1 | cut -f1)
 echo
 echo "**Ordres de grandeur.** <forme du projet> · $count issues · $total_pts pts · $pr_total PR · <agents max> agents · merges de ${first:0:16} à ${last:0:16} · <retouches>/<comptes rendus> retouches · <min/issue> · <questions>"

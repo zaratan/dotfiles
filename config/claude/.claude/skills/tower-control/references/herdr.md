@@ -56,7 +56,8 @@ herdr pane wait-output <pane> --match "AMORCE-OK" --timeout 300000
 `pane wait-output` cherche aussi dans ce qui est déjà affiché — **y compris la
 commande tapée**, où le marqueur figure en clair. Utiliser un marqueur calculé qui ne
 s'écrit pas tel quel : `echo AMORCE-$((2*100))-FIN` et attendre `AMORCE-200-FIN`.
-Vérifier ensuite l'effet (`ls node_modules`) plutôt que croire le marqueur.
+Vérifier ensuite l'effet (`ls node_modules`) plutôt que croire le marqueur. Rien d'interactif
+dans la commande d'amorçage : une saisie attendue bloque le lanceur jusqu'au timeout.
 
 Le shell de l'outil Bash de Claude Code est zsh : ses pièges sont dans « Git et fichiers » du skill.
 
@@ -111,8 +112,8 @@ transcriptions de l'agent, seul le lien `memory` se retire.
 `herdr agent wait` bloque le shell, et il rend « done » pendant qu'un agent attend des
 mesures en arrière-plan. Depuis Claude Code, lancer plutôt `assets/guetter.sh <agent>
 <compte rendu>` avec `run_in_background` : il rend la main sur une question, sur un
-compte rendu suivi de trois minutes d'arrêt, ou sur six minutes d'arrêt sans compte
-rendu. Un guetteur par agent, en parallèle.
+compte rendu suivi de trois minutes d'arrêt (dix avec des shells de fond), ou sur dix
+minutes d'arrêt sans compte rendu (trente avec des shells). Un guetteur par agent, en parallèle.
 
 ## Pièges rencontrés
 

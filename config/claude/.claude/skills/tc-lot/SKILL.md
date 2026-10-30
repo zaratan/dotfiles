@@ -16,7 +16,6 @@ Les chemins `assets/…` et `references/…` sans autre précision sont ceux de
 
 Lire `references/retours-entrants.md` et le `tour.md` du projet avant de préparer : les
 leçons qu'aucun skill ne porte encore, et celles propres au projet.
-`references/retours-archive.md` ne se lit pas.
 
 ## Les étapes
 
@@ -44,8 +43,7 @@ tableau des étapes sur « ETA ? ».
 **Une chaîne sérielle sur les mêmes fichiers coûte une fusion par issue** dès qu'une autre branche touche
 ces fichiers en parallèle (sept fusions sur quatre motifs plus une branche voisine, deux heures de chemin
 critique). Soit tout va dans une seule chaîne, soit les fusions se confient à l'agent qui connaît un des
-deux côtés, dans un worktree jetable amorcé (`git worktree add` plus l'amorçage du projet), la tour
-commitant, sur le gabarit `assets/consigne-fusion.md`. Deux agents qui créent une
+deux côtés, dans son worktree, la tour commitant, sur le gabarit `assets/consigne-fusion.md`. Deux agents qui créent une
 migration de semence le même jour copient le même identifiant d'un fichier voisin : la consigne dit « un
 identifiant se tire de la base », et la fusion le vérifie par `up`, `down`, `up` avec le compte des lignes.
 

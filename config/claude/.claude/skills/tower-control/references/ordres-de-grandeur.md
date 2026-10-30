@@ -6,7 +6,7 @@ Une ligne par lot, tirée des journaux. Sert à l'ETA du point d'avancement (`tc
 | Date (2026) | Forme | Issues | Points | PR | Agents max | Durée | Retouches | Repères |
 |---|---|---|---|---|---|---|---|---|
 | 30/09 | méta, web TS | 9 | | | 3 | une soirée | | 6 min d'agent par issue de 2-3 pts, 10 à 14 pour 3-5 |
-| 01-02/10 | monorepo, base par worktree | 12 | 36 | | 4 | 1,5 j | 3/12 | 6 à 16 min par issue ; 2 questions d'agent sur 3 nées d'une prémisse fausse de la tour |
+| 01-02/10 | monorepo, base par worktree | 12 | 36 | | 4 | 1,5 j | 3/12 | 6 à 16 min par issue ; 2 questions d'agent sur 3 nées d'une prémisse fausse de la tour ; QA par un agent dans le navigateur : 24 points en 53 min, 26 frictions → 10 issues |
 | 05-06/10 | méta, forge hors GitHub, deux tours | 16 (+2 jetées) | 48 | | 4 | deux demi-journées | | 7 issues de docs en 5 h sur deux agents ; ~45 questions directes |
 | 04-06/10 | dépôt unique, traitement vidéo, mesures | 7 | 43 | | 3 | 2,5 j | 4 | issue de 8 pts en 5 sous-phases = 5 h de bancs ; 0 CR faux ; ~15 issues créées en chemin |
 | 07/10 | méta, pile par worktree | 24 | 66 | 23 | 5 | une journée | 13/24 | 3 à 15 min par issue de 2-3 pts ; retouches = reliquats listés par l'agent ; 5 prémisses fausses malgré la relecture |

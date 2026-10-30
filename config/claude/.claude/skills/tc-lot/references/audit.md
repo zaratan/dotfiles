@@ -14,8 +14,9 @@ constat imposé, textes rédigés par les mêmes agents, lecteur froid, humanize
   complexité en points, et « avant l'échéance ? ». Un constat sans mesure est une opinion : il ne passe pas.
 - **Avant d'écrire une issue, confronter chaque constat au Backlog** (`board.sh lire`, puis `gh issue list
   --search`) : s'il rejoint une issue existante, c'est un commentaire avec `fichier:ligne`, pas une issue.
-- **Les textes** : rédigés par les agents qui ont fait le constat (`SendMessage`, contexte gardé), au gabarit
-  d'issue, un fichier par issue au format de `assets/appliquer-issues.py`, relus par un lecteur froid, passés
+- **Les textes** : un agent `Explore` ne peut pas écrire de fichier ; les constats passent à un agent
+  `general-purpose` repris par `SendMessage` (contexte gardé), qui rédige au gabarit d'issue, un fichier par
+  issue au format de `assets/appliquer-issues.py`, relus par un lecteur froid, passés
   par humanize ; priorité et points proposés avec le texte. Les constats P3 d'une même zone vont dans une
   issue index unique plutôt que dix issues d'une ligne.
 - **Montrer, puis créer** : l'utilisateur relit les fichiers ; `appliquer-issues.py --dry-run`, puis sans,

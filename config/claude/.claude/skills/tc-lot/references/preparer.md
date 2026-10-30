@@ -15,7 +15,8 @@ pour les regrouper.
 
 **Un lot peut ne pas contenir de code** : un audit du dépôt ou une relecture complète
 du backlog suit « Trier et relire le backlog » de tower-control, avec un agent de
-lecture seule par zone ou par groupe d'issues.
+lecture seule par zone ou par groupe d'issues. Un lot qui planifie une réécriture dans
+un autre langage : « Réécriture » de `references/cas.md`.
 
 **Relire chaque issue contre le code avant de grouper** (« Trier et relire le backlog »
 de tower-control). Le résultat va dans `lot-<n>/decisions.md` du dépôt des issues
@@ -48,7 +49,9 @@ retrouvée en fin de lot par la colonne du board.
 **Relire les commandes de la consigne contre ses propres règles** : un gate `pnpm format` qui réécrit tout le dépôt
 contredisait « le formateur seulement sur les fichiers touchés » (lot du 27/10). Écrire la commande de vérification
 (`format:check`), et vérifier dans le `package.json` ce que fait chaque gate cité. **Jouer chaque commande de
-vérification avant de l'écrire** : un spec d'intégration lancé sans sa config ne jouait aucun test (lot du 28/10).
+vérification avant de l'écrire** : un spec d'intégration lancé sans sa config ne jouait aucun test. **Une preuve
+que la CI rend déjà ne se demande pas à l'agent, et aucune preuve ne touche un chemin hors du worktree** : chaque
+dialogue d'autorisation du mode auto bloque l'agent jusqu'à la tour (trois blocages sur deux issues).
 **Relire chaque texte d'issue créé pour le lot contre la consigne commune** : un corps d'issue demandait des renvois
 au dépôt privé que la consigne interdit, l'agent a suivi l'issue (29 renvois retirés en retouche).
 
@@ -56,8 +59,13 @@ au dépôt privé que la consigne interdit, l'agent a suivi l'issue (29 renvois 
 ce qui finira « Bloqué » sur une décision externe.
 
 **Une issue qui change l'outillage de tous les worktrees** (pile de dev par worktree,
-amorçage, scripts de test) **se lance seule, d'abord** ; les grappes partent du `develop`
-qui la contient.
+amorçage, scripts de test) **se lance seule, d'abord** ; les grappes partent de la base
+qui la contient. De même une issue qui change les chaînes ou les noms partout (langue, noms
+de fichiers produits) : seule, après les petites issues qui réécrivent les mêmes textes, pour
+traduire une fois des textes définitifs. Quand le check local dépasse quelques minutes,
+proposer une issue qui le coupe en rapide (statique et tests nus, en local et dans le pre-push)
+et lourd (couverture, tests lents, en CI), chaque morceau mesuré avant de décider : la
+couverture seule valait 85 % du temps.
 
 Écrire les grappes dans `lot-<login>.sh` (« Le fichier des worktrees » de
 `references/lancer.md`), préparer les consignes et lancer.

@@ -11,9 +11,13 @@ de départ, que la tour vérifiera.
 Issue : `gh issue view <N> --repo <owner/dépôt des issues>`.
 Worktree : `wt/<grappe>` (dépôt `<sous-dépôt>`), branche `<branche>` depuis `<branche de base>`.
 
-<Ce qu'il faut faire, en deux à quatre phrases, avec les fichiers visés.>
+<Ce qu'il faut faire, en deux à quatre phrases, avec les fichiers visés. Chaque phrase nomme ce
+ qu'elle désigne (fichier, ligne de doc, donnée) : « il n'y en a pas » a été lu « aucun cas dans les
+ données » et a coûté une prémisse.>
 
-<Décision prise en amont, si l'issue en laissait une ouverte : « Décision prise : … ».>
+<Décision prise en amont, si l'issue en laissait une ouverte : « Décision prise : … », et « décidé, pas
+ encore dans le code » quand c'est le cas : une phrase de consigne est recopiée telle quelle comme un
+ fait par les agents, jusque dans une issue publiée.>
 
 <Ce qui est hors périmètre alors qu'on pourrait croire le contraire :
  « **Ne touche pas à …** : c'est une décision produit en attente. »>

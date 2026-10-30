@@ -91,7 +91,8 @@ pas mergée : la tour s'arrête et le dit.
 - **Avant d'attendre une CI, lire `gh pr view <N> --json mergeable`** : une PR `CONFLICTING` n'a aucune CI,
   GitHub ne la lance pas et ne le dit pas (rollup vide, close/reopen sans effet) ; une PR poussée pendant que
   sa base était en conflit reste `UNKNOWN` même après le merge de sa base. Dans les deux cas : fusionner la
-  base dans la branche, revérifier, pousser un commit neuf, qui relance la CI.
+  base dans la branche, revérifier, pousser un commit neuf, qui relance la CI. `gh pr update-branch` n'est pas
+  une voie de repli : il échoue dès qu'il y a conflit.
 - **Le hook pre-push joue l'arbre de travail, pas le commit poussé** : quand le worktree est déjà passé à
   l'issue suivante, il rejoue les gates sur le travail en cours de l'agent et rougit. Pousser avec
   `--no-verify` quand le commit a ses gates et ses e2e, et l'écrire dans le journal.

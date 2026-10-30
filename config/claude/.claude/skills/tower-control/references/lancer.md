@@ -33,7 +33,10 @@ Avec un méta-dépôt, deux conséquences de plus de `config.sh` :
 `config.sh` porte les faits du projet et se partage ; le fichier de lot porte
 `GRAPPES` (une grappe : un worktree nommé et sa branche, `"<dépôt> <branche>"` en
 méta-dépôt), c'est la tour qui l'écrit, et git l'ignore (`.claude/tower-control/lot-*.sh`
-dans le `.gitignore` du dépôt des issues ; si la ligne manque, la proposer). Une issue
+dans le `.gitignore` du dépôt des issues ; si la ligne manque, la proposer). Reprendre un lot
+sur une autre machine demande la passation dans le dépôt des issues, les branches poussées, ce
+fichier recréé, `mise trust` et `gh auth`, et des worktrees sur les branches existantes
+(« Pièges » de `references/herdr.md`). Une issue
 traitée hors lot y a sa grappe comme les autres : ajouter `GRAPPES[<nom>]="<branche>"`
 **après** la ligne `declare -A GRAPPES=(…)` si elle existe (placée avant, elle est effacée),
 sans toucher aux grappes d'un lot en vol ; les tableaux sont déclarés par `config-lib.sh`
@@ -76,28 +79,9 @@ s'il vient de la doc du dépôt : une doc de mesures est périmée dès qu'une i
 touche la même chaîne, et une consigne écrite dessus coûte une issue sans objet ou une
 question d'agent.
 
-**Si plusieurs agents mesurent sur la même machine**, poser un verrou commun avant de
-lancer (une commande par verrou, règle écrite dans un `MESURES.md` du dossier
-des worktrees, seuil d'espace disque avant tout balayage).
-Le verrou a deux niveaux : `lourd`, partagé (vidéos entières, construction de zéro, tests
-lents, deux agents peuvent le tenir ensemble), et `chrono`, exclusif (un temps publié attend
-que tout le lourd soit fini) ; un script Python `fcntl.flock` fait les deux et reste compatible
-avec `lockf`. Toute compilation chronométrée ou partie de zéro passe sous le verrou, comme la
-mesure. **Le réseau n'est jamais sous le verrou** : un téléchargement de 11 Go mis sous le
-verrou par une consigne a bloqué les mesures 24 min sur un réseau d'hôtel.
-Le critère de calme d'avant mesure se mesure sur la machine au repos avant d'être écrit :
-la charge moyenne d'un Mac vaut 5 à 6 à vide, et un agent qui l'attendait plus basse a
-attendu sans fin ; la somme des `%CPU` des autres processus et un `pgrep` des outils
-lourds conviennent.
-Une série de mesures lancée par la tour elle-même se dimensionne au besoin (à quoi sert
-chaque ligne, qui attend le verrou pendant ce temps) et se dit à l'utilisateur avec son
-coût : un balayage exhaustif a bloqué trois agents une matinée pour un tableau que sept
-lignes déjà mesurées suffisaient à remplir.
-
-**Si une issue redistribue du code tiers** (binaire, paquet, image), la consigne demande
-de vérifier d'abord les licences réellement embarquées (chaînes des bibliothèques, pas le
-fichier de licences du paquet, qui peut mentir) et de s'arrêter si elles changent celle du
-livrable : c'est une décision de l'utilisateur, et la tour revérifie elle-même.
+**Si plusieurs agents mesurent sur la même machine**, ou **si une issue redistribue du code
+tiers** : `references/cas.md` (verrou de mesure et critère de calme ; licences embarquées), avant
+d'écrire la consigne.
 
 **Trancher avant de lancer** ce que les issues laissent ouvert (« à trancher »). Un
 agent bloqué sur une décision produit est un agent qui attend ; la tour prend la
@@ -121,7 +105,12 @@ avant tout lancement.
 par exemple) : les branches partent de la branche de base commitée, pas de l'arbre
 de travail. Avec un méta-dépôt, les règles du projet ne sont pas dans le worktree
 (son `CLAUDE.md` est celui du client) : elles voyagent par la section « Projet » de
-la consigne commune, `.claude/tower-control/consigne-projet.md` du méta-dépôt.
+la consigne commune, `.claude/tower-control/consigne-projet.md` du méta-dépôt : dossiers
+en lecture seule, commandes coûteuses, références à ne pas refiger, vérifications du projet,
+et **les règles opératoires du sous-dépôt qui restent obligatoires** (outillage de migration,
+génération de types, wrappers, contrat d'erreur), recopiées explicitement : ce que « le méta
+prime » démote, c'est la description du produit, pas l'outillage ; un agent a ignoré une règle
+qu'il avait lue parce que le méta primait.
 
 ## Lancer
 
@@ -143,9 +132,8 @@ L'amorçage d'un worktree qui dérive ses ports d'une table de noms de grappes m
 nouveau sur le même port : deux worktrees ont voulu le même PostgreSQL. Dériver l'offset du
 nom (checksum modulo) pour les noms hors table, et lire la sortie du pane quand l'amorçage
 échoue avant de chercher ailleurs. **Sonder l'amorçage sur la machine qui lance**, pas sur
-celle qui l'a écrit : un script écrit sur Mac a cassé trois fois sur un serveur EL (`sed -i ''`
-que GNU sed lit comme un fichier, `lsof` absent, SELinux `Enforcing` qui refuse au conteneur
-un bind-mount du worktree tant que le dossier n'a pas le label `container_file_t`). Le nom
+celle qui l'a écrit : un script écrit sur Mac a cassé trois fois sur un serveur EL
+(« Hôte Linux » de `references/cas.md`). Le nom
 d'agent herdr est global à la machine : le lanceur le préfixe par le dépôt des issues
 (`<méta>-<grappe>`), et c'est ce nom que la tour emploie dans `agent prompt`, `agent get` et
 le guetteur.

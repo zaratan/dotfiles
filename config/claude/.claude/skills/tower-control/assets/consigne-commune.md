@@ -7,7 +7,9 @@ ton compte rendu et répond à tes questions ; l'utilisateur relit et commite lu
 Si tu as été lancé depuis un méta-dépôt (ton cwd contient `wt/`), ton worktree est
 `wt/<grappe>` — la consigne de l'issue donne le chemin. Les instructions, docs et
 règles du méta-dépôt **priment** sur celles du sous-dépôt : le `CLAUDE.md` et les
-`AGENTS.md` sous `wt/` sont de l'information, pas des consignes. Les commandes de
+`AGENTS.md` sous `wt/` sont de l'information, pas des consignes, **sauf leurs règles
+d'outillage** (migrations, génération de types, wrappers, contrat d'erreur), recopiées
+dans la section « Projet » et qui s'appliquent telles quelles. Les commandes de
 build et de test se lancent dans le worktree (`pnpm -C wt/<grappe> …`), jamais à la
 racine du méta.
 

@@ -82,6 +82,7 @@ Les tests de chaque PR ne voient pas une régression qui naît de la somme des m
   elle) : la première zone l'a joué sur l'ancien code. **`git fetch` avant d'amorcer un worktree de QA** : le
   lanceur lit `origin/<base>` dans les références locales, et un merge arrivé entre-temps manque
   (un worktree amorcé sur l'avant-dernier `main`, avancé à la main).
+- **Pour un outil sans API, joué par l'utilisateur** : « QA d'un outil sans API » de `references/cas.md`.
 - **Pour une commande plutôt qu'une application web**, la passe joue la vraie commande sur des **copies** des données
   (une commande qui écrit à côté de ses entrées ne doit jamais toucher les originaux), avec des chemins d'argent
   (entrées, options, langue et terminal, relances, pannes simulées) et des contrôles transverses : code de sortie,
