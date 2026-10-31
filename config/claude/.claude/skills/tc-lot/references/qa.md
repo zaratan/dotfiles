@@ -75,7 +75,9 @@ Les tests de chaque PR ne voient pas une régression qui naît de la somme des m
   un chemin d'or pour chaque fonction livrée par le lot qui en mérite un, après accord de
   l'utilisateur. Puis ranger les worktrees `qa-<k>` comme les autres. Comme ils n'ont pas de
   PR, la condition se réduit à un `git status --short` vide.
-- **En deux temps quand une chaîne finit tard** : la zone du cahier que la dernière chaîne ne touche
+- **En deux temps quand une chaîne finit tard**, sauf si elle touche un moteur partagé par toutes les zones
+  (un paquet de questionnaires, un formulaire commun) : la première zone serait presque entièrement à rejouer, une
+  seule passe après le dernier merge avec deux agents qui se partagent le cahier. Sinon, la zone que la dernière chaîne ne touche
   pas se joue avant son dernier merge, sur la base du moment, et la zone qu'elle touche après. Une
   heure gagnée sur un lot, aucun KO manqué. La seconde zone reprend aussi les parcours de référence
   qui passent par du code partagé que la dernière chaîne a changé (un moteur de formulaires réparé par

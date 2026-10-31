@@ -134,6 +134,9 @@ for f, tete, corps in plans:
             print(f"{f.name}: #{n} SAUTÉE, le corps a changé sur GitHub depuis l'export")
             continue
         if sha(actuel) != sha(texte):
+            if len(texte.strip()) < len(actuel.strip()) // 2:
+                print(f"{f.name}: #{n} REFUSÉE, le nouveau corps fait moins de la moitié de l'actuel ({len(texte)} contre {len(actuel)} caractères)")
+                continue
             run("gh", "issue", "edit", n, "--repo", REPO, "--title", titre, "--body", texte)
             print(f"{f.name}: #{n} mise à jour")
         else:

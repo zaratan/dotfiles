@@ -205,7 +205,11 @@ laisse le statut vide) : c'est l'utilisateur qui trie. Elle est créée avec ses
 `~/.claude/skills/tc-commun/appliquer-issues.py` (un fichier par issue, en-tête titre / labels / priorité /
 points / parente / jalon, `--dry-run` d'abord), la priorité et les points proposés avec le texte.
 Les renvois d'un fichier à un autre (nom de fichier, préfixe court) se remplacent par les numéros
-après la création, par expression régulière, puis on vérifie qu'il n'en reste aucun. Pour la
+après la création, par expression régulière, puis on vérifie qu'il n'en reste aucun. Un corps réécrit
+par script passe par un fichier vérifié (refusé s'il est vide ou plus court que l'original) puis
+`gh issue edit --body-file` : un `python3 -c` cassé par des guillemets a posé un corps vide. Chaque
+version reste lisible par GraphQL (`issue { userContentEdits { nodes { editedAt diff } } }`), qui sert à
+restaurer. Pour la
 forme, le gabarit fait foi ; une issue existante du dépôt ne sert qu'à relever les
 labels propres au projet et le jalon. En méta-dépôt, écrire soi-même ce que `board.ts`
 ajoute : `**Dépôt.** <nom>` en tête du corps, le préfixe `[<nom>]` du titre et le label

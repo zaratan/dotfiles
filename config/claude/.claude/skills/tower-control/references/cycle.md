@@ -144,7 +144,11 @@ décisions se relisent aussi contre les issues ouvertes qui touchent les mêmes 
 branche réalise parfois une issue voisine sans le savoir, et c'est un `Closes` de plus sur la PR.
 
 **Une retouche que la tour tire d'un compte rendu ou d'une revue se vérifie dans le code avant l'envoi** : lire le
-passage cité, puis l'écrire sur `assets/consigne-retouche.md` et l'assembler par `consigne.sh … --retouche`. Trois retouches fausses sont parties ainsi en un lot (des valeurs « déjà rendues » qui ne l'étaient pas,
+passage cité, puis l'écrire sur `assets/consigne-retouche.md` et l'assembler par `consigne.sh … --retouche`. Même
+chose pour une affirmation d'agent avant qu'elle devienne une question à l'utilisateur : « le simulateur borne à
+12 h par jour » est passé d'un compte rendu à une décision alors qu'aucune borne n'existait. Sur une grosse issue
+(plusieurs dizaines de fichiers), un relecteur neuf lit le diff, pas la conclusion de l'auteur : sur 70 fichiers il
+a trouvé un bloquant contraire au besoin, une donnée sensible en clair et un GET qui écrivait. Trois retouches fausses sont parties ainsi en un lot (des valeurs « déjà rendues » qui ne l'étaient pas,
 un attribut dit inutile qui servait à un lint, un chemin de cache dont la forme changeait la version de l'entrée) ;
 les agents les ont arrêtées. Au merge d'une issue, proposer de retirer sa planche lourde (vidéos, images).
 
@@ -159,13 +163,14 @@ d'une issue qui ne sort que des tableaux.
 
 ## Enchaîner une tâche
 
-Avant d'envoyer une nouvelle tâche à un agent qui en a déjà fait une (issue suivante de la grappe,
-retouche longue, fusion), relever son contexte sur sa ligne d'état. **Au-delà de 50 %, compacter
-d'abord** : `herdr agent prompt <agent> "/compact"`, attendre `done`, relire le remplissage. Un agent
-à 79 % sur sa seconde issue a vu le résumé automatique tomber au milieu du travail ; un agent compacté
-entre deux issues (79 % → 0 %) n'a rien perdu, la consigne suivante se suffit. Après le `/compact`,
-lire l'écran avant d'envoyer : la boîte « Teach auto mode about your environment? » y apparaît et
-avale le prompt suivant (deux consignes perdues ainsi) ; la fermer par `esc`, sans rien accepter.
+À chaque pause naturelle d'un agent (compte rendu, retouche, fusion, issue suivante de la grappe),
+relever son contexte sur sa ligne d'état. **Au-delà de 40 %, compacter avant la tâche suivante** :
+`herdr agent prompt <agent> "/compact"`, attendre `done`, relire le remplissage. Un agent à 79 % sur
+sa seconde issue a vu le résumé automatique tomber au milieu du travail ; un agent compacté entre deux
+issues (79 % → 0 %) n'a rien perdu, la consigne suivante se suffit. Après le `/compact`, lire l'écran
+avant d'envoyer : la commande reste parfois dans la zone de saisie et partirait avec le message suivant,
+et la boîte « Teach auto mode about your environment? » y apparaît et avale le prompt (deux consignes
+perdues ainsi) ; la fermer par `esc`, sans rien accepter.
 
 ## Branches et retard
 
@@ -198,7 +203,9 @@ diff de l'agent), sans toucher aux branches. Le point à l'utilisateur dit « N 
 nomme les fichiers. Le rebase ou la fusion est une écriture git : sur sa demande, ou sous délégation ;
 quand l'utilisateur rebase lui-même, « Rebase en cours » de `references/cas.md`.
 Sans conflit textuel n'est pas vert : `check` complet avant de pousser, et quand des fichiers sont partagés,
-jouer la fusion dans un worktree jetable. **La prédiction se refait juste avant le merge**, sur
+jouer la fusion dans un worktree jetable. Après qu'une branche a déplacé ou renommé un fichier, chercher ses
+importeurs dans les autres branches ouvertes (`git grep` sur chacune) avant de prédire leur fusion : une
+fusion sans conflit de texte a cassé le typecheck sur un import de l'ancien chemin. **La prédiction se refait juste avant le merge**, sur
 l'`origin/<base>` du moment, et dès qu'un merge est constaté, pour chaque autre branche en vol sans
 attendre sa Review : un `merge-tree` propre à l'ouverture de la PR a été suivi de trois merges, et la PR
 était sale sur cinq fichiers à son tour. Dès qu'elle est sale, lancer la fusion dans le worktree de l'agent

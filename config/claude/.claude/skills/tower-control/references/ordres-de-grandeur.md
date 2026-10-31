@@ -31,3 +31,4 @@ Une ligne par lot, tirée des journaux. Sert à l'ETA du point d'avancement (`tc
 | 27/10 | méta, réponses d'un tiers | 8 | 32 | 7 | 3 → 1 | une journée | | QA 149 lignes 30 min, deux agents, 0 régression ; issue de 8 pts en 1 h 30 |
 | 28/10 | méta, trois fusions par branche | 14 (+2 correctifs) | | | | une nuit | | merges sur preuves locales ; e2e 3-4 min ; QA 24 + 40 + 117 lignes, 50 min à 2 h 40 par agent |
 | 28/10 | méta, trois branches sur le même moteur | 13 | 47 | 10 | 4 | une journée | | 11 fusions ; QA 178 lignes en deux temps, 0 KO ; branche de 13 pts en 1 h 05 |
+| 29/10 | méta, tranche verticale neuve, audit de fin de lot | 12 | | 13 | 3 | une journée | | issue de 8 pts en 1 h 10 d'agent + 2 h de retouches (revue neuve, 27 décisions) ; e2e 6-8 min ; CI 12-15 min ; audit 72 constats → 27 issues en 2 h ; QA 174 lignes, 3 KO dont 2 du lot |

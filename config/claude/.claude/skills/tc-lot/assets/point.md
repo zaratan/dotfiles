@@ -26,7 +26,7 @@ Il est <heure locale de l'utilisateur, fuseau connu ou demandé>.
 - **Fait** : ce qui est prouvé, pas un pourcentage de Must-Have (la tour ne coche qu'après vérification) :
   sous-phases du plan faites, « code fait », « vérifié par la tour ».
 - **Contexte** : le pourcentage de la ligne d'état de l'agent (`~/.claude/tower-control/ctx/<session>`). Au-delà
-  de 50 % avant une nouvelle tâche, compacter (« Enchaîner une tâche » de `cycle.md`).
+  de 40 % à une pause naturelle, compacter (« Enchaîner une tâche » de `cycle.md`).
 - **ETA** : une heure absolue dans le fuseau de l'utilisateur, jamais une durée. Nourrie par
   `references/ordres-de-grandeur.md` (même forme de projet) et par ce que l'agent a déjà pris. Quand une ETA glisse,
   le dire avec l'écart (« 16 h 45, était 16 h 20 »).

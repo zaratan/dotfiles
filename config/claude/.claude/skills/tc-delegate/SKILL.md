@@ -51,8 +51,13 @@ pas mergée : la tour s'arrête et le dit.
   dit sans bloquer s'il est encore déverrouillé ; le lancer avant chaque série de commits.
 - **Ne jamais masquer la sortie d'un `git commit`**, ni rien enchaîner derrière sans vérifier : un commit
   échoué (gpg expiré, titre refusé par commitlint, souvent au-delà de 100 caractères : mesurer `${#M}` avant)
-  caché dans `>/dev/null 2>&1 || echo` a laissé partir le push d'une branche égale à la base, deux fois. Avant
-  chaque push : `git log -1` montre le nouveau commit, le SHA de la branche a changé, le commit est signé.
+  caché dans `>/dev/null 2>&1 || echo` a laissé partir le push d'une branche égale à la base, deux fois. La mesure
+  du titre **bloque** la suite (`[ ${#M} -le 100 ] && git commit …`) : un titre de 103 caractères mesuré puis commité
+  quand même a fait pousser la base une troisième fois. Avant chaque push : `git log -1` montre le nouveau commit, le
+  SHA de la branche a changé, le commit est signé.
+- **Un push qui suit des vérifications en dépend** : chaîner par `&&`, jamais `;` (une fusion poussée derrière un `;`
+  est partie avec un typecheck rouge), et lire un résultat de tests par `[0-9]+ failed` et la présence de
+  `[0-9]+ passed`, pas par `failed` seul : un serveur imprime « failed to get redirect response » sur une suite verte.
 - **Un commit construit à la main se signe aussi** : `git commit-tree` ignore `commit.gpgsign`, il faut `-S`.
   Avant chaque push, `git cat-file commit <sha> | grep -c '^gpgsig'` sur chaque commit nouveau ; deux commits
   sans signature ont bloqué une PR verte sur un ruleset `required_signatures`. Recette pour séparer une fusion
