@@ -2,12 +2,23 @@
 
 Les chemins `assets/…` et `references/…` sont ceux de `~/.claude/skills/tower-control/`.
 
+Chaque étape de cette liste se fait. Aucune ne se pose en question à l'utilisateur, seule sa portée se
+valide (les zones de l'audit, la liste à supprimer) : une tour a mis l'audit en question dans une question
+groupée, avec une recommandation contre, et l'utilisateur ne s'est pas reconnu dans la réponse.
+
 - Proposer l'ordre de merge qui minimise les conflits : la plus grosse branche d'abord, les grappes
   qui partagent un fichier en dernier, l'une après l'autre ; quand plusieurs merges arrivent sur la
   base, une branche ouverte ne la fusionne qu'une fois, après le dernier. Les migrations des PR
   ouvertes peuvent imposer cet ordre (« Merger » de tc-delegate) : le dire dès que deux PR en portent.
 - **Passe de QA de fin de lot**, une fois tout mergé et avant de dire le lot livrable :
   `tc-lot/references/qa.md` (cahier, agents, suivi, KO, deux temps, commande ou TUI).
+- **Faire évoluer les cahiers de QA**, le jour même de la passe, avant de ranger les worktrees `qa-<k>` :
+  les cahiers ne sont pas figés, ils suivent l'outil. Réécrire `chemins-d-or.md` avec les apprentissages des
+  agents (libellés réels, `h2` contre `h3`, montants à figer, codes HTTP) et les attendus que le lot a
+  changés ; y ajouter un chemin d'or par fonction livrée qui en mérite un, après accord de l'utilisateur ;
+  fondre les lignes du lot dans les chemins d'or ou d'argent plutôt que de les laisser s'accumuler dans le
+  cahier commun ; créer `chemins-d-argent.md` s'il manque. Laissée en note de fin de `qa.md`, cette étape
+  a été sautée, et les apprentissages d'une passe se perdent avec les worktrees.
 - **Passe SOLID / DRY / KISS, en parallèle de la QA**, dès le dernier merge : `tc-lot/references/audit.md`.
   Lecture seule, aucun changement de code ; des constats mesurés, confrontés au Backlog, puis des issues.
 - **Mesurer le dossier des comptes rendus et les dossiers temporaires des agents** (planches, maquettes des

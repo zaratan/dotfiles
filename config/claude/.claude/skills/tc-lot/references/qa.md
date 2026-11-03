@@ -20,7 +20,11 @@ Les tests de chaque PR ne voient pas une régression qui naît de la somme des m
     régressions de variantes. Les attendus que le lot a pu changer se corrigent dans le cahier du lot ;
   - **une ligne par issue du label `lot: <n>`**, tirée de la section « Vérifier sur une
     instance » de son runbook, ou de la vérification d'après merge écrite dans le How de
-    l'issue, à défaut de l'Attendu de sa consigne.
+    l'issue, à défaut de l'Attendu de sa consigne ;
+  - **les lignes des lots précédents** encore dans le cahier commun : elles se rejouent à chaque passe,
+    attribuées aux agents comme les autres, jusqu'à ce que la clôture les fonde dans les chemins d'or ou
+    d'argent. Un brief de rédacteur qui ne citait que les chemins d'or en a laissé la moitié de côté,
+    et l'utilisateur a dû les réclamer.
 - **Avant d'écrire les lignes du lot, relire ses décisions et les comptes rendus des agents** : les deux KO d'une
   passe venaient de lignes de la tour qui décrivaient le contraire d'une décision prise le jour même.
 - **Un attendu que le rédacteur a calculé sans le mesurer est marqué « calculé »** : deux KO d'une passe
@@ -67,14 +71,10 @@ Les tests de chaque PR ne voient pas une régression qui naît de la somme des m
   (corriger tout de suite ou trier). Dans les deux cas, une issue va au Backlog, et
   l'utilisateur trie ; un correctif décidé passe par le cycle normal dans un worktree
   libéré, avec un agent qui a déjà le cadre.
-- **Après la passe**, le jour même : réécrire `chemins-d-or.md` avec les apprentissages des
-  agents (libellés réels, `h2` contre `h3`, montants à figer, codes HTTP), qui se perdent
-  sinon. Réunir
-  leurs « seeds à ajouter » en une issue au Backlog, pour qu'une passe parte un jour d'une
-  base remise à zéro sans préparation à la main. Y ajouter
-  un chemin d'or pour chaque fonction livrée par le lot qui en mérite un, après accord de
-  l'utilisateur. Puis ranger les worktrees `qa-<k>` comme les autres. Comme ils n'ont pas de
-  PR, la condition se réduit à un `git status --short` vide.
+- **Après la passe**, le jour même : faire évoluer les cahiers (étape de `clore.md`, avec les
+  apprentissages des agents). Réunir leurs « seeds à ajouter » en une issue au Backlog, pour qu'une passe
+  parte un jour d'une base remise à zéro sans préparation à la main. Puis ranger les worktrees `qa-<k>`
+  comme les autres. Comme ils n'ont pas de PR, la condition se réduit à un `git status --short` vide.
 - **En deux temps quand une chaîne finit tard**, sauf si elle touche un moteur partagé par toutes les zones
   (un paquet de questionnaires, un formulaire commun) : la première zone serait presque entièrement à rejouer, une
   seule passe après le dernier merge avec deux agents qui se partagent le cahier. Sinon, la zone que la dernière chaîne ne touche
