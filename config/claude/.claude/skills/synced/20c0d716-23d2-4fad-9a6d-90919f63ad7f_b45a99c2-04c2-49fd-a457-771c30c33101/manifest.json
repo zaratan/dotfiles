@@ -1,5 +1,5 @@
 {
-  "lastUpdated": 1793238387122,
+  "lastUpdated": 1793580034186,
   "skills": [
     {
       "skillId": "computer-use",
@@ -101,12 +101,12 @@
       "backingPluginId": "plugin_01BV8GC9fyUiZtw8AHyAY1AB"
     },
     {
-      "skillId": "skill_01KbM9SNxYfqDTYPWitQuT3q",
+      "skillId": "skill_01W6YG9LGeLQmTDcL9G1JA9z",
       "name": "dirfyn",
       "description": "Dans Cowork, sur un dossier avec « 0 - Dirfyn/ » : question, contrat, échéance, document à ranger, pièces manquantes, contrôle, retour, poste ; ou pour créer ou reprendre un client qui ne l'a pas.",
       "source": "plugin",
-      "updatedAt": "2026-10-29T01:39:13.554066Z",
-      "backingPluginId": "plugin_01YA3W7iUCzq3Z4y3SQmpGMn"
+      "updatedAt": "2026-11-02T00:39:35.095471Z",
+      "backingPluginId": "plugin_01DmNFXbfZyEePjiGKrM6SWr"
     }
   ]
 }
