@@ -49,7 +49,8 @@ Pour chaque ligne :
 ## Suivi au fil de l'eau
 
 Écris tes constats au fur et à mesure dans `<chemin absolu de travail/>qa-<n>-<k>-suivi.md`, en ajoutant
-(jamais en réécrivant) :
+(jamais en réécrivant). `HH:MM` est la sortie de `date -u +%H:%M` lancée au moment d'écrire la ligne, jamais
+une heure estimée ; une ligne s'écrit dès qu'elle est jouée, jamais par paquet de lignes :
 - `HH:MM | en cours | <ligne du cahier>` quand tu commences une ligne ;
 - `HH:MM | <identifiant> | OK/KO/bloquée | constaté | capture` dès qu'elle est jouée ;
 - sous un KO, un bloc `KO <identifiant>` : étapes, attendu, constaté, console, journal serveur, cause si isolée.

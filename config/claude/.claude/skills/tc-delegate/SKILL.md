@@ -106,9 +106,12 @@ pas mergée : la tour s'arrête et le dit.
   vertes avant la PR suivante. Cette attente ne vaut qu'entre deux merges : lancer un agent sur une branche
   partie de la base n'attend pas, le contenu est celui que la CI de la PR a déjà validé.
 - PR empilée : viser la branche de la PR du dessous tant qu'elle n'est pas mergée ; après son merge, GitHub
-  recible sur la base sans relancer la CI : close/reopen (`cycle.md`).
+  recible sur la base sans relancer la CI : close/reopen (`cycle.md`), **avant chaque série de merges**, pas
+  plus tard : une PR empilée dont la base est mergée n'est plus reciblable si on attend. Une PR sans CI propre
+  (« no checks reported ») n'entre pas dans une série : ses rouges n'apparaissent qu'au merge.
 - Après chaque merge : fermer l'issue privée avec la PR et le commit, en lot, lui poser le label
-  `lot: <n>` (voir tc-lot), passer à l'issue suivante.
+  `lot: <n>` (voir tc-lot), fermer les PR restantes dont la tête est déjà dans la base avec un commentaire
+  qui le dit (c'est le geste de merge, pas une décision à rendre à l'utilisateur), passer à l'issue suivante.
 
 ### Rendre compte
 

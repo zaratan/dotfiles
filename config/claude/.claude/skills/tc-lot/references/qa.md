@@ -44,7 +44,9 @@ Les tests de chaque PR ne voient pas une régression qui naît de la somme des m
   `assets/consigne-qa.md` rempli par agent, assemblé par `consigne.sh … --qa`, sans la consigne commune.
   Ils ne corrigent rien.
 - **Suivi en direct** : chaque agent ajoute une ligne à `travail/qa-<n>-<k>-suivi.md` par ligne
-  jouée, avec le détail de chaque KO. La tour lit ces fichiers pendant la passe (un point toutes
+  jouée, dès qu'elle l'est, datée par `date -u` (un agent a daté son suivi de tête, de 00:18 à 02:50 pour une
+  passe finie à 00:50, et l'a rempli par paquets : la tour n'a rien pu faire au fil de l'eau), avec le détail
+  de chaque KO. La tour lit ces fichiers pendant la passe (un point toutes
   les 15 minutes si l'utilisateur le demande). Elle n'attend pas le rapport final pour agir sur un
   KO : rejouer, ouvrir l'issue, et lancer le correctif dans une grappe neuve partie de
   `origin/<base>`, en suivant le cycle normal (consigne, vérification, décisions posées,
@@ -58,7 +60,8 @@ Les tests de chaque PR ne voient pas une régression qui naît de la somme des m
   `chemins-d-or.md` (section 0) ou dans les seeds.
 - **États hors écran** : une ligne qui exige un état que l'app refuse de fabriquer (transition
   interdite, doublon, dates passées) se signale « attente tour » dans le suivi. La tour prépare
-  cet état elle-même sur la pile locale de l'agent, au besoin en contournant les protections de
+  cet état elle-même sur la pile locale de l'agent (cinq minutes pour une session modifiée en SQL), au
+  besoin en contournant les protections de
   l'app (jamais ailleurs que sur une pile locale), puis dit à l'agent ce qu'elle a fait et
   l'ajoute aux seeds à prévoir. Le garde-fou d'un agent a déjà refusé cette préparation, et la
   ligne est restée bloquée toute une passe. Un état fabriqué ainsi n'est pas une donnée normale :
@@ -66,11 +69,14 @@ Les tests de chaque PR ne voient pas une régression qui naît de la somme des m
 - **Chaque KO**, la tour le rejoue elle-même avant d'en parler. Puis elle le classe :
   régression du lot (à dire tout de suite, avec la recommandation de ne pas livrer avant
   le correctif) ou défaut préexistant. Le classement se **date par `git log -- <fichiers de
-  la cause>` entre la base du lot et la tête**, pas par la seule lecture de la cause : sur
+  la cause>` entre la base du lot et la tête**, ou par le même fichier dans les deux versions d'une
+  dépendance montée (un worktree resté sur l'ancien lockfile : deux commandes), pas par la seule lecture de
+  la cause : sur
   une passe, les quatre KO étaient antérieurs au lot, et le dire a changé la décision
   (corriger tout de suite ou trier). Dans les deux cas, une issue va au Backlog, et
-  l'utilisateur trie ; un correctif décidé passe par le cycle normal dans un worktree
-  libéré, avec un agent qui a déjà le cadre.
+  l'utilisateur trie ; un correctif décidé passe par le cycle normal, confié à l'agent qui a écrit le code
+  touché, dans son worktree libéré, `install` et `build` en tête de consigne : correctif, revue et retouche
+  en 40 minutes.
 - **Après la passe**, le jour même : faire évoluer les cahiers (étape de `clore.md`, avec les
   apprentissages des agents). Réunir leurs « seeds à ajouter » en une issue au Backlog, pour qu'une passe
   parte un jour d'une base remise à zéro sans préparation à la main. Puis ranger les worktrees `qa-<k>`

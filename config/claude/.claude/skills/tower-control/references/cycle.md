@@ -59,9 +59,11 @@ jamais la main ; guetter la dernière exécution de la base, pas un SHA : un mer
 le commit introuvable et la boucle tourne sans fin. Une PR empilée que GitHub recible sur la base après le merge de celle du dessous ne
 relance pas sa CI : la fermer puis la rouvrir la déclenche, **à condition de laisser une pause
 entre les deux** (un close/reopen à trois secondes d'écart n'a déclenché aucun run sur deux PR ;
-45 s ont suffi). Quand la base n'a pas de déclencheur `push` (décision de coût de l'utilisateur),
-le run d'après merge n'existe pas : **recibler chaque PR en attente sur la base courante** par
-ce même close/reopen avant de la merger, pour que sa CI rejoue sur le merge réel. Le titre par
+45 s ont suffi). **Avant d'attendre la CI d'un commit de la base, lister les workflows déclenchés sur
+`push`** (`gh workflow list`, puis le `on:` de chaque fichier) : s'il n'y en a pas (décision de coût de
+l'utilisateur), le run d'après merge n'existe pas ; le dire et ne rien guetter (un guet a attendu des jobs
+Dependabot en échec pour une raison sans rapport), et **recibler chaque PR en attente sur la base courante**
+par ce même close/reopen avant de la merger, pour que sa CI rejoue sur le merge réel. Le titre par
 défaut d'un merge commit GitHub cite le numéro de PR et le propriétaire (« Merge pull request
 #10 from owner/branche ») : si le dépôt du code interdit ces références, merger avec
 `gh pr merge --merge --subject "Merge branch '<branche>'"`. Quand un ruleset, un hook ou un
@@ -253,10 +255,12 @@ parler à l'utilisateur.
 ## Ranger un worktree
 
 Une fois la PR mergée et la grappe sans issue suivante : `assets/ranger.sh <dépôt> <grappe> --dry-run`,
-puis sans `--dry-run` quand l'utilisateur est d'accord. Il refuse tant que la PR n'est pas mergée, que
-`git status --short` n'est pas vide, ou qu'un fichier ignoré hors build subsiste (un prototype n'a vécu
-que dans un `out/` sans commit ; une retouche non commitée a été perdue par un `--force`) : le dire à
-l'utilisateur, proposer une branche, garder le worktree tant qu'il n'a pas répondu. Puis il ferme le
+puis sans `--dry-run` quand l'utilisateur est d'accord ; `--sans-pr` pour une grappe `qa-<k>` ou jetable. Il
+refuse tant que la PR n'est pas mergée, que `git status --short` n'est pas vide, ou qu'un fichier ignoré hors
+build subsiste (un prototype n'a vécu que dans un `out/` sans commit ; une retouche non commitée a été perdue
+par un `--force`) : le dire à l'utilisateur, proposer une branche, garder le worktree tant qu'il n'a pas
+répondu. Les ignorés propres au projet (`.env` d'amorçage, certificats de dev) se listent dans `RANGER_IGNORE`
+du `config.sh`, pas dans le script. Puis il ferme le
 sous-espace herdr, retire le worktree sans `--force`, le lien mémoire, et imprime la ligne du fichier de
 lot à retirer. La pile Docker du worktree survit à `git worktree remove` : l'arrêter par son nom de
 projet (recette du dépôt, `tour.md` ; « Piles Docker » de `references/cas.md`) et nettoyer ses volumes

@@ -76,6 +76,14 @@ echo "12" > "$FAKE/merged"; echo proto > "$T/wts/g/out.bin"; echo 'out.bin' > "$
 out=$("$ASSETS/ranger.sh" "$T/wt" g --dry-run 2>&1); check "ranger refuse un ignoré hors build" "$?" 3
 rm "$T/wts/g/out.bin"; out=$("$ASSETS/ranger.sh" "$T/wt" g --dry-run 2>&1); check "ranger dry-run passe" "$?" 0
 check "ranger imprime la ligne de lot" "$(echo "$out" | grep -c 'GRAPPES\[g\]')" 1
+mkdir -p "$T/wts/g/apps/api/node_modules"; echo x > "$T/wts/g/apps/api/node_modules/m.js"; echo secret > "$T/wts/g/.env"
+printf 'out.bin\nnode_modules/\n.env\n' > "$T/wts/g/.gitignore"; git -C "$T/wts/g" -c user.name=t -c user.email=t@t commit -qam ignore2
+out=$("$ASSETS/ranger.sh" "$T/wt" g --dry-run 2>&1); check "ranger refuse un .env hors RANGER_IGNORE" "$?" 3
+check "ranger ne compte pas un node_modules de sous-dossier" "$(echo "$out" | grep -c node_modules)" 0
+echo "RANGER_IGNORE='^\\.env\$'" >> "$T/wt/.claude/tower-control/config.sh"
+out=$("$ASSETS/ranger.sh" "$T/wt" g --dry-run 2>&1); check "ranger passe un .env listé dans RANGER_IGNORE" "$?" 0
+echo "" > "$FAKE/merged"; out=$("$ASSETS/ranger.sh" "$T/wt" g --dry-run --sans-pr 2>&1); check "ranger --sans-pr passe sans PR" "$?" 0
+out=$("$ASSETS/ranger.sh" "$T/wt" g --zz 2>&1); check "ranger refuse une option inconnue" "$?" 2
 
 # --- appliquer-issues.py --dry-run (aucun appel à gh)
 : > "$FAKE/journal"

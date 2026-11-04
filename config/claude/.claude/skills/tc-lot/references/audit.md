@@ -19,8 +19,10 @@ constat imposé, textes rédigés par les mêmes agents, lecteur froid, humanize
 - **Les textes** : un agent `Explore` ne peut pas écrire de fichier ; les constats passent à un agent
   `general-purpose` repris par `SendMessage` (contexte gardé), qui rédige au gabarit d'issue, un fichier par
   issue au format de `~/.claude/skills/tc-commun/appliquer-issues.py`, relus par un lecteur froid, passés
-  par humanize ; priorité et points proposés avec le texte. Les constats P3 d'une même zone vont dans une
-  issue index unique plutôt que dix issues d'une ligne.
+  par humanize ; priorité et points proposés avec le texte, chacun avec sa raison. Le périmètre d'échéance se
+  demande, il ne se déduit pas d'une doc ou d'un ADR que l'utilisateur tient pour malléable (un « nice to
+  have » gonflé en P1, repris deux fois). Les constats P3 d'une même zone vont dans une issue index unique
+  plutôt que dix issues d'une ligne.
 - **Montrer, puis créer** : les décisions que les textes laissent ouvertes se posent à l'utilisateur avant
   la reprise, pas après (le lecteur froid en a trouvé trois, bloquantes) ; il relit les fichiers ;
   `appliquer-issues.py --dry-run`, puis sans, tout au Backlog avec priorité et points. Un même constat deux

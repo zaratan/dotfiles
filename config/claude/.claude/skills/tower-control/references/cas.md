@@ -87,13 +87,20 @@ test d'une option neuve plutôt que changer son attendu), vérifie lint, types e
 que le commit suivant du rebase corrige, et laisse `git add` et `rebase --continue` à l'utilisateur, commandes
 écrites.
 
-## Piles Docker et dépendances
+## Piles Docker, dépendances et montées majeures
 
 Une copie d'un worktree garde son nom de projet compose : `docker compose` depuis la copie recrée la pile de
 l'original en plein run ; poser `COMPOSE_PROJECT_NAME`, ou pas de compose du tout. Dependabot ne monte pas une
 peer installée automatiquement par pnpm : un override temporaire force la résolution, à retirer une fois le
 lockfile écrit. Un spec nouveau qui nettoie des tables se joue dans la même commande que ses voisins qui
 écrivent dans ces tables : seul, il passe sur une table parente vide et tombe en CI.
+
+Une montée majeure de framework change un comportement transverse sans qu'aucun test ne rougisse : un routeur
+qui ne monte plus son gestionnaire des routes inconnues qu'à la racine du préfixe a changé le journal et la 404
+de toute l'API, 4 353 tests et 170 e2e verts, trouvé par un contrôle transverse de la QA de fin de lot. La
+consigne de la montée demande de comparer le code du framework entre les deux versions sur les chemins
+transverses (404, en-têtes, journal, erreurs), et la vérification de la tour rejoue ces contrôles sur l'image,
+pas seulement la suite.
 
 ## Réécriture dans un autre langage
 

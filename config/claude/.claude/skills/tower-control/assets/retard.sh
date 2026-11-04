@@ -27,7 +27,7 @@ idx=$(mktemp); trap 'rm -f "$idx"' EXIT
 GIT_INDEX_FILE=$idx g read-tree HEAD
 GIT_INDEX_FILE=$idx g add -A
 tree=$(GIT_INDEX_FILE=$idx g write-tree)
-tmp=$(g commit-tree "$tree" -p HEAD -m "prédiction")
+tmp=$(g -c user.name=tour -c user.email=tour@local commit-tree "$tree" -p HEAD -m "prédiction")
 if out=$(g merge-tree --write-tree --name-only "$BASE" "$tmp" 2>&1); then
   echo "sans conflit textuel (un conflit sémantique reste possible : jouer la fusion dans un worktree jetable quand des fichiers sont partagés)"
 else

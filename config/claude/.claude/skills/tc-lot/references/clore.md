@@ -17,8 +17,10 @@ groupée, avec une recommandation contre, et l'utilisateur ne s'est pas reconnu 
   agents (libellés réels, `h2` contre `h3`, montants à figer, codes HTTP) et les attendus que le lot a
   changés ; y ajouter un chemin d'or par fonction livrée qui en mérite un, après accord de l'utilisateur ;
   fondre les lignes du lot dans les chemins d'or ou d'argent plutôt que de les laisser s'accumuler dans le
-  cahier commun ; créer `chemins-d-argent.md` s'il manque. Laissée en note de fin de `qa.md`, cette étape
-  a été sautée, et les apprentissages d'une passe se perdent avec les worktrees.
+  cahier commun ; créer `chemins-d-argent.md` s'il manque. Un rédacteur qui a l'outil Write (pas un
+  `Explore`), avec la consigne de proposer les chemins d'or nouveaux sans les créer, puis de les appliquer
+  dans un second passage (contexte gardé). Laissée en note de fin de `qa.md`, cette étape a été sautée, et
+  les apprentissages d'une passe se perdent avec les worktrees.
 - **Passe SOLID / DRY / KISS, en parallèle de la QA**, dès le dernier merge : `tc-lot/references/audit.md`.
   Lecture seule, aucun changement de code ; des constats mesurés, confrontés au Backlog, puis des issues.
 - **Mesurer le dossier des comptes rendus et les dossiers temporaires des agents** (planches, maquettes des

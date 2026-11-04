@@ -11,6 +11,7 @@ BASE_BRANCH="origin/main"                     # les branches d'issue en partent 
 BOOTSTRAP='pnpm install --frozen-lockfile'    # joué dans le worktree neuf, dans le pane de l'agent
 declare -A REPO_CHECK=([_]='test -d node_modules')   # contrôle de l'amorçage ; `_` est la clé du dépôt unique
 PROD_START='pnpm build && pnpm start'          # pour demarrer-prod.sh
+# RANGER_IGNORE='^\.env$|^certs/'             # ERE : ignorés propres au projet que ranger.sh ne compte pas comme sorties
 # MODEL="claude-opus-5-5"                      # modèle des agents, défaut dans lancer.sh
 # BOOTSTRAP_TIMEOUT=900000                     # ms
 

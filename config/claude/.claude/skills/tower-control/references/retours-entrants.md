@@ -12,3 +12,5 @@ Ce qu'un lot a appris et qu'aucun skill ne porte encore. Lu au début de chaque 
 - « Aucune donnée réelle d'un client, même dans un exemple » : un agent de lecture le cherche avant le premier
   lot. Vaut pour tout projet client, vu une fois ; consigne commune (Interdits) ou consigne projet ? Le contenu
   livré au client appartient à l'utilisateur.
+- Un artefact long (2 200 lignes) se relit en entier après un `/compact` de la tour avant d'être republié :
+  aucune perte, une partie datée ajoutée. Vu une fois ; règle de « Enchaîner une tâche » dans `cycle.md`, ou rien ?
