@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Pose ou efface un champ du board pour plusieurs issues, en GraphQL direct (une lecture du projet, une mutation par issue).
 Usage : board-field.py <owner> <numéro de projet> <Champ> <valeur|clear> <issue>...
-Champ à option unique (Status, Priorité) : la valeur est le nom de l'option. Champ numérique (Points) : un entier.
+Champ à option unique (Status, Priorité) : la valeur est le nom de l'option. Points : 1 2 3 5 8 13 seulement.
 Pourquoi : `gh project item-edit --url` relit tous les items à chaque appel et épuise le quota GraphQL en points."""
 import json, subprocess, sys, time
 
@@ -9,6 +9,8 @@ if len(sys.argv) < 6:
     print(__doc__); raise SystemExit(2)
 OWNER, PROJECT, FIELD = sys.argv[1], int(sys.argv[2]), sys.argv[3]
 value, numbers = sys.argv[4], [int(n) for n in sys.argv[5:]]
+if FIELD == "Points" and value not in ("clear", "1", "2", "3", "5", "8", "13"):
+    print(f"Points {value} hors de la suite 1 2 3 5 8 13 : à 13, l'issue se coupe"); raise SystemExit(2)
 
 
 def gql(query, **vars):
