@@ -51,8 +51,9 @@ main à la fois.
 branche de base après chaque merge. Une tâche annulée par son délai n'est pas un test qui
 échoue : lire l'étape avant de relancer, et proposer la cause et le correctif avec la
 relance. Un temps de CI s'explique par étape (`actions/runs/<id>` → `jobs[].steps[]`) avant
-d'être réduit ou parallélisé, et la liste des tests passés se compare avant et après pour
-prouver qu'aucun n'a disparu. Sur la branche de base, attendre que **toutes les exécutions du
+d'être réduit ou parallélisé ; un gain de parallélisme se mesure sur les runners de la CI, sur
+plusieurs runs, jamais en local (deux workers e2e : 613 s contre 617, trois tests instables en
+plus) ; et la liste des tests passés se compare avant et après pour prouver qu'aucun n'a disparu. Sur la branche de base, attendre que **toutes les exécutions du
 commit de merge** soient terminées, jamais un nombre fixe de workflows : un filtre `paths:` en
 lance moins quand la base de données n'est pas touchée, et une attente sur « trois » ne rend
 jamais la main ; guetter la dernière exécution de la base, pas un SHA : un merge suivant rend
@@ -97,14 +98,17 @@ arrêté peut montrer une suggestion de prompt grisée de Claude Code : ce n'est
 de l'utilisateur, ne jamais la lui attribuer. Ne pas guetter seulement le fichier : trois agents sont
 restés bloqués sur une question pendant que la tour attendait leur compte rendu. Ne pas
 se fier à `herdr agent wait` seul : il rend « done » pendant que l'agent a des mesures en
-arrière-plan. Ne pas partager une attente entre agents : la fin de l'un est passée
-inaperçue.
+arrière-plan. Ne pas partager une attente entre agents, ni enchaîner leurs guets dans une seule
+commande : la fin de l'un est passée inaperçue, et un guet séquentiel de trois agents n'a prévenu
+qu'avec le dernier.
 
 ## Vérifier
 
 **Vérifier indépendamment, mais jamais en même temps que l'agent.** Attendre `done`
 et un écran arrêté : deux générations dans le même `travail/` se marchent dessus et
-fabriquent des écarts fantômes.
+fabriquent des écarts fantômes. Ni deux vérifications complètes en même temps : des tests à
+délai fixe tombent sous charge et jamais seuls ; un échec vu sous charge se rejoue seul avant
+d'être jugé.
 
 **Mesurer la sortie de succès de chaque commande de vérification avant de l'écrire
 dans une consigne** (« doit être muet » était faux pour un script qui imprime une ligne
@@ -191,7 +195,8 @@ le commit de la précédente : c'est la tour qui le fait (l'agent en est interdi
 l'utilisateur ou sous délégation. Le script part de `origin/<base>` après un `fetch` (le HEAD local ne
 « prend » jamais les merges des autres worktrees), refuse un arbre sale, crée sans amont (une branche
 qui suit la base a déjà poussé sur `main`) et vérifie que HEAD porte bien le nom demandé (trois agents
-sont partis sur des branches jamais créées). On n'empile sur la branche précédente que si sa PR n'est
+sont partis sur des branches jamais créées). Le lancer sans tuyau derrière : un `| tail -1` a gardé le code
+de sortie du filtre, et l'agent suivant a reçu sa consigne sur une branche absente. On n'empile sur la branche précédente que si sa PR n'est
 pas encore mergée ; une fois cette PR mergée, la branche empilée est « N derrière, 0 devant » : le
 rebase est un déplacement, seuls les fichiers touchés par d'autres PR mergées entre-temps peuvent
 conflicter, le dire tel quel dans le point. Jamais `git pull` sur la branche de base, même en avance
@@ -240,8 +245,9 @@ où ranger la réponse) sont dans « Les questions » du skill. En plus, pour le
   se demander si on en a besoin avant l'échéance ; la réponse par défaut est non, et on
   relit la somme de ce qu'on a ajouté sur l'issue, pas la dernière question seule : une
   issue de 3 points a pris trois formes avant que l'utilisateur demande la plus simple.
-- L'utilisateur ne répond pas dans les panes, et **un texte non envoyé dans la zone de
-  saisie d'un agent n'est jamais de lui** : c'est une suggestion automatique de Claude
+- L'utilisateur ne répond pas dans les panes (quand il dit l'avoir fait, relire `agent_status` : une
+  réponse tapée là n'a jamais été soumise, la renvoyer par `envoyer.sh`), et **un texte non envoyé
+  dans la zone de saisie d'un agent n'est jamais de lui** : c'est une suggestion automatique de Claude
   Code (« Compte rendu lu, je commite. », « aligne aussi … »). Ne pas l'interpréter, ne pas
   le consigner, ne pas poser de question dessus ; `agent prompt` le remplace. `send-keys
   enter` ne sert qu'aux dialogues (`AskUserQuestion`).

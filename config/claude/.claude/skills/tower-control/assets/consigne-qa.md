@@ -39,6 +39,9 @@ Pour chaque ligne :
 - une capture par écran d'arrivée, dans `<dossier des captures>/qa-<n>-<k>/` ;
 - si une ligne échoue, rejoue-la une fois depuis un onglet neuf avant de la noter KO, et garde
   la console du navigateur et les journaux du serveur autour de l'échec ;
+- une suite de tests ou une commande que tu rejoues écrit toute sa sortie dans un fichier
+  (`> <dossier>/<identifiant>.log 2>&1`), jamais tronquée : un rouge sur sept a perdu le nom de son
+  test dans un script qui ne gardait que six lignes ;
 - si la ligne est impossible à jouer (donnée absente, cahier faux), note-la « bloquée » avec la
   raison, et passe à la suivante ;
 - si une ligne demande un état qu'on ne peut pas fabriquer par l'écran (une transition interdite,

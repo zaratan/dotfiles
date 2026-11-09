@@ -26,7 +26,7 @@ quatre formats : les deux à tableau se lisaient, les deux en puces se subissaie
 **Reste.** <livraison, issues au Backlog, ce qui attend un tiers>
 
 **Ordres de grandeur.** <forme du projet> · <issues> issues · <points> pts · <PR> PR · <agents max> agents ·
-<durée> · <retouches>/<comptes rendus> retouches · <min/issue> · <questions à l'utilisateur>
+<durée> · <retouches>/<comptes rendus> retouches · <min/issue> · <questions à l'utilisateur> · CI <min par job>
 ```
 
 La ligne d'ordres de grandeur a les colonnes de `references/ordres-de-grandeur.md` : elle s'y recopie sans

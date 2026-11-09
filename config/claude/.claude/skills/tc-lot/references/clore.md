@@ -27,6 +27,8 @@ groupée, avec une recommandation contre, et l'utilisateur ne s'est pas reconnu 
   sous-agents de revue) : 9,7 Go et 2 Go s'y étaient accumulés en un lot. Proposer la liste à supprimer. Ce
   qui doit survivre se copie et se compte d'abord ; la suppression vient dans une commande à part : une copie
   vide a fait perdre les scripts de mesure de deux agents.
+- **Relever la durée des jobs de CI et la comparer au lot précédent**, dans le journal du lot : e2e de 6,7 à
+  14,6 min (208 à 431 tests, un worker) et unitaires de 213 à 511 s en trois semaines, sans que personne le voie.
 - **Un run de CI qui finit en quelques secondes sans étape** se lit dans les annotations du job
   (`check-runs/<id>/annotations`) : facturation de l'organisation, quota. La tour le dit, suspend les merges, et ne
   reprend sur preuves locales (tc-delegate) que sur décision de l'utilisateur.

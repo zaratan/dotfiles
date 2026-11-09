@@ -9,7 +9,11 @@ Poser un verrou commun avant de lancer, une commande par verrou, règle écrite 
 des worktrees, seuil d'espace disque avant tout balayage. Deux niveaux : `lourd`, partagé (données entières,
 construction de zéro, tests lents ; deux agents peuvent le tenir ensemble) et `chrono`, exclusif (un temps
 publié attend que tout le lourd soit fini) ; un script Python `fcntl.flock` fait les deux et reste compatible
-avec `lockf`. Toute compilation chronométrée ou partie de zéro passe sous le verrou, comme la mesure. **Le
+avec `lockf`. Un verrou se prend par `flock` ou `fcntl`, jamais en cherchant un processus par son nom : un
+`pgrep -f` attrapait les shells qui attendaient le verrou, et ils se sont attendus deux heures. Même piège pour
+`pkill -f <motif>` lancé depuis une commande qui contient le motif : il tue son propre shell ; tuer par PID (`$!`,
+fichier de PID) ou par un motif qui ne se reconnaît pas lui-même (`[e]2e-local`). Toute compilation
+chronométrée ou partie de zéro passe sous le verrou, comme la mesure. **Le
 réseau n'est jamais sous le verrou** : un téléchargement de 11 Go mis sous le verrou a bloqué les mesures
 24 min. Le critère de calme se mesure sur la machine au repos avant d'être écrit (la charge moyenne d'un Mac
 vaut 5 à 6 à vide, un agent qui l'attendait plus basse a attendu sans fin) : somme des `%CPU` des autres

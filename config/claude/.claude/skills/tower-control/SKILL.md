@@ -257,9 +257,11 @@ dépôt créé pour rien.
   connecte pas, elle écrit la commande en lecture seule avec sa valeur attendue et tranche sur
   ce qu'il rapporte. Les verdicts à l'œil (planches, images) : « Verdicts à l'œil » de
   `references/cas.md`.
-- **Les heures dans le fuseau de l'utilisateur.** Le serveur peut être en UTC pendant que
-  l'utilisateur voyage : une ETA se convertit (`TZ=<zone> date`) ou se dit « UTC ». Demander le
-  fuseau s'il n'est pas connu.
+- **Les heures dans le fuseau de l'utilisateur, lues à l'horloge.** Le serveur peut être en UTC
+  pendant que l'utilisateur voyage : chaque heure écrite sort de `TZ=<zone> date` lancé à ce moment,
+  jamais de tête (deux heures fausses en un lot) ; demander le fuseau s'il n'est pas connu. De même,
+  un niveau de contexte ne s'annonce jamais sans mesure : un `/compact` se demande sur un fait observé
+  (réponses tronquées, oublis), pas sur un indicateur.
 - Ranger la réponse : décision sur une issue → son How ; décision produit → docs du
   dépôt (questions ouvertes, écarts) ; règle de travail → CLAUDE.md ; seulement ce qui
   reste flou → mémoire.

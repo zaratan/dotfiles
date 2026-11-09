@@ -6,6 +6,7 @@
 # Sourcé au niveau du script, pas dans une fonction : un `declare -A` d'un fichier sourcé dans une fonction y resterait local.
 [ "${BASH_VERSINFO[0]:-0}" -ge 4 ] || { echo "bash 4 requis (tableaux associatifs) ; /bin/bash du Mac est en 3.2, utiliser /usr/bin/env bash" >&2; exit 2; }
 : "${REPO:?REPO doit être posé avant de sourcer config-lib.sh}"
+REPO=$(cd "$REPO" 2>/dev/null && pwd -P) || { echo "dépôt introuvable : $REPO" >&2; exit 2; }
 CONFIG="$REPO/.claude/tower-control/config.sh"
 test -f "$CONFIG" || { echo "config absente : $CONFIG" >&2; exit 2; }
 # shellcheck disable=SC2034

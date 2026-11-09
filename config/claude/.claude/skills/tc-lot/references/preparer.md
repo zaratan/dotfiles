@@ -67,5 +67,13 @@ proposer une issue qui le coupe en rapide (statique et tests nus, en local et da
 et lourd (couverture, tests lents, en CI), chaque morceau mesuré avant de décider : la
 couverture seule valait 85 % du temps.
 
+**Plusieurs agents sur une même bibliothèque** (un design system, un paquet partagé) : la consigne de
+départ dit où vont les composants communs et demande de regarder les autres worktrees avant d'en créer
+un ; la découpe prévoit dès le début l'issue de mise en commun, lancée après les autres. Envoyée quatre
+minutes après le départ, la règle a laissé deux `Folded` de forme différente et sept boîtes écrites à la
+main, rechiffrés en cours de lot. Quand le designer n'est pas là, l'agent prend le défaut (l'existant rendu
+avec le paquet), le liste dans son compte rendu, et le designer retravaille ensuite : trois questions de
+design sont restées ouvertes sans arrêter un agent, le lot est passé la nuit sans l'utilisateur.
+
 Écrire les grappes dans `lot-<login>.sh` (« Le fichier des worktrees » de
 `references/lancer.md`), préparer les consignes et lancer.

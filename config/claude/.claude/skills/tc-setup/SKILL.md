@@ -48,7 +48,10 @@ méta**, `<méta>/wt`, ajouté à son `.gitignore`, pour que les agents hériten
 indexé par le nom de chaque sous-dépôt : `REPO_PATH`
 (chemin), `REPO_BASE` (branche de base — `develop` sur un projet qui ne déploie pas
 depuis `main`), `REPO_BOOTSTRAP` (ce qu'un worktree neuf doit lancer), `REPO_CHECK`
-(ce qui prouve que l'amorçage a marché). `config.sh` se partage entre toutes les
+(ce qui prouve que l'amorçage a marché), et dès ce moment `RANGER_IGNORE` (ERE des
+fichiers ignorés propres au projet : `.env` d'amorçage, certificats de dev, résultats
+e2e, fichiers régénérés ; sans lui, treize rangements d'un lot ont été refusés).
+`config.sh` se partage entre toutes les
 personnes qui lancent une tour : les grappes du premier lot vont à côté, dans
 `lot-<login GitHub>.sh`, et s'écrivent pour un méta-dépôt `"<dépôt> <branche>"`.
 Deux lignes vont avec, dans le dépôt des issues : `.claude/tower-control/lot-*.sh`

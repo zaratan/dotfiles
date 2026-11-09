@@ -84,6 +84,11 @@ echo "RANGER_IGNORE='^\\.env\$'" >> "$T/wt/.claude/tower-control/config.sh"
 out=$("$ASSETS/ranger.sh" "$T/wt" g --dry-run 2>&1); check "ranger passe un .env listé dans RANGER_IGNORE" "$?" 0
 echo "" > "$FAKE/merged"; out=$("$ASSETS/ranger.sh" "$T/wt" g --dry-run --sans-pr 2>&1); check "ranger --sans-pr passe sans PR" "$?" 0
 out=$("$ASSETS/ranger.sh" "$T/wt" g --zz 2>&1); check "ranger refuse une option inconnue" "$?" 2
+out=$(cd "$T/wt" && "$ASSETS/ranger.sh" . g --dry-run --sans-pr 2>&1); check "ranger nomme l'agent depuis le chemin absolu" "$(echo "$out" | grep -c 'agent get wt-g')" 1
+out=$("$ASSETS/ranger.sh" "$T/wt" g --dry-run 2>&1); check "ranger refuse une branche hors base sans PR" "$?" 3
+git -C "$T/wt" -c user.name=t -c user.email=t@t merge -q --no-ff issue/2 -m train; git -C "$T/wt" push -q origin main 2>/dev/null
+out=$("$ASSETS/ranger.sh" "$T/wt" g --dry-run 2>&1); check "ranger passe une branche contenue dans la base" "$?" 0
+check "ranger dit la branche mergée par un train" "$(echo "$out" | grep -c 'contenue dans')" 1
 
 # --- appliquer-issues.py --dry-run (aucun appel à gh)
 : > "$FAKE/journal"

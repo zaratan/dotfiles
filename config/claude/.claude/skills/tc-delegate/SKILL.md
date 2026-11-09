@@ -79,6 +79,12 @@ pas mergée : la tour s'arrête et le dit.
 - **Les PR s'ouvrent dès le push, leurs CI tournent en parallèle, seul le merge est sérialisé** (un
   verrou pris juste avant `gh pr merge`, relâché après). Une file où chaque PR attend la précédente de bout
   en bout coûte douze minutes par PR pour rien.
+- **Une série de merges (un « train » : une branche qui fusionne plusieurs PR, une CI, un merge) se propose avec
+  son coût** : une même modification passe alors trois CI complètes (PR d'issue, PR du train, push sur la base),
+  44 à 76 runs et 7 à 8 $ par jour ; proposer de n'en garder qu'une complète par changement. Le worktree du train
+  s'amorce comme celui d'un agent (dépendances, build, `.env`) : une vérification qui ne compte aucun test, ou
+  finit en quelques secondes, est un échec, jamais un vert. Un rouge de CI dans le train se règle dans le train,
+  par une branche à part.
 - **Avant tout merge dont la base a bougé depuis la CI de la PR** : fusionner la base dans la branche,
   jouer les migrations venues de la base (`pnpm db:migrate` ou l'équivalent, sinon la suite échoue sur sa
   mise en place), régénérer les relevés figés par un instantané (registre de textes), `build` (un paquet
@@ -99,8 +105,10 @@ pas mergée : la tour s'arrête et le dit.
   base dans la branche, revérifier, pousser un commit neuf, qui relance la CI. `gh pr update-branch` n'est pas
   une voie de repli : il échoue dès qu'il y a conflit.
 - **Le hook pre-push joue l'arbre de travail, pas le commit poussé** : quand le worktree est déjà passé à
-  l'issue suivante, il rejoue les gates sur le travail en cours de l'agent et rougit. Pousser avec
-  `--no-verify` quand le commit a ses gates et ses e2e, et l'écrire dans le journal.
+  l'issue suivante, il rejoue les gates sur le travail en cours de l'agent et rougit ; sous huit agents, il
+  tombe de lui-même. Pousser avec `--no-verify` quand le commit a ses gates et ses e2e **sur l'arbre fusionné
+  avec la base** (trois commits `--no-verify` portaient un travail qui ne compilait qu'après la fusion), et
+  l'écrire dans le journal.
 - Une PR à la fois. Attendre sa CI, merger avec la méthode de ses merges précédents (merge commit, squash),
   puis attendre que **toutes** les exécutions du commit de merge sur la branche de base soient terminées et
   vertes avant la PR suivante. Cette attente ne vaut qu'entre deux merges : lancer un agent sur une branche
@@ -117,4 +125,5 @@ pas mergée : la tour s'arrête et le dit.
 
 À chaque merge, une ligne à l'utilisateur (PR, commit de merge, CI de la base). À la fin ou sur `off`, le
 tableau complet. Les décisions prises seul par un agent continuent d'être posées à l'utilisateur avant le
-commit : la délégation porte sur les gestes git, pas sur les choix.
+commit, même petites (une seconde revue demandée sur l'une d'elles a trouvé une régression bloquante) : la
+délégation porte sur les gestes git, pas sur les choix.

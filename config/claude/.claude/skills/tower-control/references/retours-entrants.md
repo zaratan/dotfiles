@@ -14,3 +14,5 @@ Ce qu'un lot a appris et qu'aucun skill ne porte encore. Lu au début de chaque 
   livré au client appartient à l'utilisateur.
 - Un artefact long (2 200 lignes) se relit en entier après un `/compact` de la tour avant d'être republié :
   aucune perte, une partie datée ajoutée. Vu une fois ; règle de « Enchaîner une tâche » dans `cycle.md`, ou rien ?
+- Deux lots menés ensemble dans un seul dossier (décisions, consignes, rapports, une QA, un audit, une
+  livraison) : 100 décisions numérotées sans collision. Vu une fois ; règle de `preparer.md` ?

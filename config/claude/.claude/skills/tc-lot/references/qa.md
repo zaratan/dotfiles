@@ -36,7 +36,11 @@ Les tests de chaque PR ne voient pas une régression qui naît de la somme des m
   question attendait que l'outil compte des jours, ce que son skill lui interdit, et l'écart
   n'a été vu qu'en pleine passe. Une suite de tests à rejouer se lance avec sa sortie dans un
   fichier : un échec vu une fois sur cinq passages n'a pas gardé son nom, et ne s'est plus
-  reproduit.
+  reproduit ; la consigne de QA porte cette règle mot pour mot (un script d'agent ne gardait que six lignes).
+- **Estimer la passe sur les passes précédentes du projet** (lignes par minute et par agent,
+  `references/ordres-de-grandeur.md`), jamais ligne à ligne : un rédacteur a estimé 20 h 30 pour 90 lignes
+  jouées en 67 minutes à trois agents. Un script d'inventaire prend les mesures d'écran (couleurs, rayons,
+  focus, cibles, 320 px, avec et sans script) : 274 mesures en six minutes.
 - **Les agents** : deux ou trois agents de QA, un par zone du cahier. Chacun a son worktree
   temporaire `wt/qa-<k>` sur `origin/<base>` (grappes `qa-<k>` dans le fichier de lot, branche
   locale `qa/lot-<n>-<k>` jamais poussée), sa pile locale et l'app en mode production. Il

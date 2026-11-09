@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # ranger.sh <dépôt des issues> <grappe> [--dry-run] [--sans-pr] : retire le worktree d'une grappe finie. Préconditions,
-# chacune bloquante : PR de la branche mergée (sauf `--sans-pr` : grappe de QA ou jetable, qui n'a pas de PR), `git status
+# chacune bloquante : branche mergée (PR mergée, ou branche contenue dans la base quand un train l'a portée ; `--sans-pr`
+# pour une grappe de QA ou jetable, qui n'a ni l'un ni l'autre), `git status
 # --short` vide, aucun fichier ignoré hors dossiers de build ni hors `RANGER_IGNORE` du config.sh (un prototype n'a vécu
 # que dans un `out/` sans commit ; une retouche non commitée a été perdue par un `--force`). Puis : `herdr workspace close`,
 # `git worktree remove` sans `--force`, lien mémoire (dépôt unique), et la ligne du fichier de lot à retirer, imprimée,
@@ -23,12 +24,22 @@ test -d "$WT" || { echo "worktree absent : $WT" >&2; exit 2; }
 BUILD='(^|/)(node_modules|target|dist|\.next|\.turbo|__pycache__|\.venv|coverage|\.cache|\.husky/_)(/|$)|(\.tsbuildinfo|next-env\.d\.ts)$'
 [ -z "${RANGER_IGNORE:-}" ] || BUILD="$BUILD|$RANGER_IGNORE"
 
+base=$(tc_base_of "$r")
 if [ "$SANS_PR" = 1 ]; then
-  merged=""
+  via="sans PR (--sans-pr)"
 else
   slug=$(git -C "$code" remote get-url origin | sed -E 's#\.git$##; s#.*[:/]([^/]+/[^/]+)$#\1#')
   merged=$(gh pr list --repo "$slug" --head "$branche" --state merged --json number -q '.[].number' | head -1)
-  [ -n "$merged" ] || { echo "REFUSÉ : aucune PR mergée pour $branche (grappe de QA ou jetable : --sans-pr)"; exit 3; }
+  if [ -n "$merged" ]; then
+    via="PR #$merged mergée"
+  else
+    case "$base" in origin/*) git -C "$code" fetch -q origin 2>/dev/null || true ;; esac
+    if git -C "$code" merge-base --is-ancestor "$branche" "$base" 2>/dev/null; then
+      via="branche contenue dans $base (mergée par un train, sans PR à elle)"
+    else
+      echo "REFUSÉ : aucune PR mergée pour $branche, et $base ne la contient pas (grappe de QA ou jetable : --sans-pr)"; exit 3
+    fi
+  fi
 fi
 dirty=$(git -C "$WT" status --short); [ -z "$dirty" ] || { echo "REFUSÉ : fichiers non commités dans $WT"; echo "$dirty"; exit 3; }
 ignored=$(git -C "$WT" status --short --ignored=matching | awk '$1=="!!"{print $2}' | grep -vE "$BUILD" || true)
@@ -39,7 +50,7 @@ ws=$(herdr worktree list --cwd "$code" | jq -r --arg p "$WT" '.result.worktrees[
 agent="$(basename "$REPO" | tr '[:upper:]' '[:lower:]')-$GRAPPE"
 [ -n "$ws" ] || ws=$(herdr agent get "$agent" 2>/dev/null | jq -r '.result.agent.workspace_id // empty')
 key="$HOME/.claude/projects/$(echo "$WT" | tr '/' '-')/memory"
-if [ -n "$merged" ]; then echo "PR #$merged mergée, arbre propre. À faire :"; else echo "sans PR (--sans-pr), arbre propre. À faire :"; fi
+echo "$via, arbre propre. À faire :"
 echo "  herdr workspace close ${ws:-<workspace introuvable : herdr worktree list --cwd $code, herdr agent get $agent>}"
 echo "  git -C $code worktree remove $WT"
 [ -n "$r" ] || echo "  rm $key"
