@@ -16,3 +16,8 @@ Ce qu'un lot a appris et qu'aucun skill ne porte encore. Lu au début de chaque 
   aucune perte, une partie datée ajoutée. Vu une fois ; règle de « Enchaîner une tâche » dans `cycle.md`, ou rien ?
 - Deux lots menés ensemble dans un seul dossier (décisions, consignes, rapports, une QA, un audit, une
   livraison) : 100 décisions numérotées sans collision. Vu une fois ; règle de `preparer.md` ?
+- Avant d'ajouter à une issue une case « prévenir X », vérifier que la chose est dans le périmètre de
+  l'utilisateur : la tour a rédigé une question à un tiers sur un jeton qui appartenait à l'exploitant. Vu une
+  fois ; règle de « Écrire sur GitHub » ?
+- Des grappes déséquilibrées se complètent par des refactos du Backlog, ajoutées avec l'accord de
+  l'utilisateur : sept agents finis à moins d'une heure d'écart. Vu une fois ; règle de `preparer.md` ?

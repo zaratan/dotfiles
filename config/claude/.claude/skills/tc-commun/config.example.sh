@@ -23,6 +23,14 @@ PROD_START='pnpm build && pnpm start'          # pour demarrer-prod.sh
 # declare -A REPO_CHECK=([app]='test -d node_modules')
 # declare -A REPO_PROD_START=([app]='pnpm build && pnpm start')
 
+# Trains et convois (tower-control/references/trains.md). verif-train.sh joue ces étapes dans l'ordre, une ligne
+# `nom: commande` chacune, la remise à zéro de la base en tête ; l'étape `e2e` reçoit les specs. Une étape test… ou
+# e2e… est rouge sur une sortie non nulle, et aussi quand elle n'affiche pas VERIF_PASSE.
+# VERIF=$'install: pnpm install --frozen-lockfile\ndb: bin/db-reset\nbuild: pnpm build\nlint: pnpm lint\ntest: pnpm test\ne2e: pnpm exec playwright test'
+# declare -A REPO_VERIF=([app]=$'install: pnpm install --frozen-lockfile\ntest: pnpm test')   # méta-dépôt
+# VERIF_PASSE='[1-9][0-9]* passed'             # défaut, « 0 passed » est rouge ; `go test` n'imprime pas « passed » : '^ok '
+# REFS_INTERDITES='monprojet-prive|Claude'     # ERE refusée par train.sh dans le diff et le titre ; défaut en méta : le nom du dépôt des issues
+
 # Les grappes du lot vont dans lot-<login GitHub>.sh, à côté, ignoré par git (propre à la personne et au poste) :
 #   declare -A GRAPPES=([p0-controle]="p0/4-couleur" [p0-photos]="p0/5-credit")          # dépôt unique
 #   declare -A GRAPPES=([irn]="app p0/2-echelle" [keys]="infra p1/62-cles")              # méta-dépôt

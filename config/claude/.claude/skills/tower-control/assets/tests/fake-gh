@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
-# Faux gh : login « moi » ; assignés depuis $FAKE/assignees ; PR mergée depuis $FAKE/merged ; journal dans $FAKE/journal.
+# Faux gh : login « moi » ; assignés depuis $FAKE/assignees ; PR mergée depuis $FAKE/merged ; PR d'un train depuis $FAKE/pr_train, pr_vue, pr_checks et pr_etat ; journal dans $FAKE/journal.
 echo "$*" >> "$FAKE/journal"
 case "$*" in
   "api user -q .login") echo moi ;;
   *"issue view"*assignees*) echo "$(cat "$FAKE/assignees")" | tr ' ' '\n' | grep -v '^$' | paste -sd' ' - ;;
   *"issue edit"*) : ;;
+  *"pr list"*"--state all"*) cat "$FAKE/pr_train" 2>/dev/null || true ;;
+  *"pr create"*) echo "https://github.com/o/r/pull/55" ;;
+  *"pr view"*mergeable*) cat "$FAKE/pr_vue" 2>/dev/null || echo MERGEABLE ;;
+  *"pr view"*statusCheckRollup*) cat "$FAKE/pr_checks" 2>/dev/null || echo 0 ;;
+  *"pr view"*state*) cat "$FAKE/pr_etat" 2>/dev/null || echo MERGED ;;
+  *"pr merge"*) : ;;
   *"pr list"*merged*) n=$(cat "$FAKE/merged" 2>/dev/null); [ -z "$n" ] || echo "$n" ;;
   *) echo '[]' ;;
 esac

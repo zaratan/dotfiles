@@ -29,8 +29,9 @@ qu'elle a constaté elle-même, selon la recette de « Écrire sur GitHub » dan
 passe humanize ni accord, qu'elle dit dans son point à l'utilisateur. Ce que l'agent
 affirme et que la tour n'a pas revu reste décoché.
 
-L'issue passe en Review quand toutes les cases sont cochées, ou quand sa PR est mergée et que
-ses cases ouvertes n'attendent plus que la QA ou une autre issue. « En cours » ne garde que ce
+L'issue passe en Review quand toutes les cases sont cochées et que sa PR existe, ou quand sa PR est
+mergée et que ses cases ouvertes n'attendent plus que la QA ou une autre issue. Sans PR, pas de Review,
+même dans un train (`references/trains.md`) : l'utilisateur a vu sept issues en Review et aucune PR. « En cours » ne garde que ce
 qu'un agent a entre les mains : cinq issues « En cours » dont deux seulement travaillées ont
 fait demander à l'utilisateur ce qui se passait. Une case qui attend un tiers passe l'issue en
 Bloqué. Abandonner une case est une

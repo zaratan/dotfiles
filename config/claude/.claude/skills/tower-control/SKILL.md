@@ -30,7 +30,8 @@ pour l'utilisateur. C'est le rôle de la tour.
   puis `references/cycle.md`. Les relire après un résumé automatique du contexte.
 - Un lot (colonne « À faire », grappes, QA, clôture) passe par `/tc-lot`, que seul
   l'utilisateur peut taper. Si on demande à la tour de dispatcher un lot, répondre
-  « tape /tc-lot » plutôt que de l'improviser.
+  « tape /tc-lot » plutôt que de l'improviser. Ses merges, quand il est gros et la CI
+  lente : `references/trains.md`.
 - `references/retours-entrants.md` : les leçons des lots passés qu'aucun skill ne porte
   encore. En mode tour, y chercher le sujet qui coince.
 - `references/cas.md` : les situations rares, à lire quand elles se présentent : plusieurs
@@ -252,14 +253,18 @@ dépôt créé pour rien.
   journal. La tour a proposé de renvoyer huit écarts jugés deux jours plus tôt ; c'est un
   agent qui a fait le rapprochement. Et ce qu'un agent rapporte d'un document se relit dans
   le document avant d'être posé, la source exacte citée dans la question : deux questions ont
-  contredit une décision déjà prise.
+  contredit une décision déjà prise. De même, un « écart » à une convention se dit avec la règle
+  citée et l'endroit où elle s'applique : un import présenté comme un écart a alarmé l'utilisateur,
+  alors que la règle ne valait que pour un autre paquet, où le lint la tient.
 - **Sur un hôte distant, la lecture de l'utilisateur est la seule mesure** : la tour ne s'y
   connecte pas, elle écrit la commande en lecture seule avec sa valeur attendue et tranche sur
   ce qu'il rapporte. Les verdicts à l'œil (planches, images) : « Verdicts à l'œil » de
   `references/cas.md`.
 - **Les heures dans le fuseau de l'utilisateur, lues à l'horloge.** Le serveur peut être en UTC
   pendant que l'utilisateur voyage : chaque heure écrite sort de `TZ=<zone> date` lancé à ce moment,
-  jamais de tête (deux heures fausses en un lot) ; demander le fuseau s'il n'est pas connu. De même,
+  jamais de tête (deux heures fausses en un lot, deux encore au suivant, de dix minutes à trois heures) ;
+  après une question restée deux heures sans réponse, l'heure du message suivant se relit aussi.
+  Demander le fuseau s'il n'est pas connu. De même,
   un niveau de contexte ne s'annonce jamais sans mesure : un `/compact` se demande sur un fait observé
   (réponses tronquées, oublis), pas sur un indicateur.
 - Ranger la réponse : décision sur une issue → son How ; décision produit → docs du
@@ -275,13 +280,14 @@ dépôt créé pour rien.
   `cd <worktree> &&` en tête de chaîne : une fois, le `cd` n'a pas pris dans le shell de l'outil,
   `git add` a échoué sur un chemin inexistant et un `push` a visé le dépôt des issues, refusé
   parce que la référence n'existait pas. Rien d'écrit, par chance.
-- **Le shell de l'outil Bash est zsh**, quatre pièges qui ont chacun coûté un incident :
+- **Le shell de l'outil Bash est zsh**, cinq pièges qui ont chacun coûté un incident :
   `${VAR}:…` et jamais `$VAR:…` (`:r`, `:a` sont des modificateurs d'historique, un refspec a été
   tronqué deux fois le même jour) ; une variable ne se découpe pas en mots (`docker rm -f $C` a
   reçu une seule chaîne et n'a rien supprimé, `set -- $p` n'a créé aucune branche : `${=v}`, `xargs`,
   ou des lignes explicites, puis recompter) ; `path` est lié à `$PATH` (une boucle `for path` ou
-  `read taille path` vide le PATH, exit 127 : nommer `chemin`) ; l'historique est partagé entre
-  les panes herdr (une flèche haut rejoue la commande d'un autre agent).
+  `read taille path` vide le PATH, exit 127 : nommer `chemin`) ; `=` en tête de mot cherche une
+  commande (`echo =====` sort en « not found » et casse la chaîne : séparateurs entre quotes) ;
+  l'historique est partagé entre les panes herdr (une flèche haut rejoue la commande d'un autre agent).
 - Avant toute opération git qui change d'arbre dans un dossier où vivent des fichiers
   non suivis (rebase, checkout, abort), en copier une sauvegarde hors du dépôt.
 - **Les scripts et captures de la tour vont dans son scratchpad, jamais dans le cwd d'un

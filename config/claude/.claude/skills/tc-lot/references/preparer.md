@@ -38,7 +38,10 @@ Trois petites issues (≤ 5 points) qui touchent le même fichier de tests ou le
 une seule chaîne même si l'horloge en souffre : réparties sur deux grappes pour aller vite, elles
 ont coûté quatre `git merge origin/main` résolus par les agents (lot 10).
 
-**Quand la CI d'une PR dépasse une dizaine de minutes**, proposer au groupement de réunir
+**Quand la CI d'une PR dépasse une dizaine de minutes et que le lot compte plus d'une dizaine d'issues**,
+proposer les trains et convois (`references/trains.md` de tower-control) : 29 issues en 4 CI vers la base et
+3 h 21, contre au moins douze heures de merges en série. Plusieurs worktrees de vérification se prévoient avec
+les grappes. Sur un lot plus petit, proposer au groupement de réunir
 les petites issues d'une même grappe en une seule PR (une branche, un `Closes` par issue) :
 chaque PR coûte une CI complète et une relecture. Trois issues d'un banc de mesure sont
 passées ainsi en une PR, à la demande de l'utilisateur, sur une CI de quinze minutes.

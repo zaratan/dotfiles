@@ -2,7 +2,7 @@
 # À sourcer depuis un script bash, après avoir posé REPO (chemin du dépôt qui porte les issues) :
 #   REPO=…; source "$(dirname "$0")/../../tc-commun/config-lib.sh"   # depuis <skill>/assets/
 # Charge .claude/tower-control/config.sh puis lot-<login GitHub>.sh, pose GH_LOGIN, LOT, CONFIG et les
-# tableaux REPO_PATH, REPO_BASE, REPO_BOOTSTRAP, REPO_CHECK, REPO_PROD_START, GRAPPES, ISSUES. Voir config.example.sh, à côté.
+# tableaux REPO_PATH, REPO_BASE, REPO_BOOTSTRAP, REPO_CHECK, REPO_PROD_START, REPO_VERIF, GRAPPES, ISSUES. Voir config.example.sh, à côté.
 # Sourcé au niveau du script, pas dans une fonction : un `declare -A` d'un fichier sourcé dans une fonction y resterait local.
 [ "${BASH_VERSINFO[0]:-0}" -ge 4 ] || { echo "bash 4 requis (tableaux associatifs) ; /bin/bash du Mac est en 3.2, utiliser /usr/bin/env bash" >&2; exit 2; }
 : "${REPO:?REPO doit être posé avant de sourcer config-lib.sh}"
@@ -10,7 +10,7 @@ REPO=$(cd "$REPO" 2>/dev/null && pwd -P) || { echo "dépôt introuvable : $REPO"
 CONFIG="$REPO/.claude/tower-control/config.sh"
 test -f "$CONFIG" || { echo "config absente : $CONFIG" >&2; exit 2; }
 # shellcheck disable=SC2034
-declare -A REPO_PATH=() REPO_BASE=() REPO_BOOTSTRAP=() REPO_CHECK=() REPO_PROD_START=() GRAPPES=() ISSUES=()
+declare -A REPO_PATH=() REPO_BASE=() REPO_BOOTSTRAP=() REPO_CHECK=() REPO_PROD_START=() REPO_VERIF=() GRAPPES=() ISSUES=()
 # shellcheck source=/dev/null
 source "$CONFIG"
 GH_LOGIN=$(gh api user -q .login) && test -n "$GH_LOGIN" || { echo "login GitHub introuvable : gh auth status" >&2; exit 2; }
@@ -32,3 +32,4 @@ tc_base_of() { local r=${1:-_}; echo "${REPO_BASE[$r]:-${BASE_BRANCH:-main}}"; }
 tc_bootstrap_of() { local r=${1:-_}; echo "${REPO_BOOTSTRAP[$r]:-${BOOTSTRAP:-true}}"; }
 tc_check_of() { local r=${1:-_}; echo "${REPO_CHECK[$r]:-true}"; }
 tc_prod_start_of() { local r=${1:-_}; echo "${REPO_PROD_START[$r]:-${PROD_START:-}}"; }
+tc_verif_of() { local r=${1:-_}; echo "${REPO_VERIF[$r]:-${VERIF:-}}"; }

@@ -46,7 +46,10 @@ Les tests de chaque PR ne voient pas une régression qui naît de la somme des m
   locale `qa/lot-<n>-<k>` jamais poussée), sa pile locale et l'app en mode production. Il
   utilise le Chromium headless du projet, avec un onglet par compte. Consigne :
   `assets/consigne-qa.md` rempli par agent, assemblé par `consigne.sh … --qa`, sans la consigne commune.
-  Ils ne corrigent rien.
+  Ils ne corrigent rien. D'un lot au suivant, les consignes se tirent par script de celles du lot précédent
+  (substitutions, section de la part réécrite), puis un `grep` prouve qu'il ne reste rien de l'ancien lot.
+  Les parts s'équilibrent en lignes à la rédaction, en donnant les chemins d'argent à l'agent qui joue
+  déjà les mêmes écrans (37/33/28 au lieu de 35/30/33 : trois agents finis ensemble).
 - **Suivi en direct** : chaque agent ajoute une ligne à `travail/qa-<n>-<k>-suivi.md` par ligne
   jouée, dès qu'elle l'est, datée par `date -u` (un agent a daté son suivi de tête, de 00:18 à 02:50 pour une
   passe finie à 00:50, et l'a rempli par paquets : la tour n'a rien pu faire au fil de l'eau), avec le détail
@@ -63,7 +66,10 @@ Les tests de chaque PR ne voient pas une régression qui naît de la somme des m
   de suivi et que les autres n'ont pas encore écrit. Après la passe, ces contournements vont dans
   `chemins-d-or.md` (section 0) ou dans les seeds.
 - **États hors écran** : une ligne qui exige un état que l'app refuse de fabriquer (transition
-  interdite, doublon, dates passées) se signale « attente tour » dans le suivi. La tour prépare
+  interdite, doublon, dates passées) se signale « attente tour » dans le suivi. **Les états que le cahier
+  marque « tour » se préparent avant d'envoyer les consignes**, ou se confient à l'agent comme manipulation
+  de test autorisée : un état attendu pendant que la tour posait une question à l'utilisateur a été
+  joué deux heures après la passe. Pour un état qui n'était pas prévu, la tour prépare
   cet état elle-même sur la pile locale de l'agent (cinq minutes pour une session modifiée en SQL), au
   besoin en contournant les protections de
   l'app (jamais ailleurs que sur une pile locale), puis dit à l'agent ce qu'elle a fait et

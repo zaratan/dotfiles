@@ -33,7 +33,11 @@ Confirmer en une phrase ce qui est délégué et ce qui ne l'est pas, puis appli
 - `gh pr merge` quand la CI de la PR est verte ;
 - `git merge origin/<base>` dans une branche d'issue pour résoudre un conflit, avec revérification complète
   de l'arbre fusionné avant de pousser. La tour commite d'abord le travail vérifié de l'agent, puis fusionne :
-  jamais de fusion demandée à un agent sur du travail non commité.
+  jamais de fusion demandée à un agent sur du travail non commité ;
+- quand l'utilisateur a choisi les trains et convois (`tower-control/references/trains.md`) : créer et pousser
+  les branches `train/*` et `convoi/*` (refspec explicite, jamais `--force`), y fusionner et commiter, ouvrir la
+  PR d'issue vers son train et la merger sans CI par `tower-control/assets/train.sh`, qui refuse une PR vers un
+  train qui a des checks.
 
 **Pas délégué** : tout le reste. Pas de commit dans le méta-dépôt ni dans un autre dépôt, pas de
 `git branch -D`, pas de `push --force`, pas de réécriture d'historique, pas de tag ni de release, pas de
@@ -79,12 +83,11 @@ pas mergée : la tour s'arrête et le dit.
 - **Les PR s'ouvrent dès le push, leurs CI tournent en parallèle, seul le merge est sérialisé** (un
   verrou pris juste avant `gh pr merge`, relâché après). Une file où chaque PR attend la précédente de bout
   en bout coûte douze minutes par PR pour rien.
-- **Une série de merges (un « train » : une branche qui fusionne plusieurs PR, une CI, un merge) se propose avec
-  son coût** : une même modification passe alors trois CI complètes (PR d'issue, PR du train, push sur la base),
-  44 à 76 runs et 7 à 8 $ par jour ; proposer de n'en garder qu'une complète par changement. Le worktree du train
-  s'amorce comme celui d'un agent (dépendances, build, `.env`) : une vérification qui ne compte aucun test, ou
-  finit en quelques secondes, est un échec, jamais un vert. Un rouge de CI dans le train se règle dans le train,
-  par une branche à part.
+- **Un lot de plus d'une dizaine d'issues sur une CI de plus de dix minutes se merge en trains et convois**,
+  sur décision de l'utilisateur : `~/.claude/skills/tower-control/references/trains.md`. Les PR d'issue vont
+  vers le train, sans CI, et seule la PR du convoi vers la base en lance une. L'ancien train, où chaque issue avait encore sa PR vers
+  la base, faisait passer une même modification par trois CI complètes (44 à 76 runs et 7 à 8 $ par jour).
+  Un rouge de CI dans un convoi se règle dans le train fautif, qui sort du convoi.
 - **Avant tout merge dont la base a bougé depuis la CI de la PR** : fusionner la base dans la branche,
   jouer les migrations venues de la base (`pnpm db:migrate` ou l'équivalent, sinon la suite échoue sur sa
   mise en place), régénérer les relevés figés par un instantané (registre de textes), `build` (un paquet
@@ -108,7 +111,8 @@ pas mergée : la tour s'arrête et le dit.
   l'issue suivante, il rejoue les gates sur le travail en cours de l'agent et rougit ; sous huit agents, il
   tombe de lui-même. Pousser avec `--no-verify` quand le commit a ses gates et ses e2e **sur l'arbre fusionné
   avec la base** (trois commits `--no-verify` portaient un travail qui ne compilait qu'après la fusion), et
-  l'écrire dans le journal.
+  l'écrire dans le journal. Même chose pour un commit de fusion que lint-staged refuse (« Failed to back up ») :
+  `--no-verify`, les gates rejouées à la main avant.
 - Une PR à la fois. Attendre sa CI, merger avec la méthode de ses merges précédents (merge commit, squash),
   puis attendre que **toutes** les exécutions du commit de merge sur la branche de base soient terminées et
   vertes avant la PR suivante. Cette attente ne vaut qu'entre deux merges : lancer un agent sur une branche

@@ -28,5 +28,6 @@ constat imposé, textes rédigés par les mêmes agents, lecteur froid, humanize
   `appliquer-issues.py --dry-run`, puis sans, tout au Backlog avec priorité et points. Un même constat deux
   lots de suite sans décision : le dire, pas le recréer.
 - Ordres de grandeur : cinq zones, 62 constats et 20 prémisses fausses du Backlog corrigées en passant en
-  une heure de machine ; 72 constats, 27 issues et 6 commentaires en deux heures ; trois passes sur deux
-  projets.
+  une heure de machine ; 72 constats, 27 issues et 6 commentaires en deux heures ; quatre zones sur le seul
+  diff du lot, 60 constats en six minutes de machine par zone, dont 11 contre une décision retrouvée par le
+  rédacteur et gardés hors des issues ; quatre passes sur deux projets.
