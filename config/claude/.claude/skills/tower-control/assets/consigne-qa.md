@@ -45,9 +45,15 @@ Pour chaque ligne :
 - si la ligne est impossible à jouer (donnée absente, cahier faux), note-la « bloquée » avec la
   raison, et passe à la suivante ;
 - si une ligne demande un état qu'on ne peut pas fabriquer par l'écran (une transition interdite,
-  des dates passées, un doublon que l'app refuse), n'essaie pas de contourner l'app : ajoute
+  des dates passées, un doublon que l'app refuse), regarde « Manipulations autorisées » ; hors de
+  cette liste, n'essaie pas de contourner l'app : ajoute
   « HH:MM | attente tour | <ligne> » à ton suivi et pose la question à la tour. C'est elle qui
   prépare l'état sur ta pile locale, puis te dit ce qu'elle a fait.
+
+## Manipulations autorisées
+
+<Les états « tour » du cahier que tu prépares toi-même, chacun avec sa commande sur ta pile locale ; ce
+que la tour a déjà préparé (worktrees, dépendances) et où. « Aucune » s'il n'y en a pas.>
 
 ## Suivi au fil de l'eau
 

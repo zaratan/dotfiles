@@ -55,9 +55,11 @@ le deuxième train attend le premier. À la clôture, ils se retirent par `git -
 
 Une branche `convoi/<lot>-<k>` qui fusionne plusieurs trains vérifiés. Elle se compose dans un worktree à elle,
 jamais dans un worktree de vérification : celui-ci reste détaché, et `verif-train.sh` refuse un worktree qui porte
-une branche. Les conflits entre trains se règlent sur le convoi, puis le convoi est poussé. Il se vérifie à nouveau en local, avec la suite entière cette fois (`verif-train.sh … --tout`),
-puis ouvre **une PR vers la base** : c'est la seule CI qui tourne. Une fois verte, merge (tc-delegate,
-« Merger »), et les trains suivants fusionnent la base.
+une branche. Les conflits entre trains se règlent sur le convoi, puis le convoi est poussé. Il ouvre **une PR vers la base** :
+c'est la seule CI qui tourne. Si son arbre (`git rev-parse 'origin/convoi/<lot>-<k>^{tree}'`) est celui d'un SHA
+qu'une vérification a rendu `VERT` sur la suite entière (`--tout`, ou la suite entière jouée par un agent), la PR part sans vérification locale (dix minutes gagnées, trois fois en un lot) ;
+sinon la suite entière (`verif-train.sh … --tout`) tourne en local pendant la CI, et le merge attend les deux. CI verte, merge
+(tc-delegate, « Merger »), et les trains suivants fusionnent la base.
 
 ## Les règles
 
@@ -70,6 +72,8 @@ puis ouvre **une PR vers la base** : c'est la seule CI qui tourne. Une fois vert
   convoi qui la porte, et reçoit à ce moment son label `lot: <n>`.
 - **Le conflit d'un train avec la base** se confie à l'agent qui connaît l'un des deux côtés, dans son
   worktree ; la tour commite la fusion.
+- **Pendant la QA de fin de lot, sur décision de l'utilisateur**, un train `train/<lot>-qa` reçoit les correctifs
+  des KO, sans CI, et une seule PR part vers la base à la fin de la passe : trois correctifs pour une CI de 22 minutes.
 - **Délégation** : sous `/tc-delegate on`, avec ce modèle choisi par l'utilisateur, les branches `train/*` et
   `convoi/*` entrent dans le périmètre délégué au même titre que les branches d'issue. Jamais de `--force` dessus.
 

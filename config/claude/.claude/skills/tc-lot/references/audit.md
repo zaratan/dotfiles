@@ -1,6 +1,7 @@
 # La passe SOLID / DRY / KISS de fin de lot
 
-Les chemins `assets/…` sont ceux de `~/.claude/skills/tower-control/`. Lancée au dernier merge du lot, en
+Les chemins `assets/…` sont ceux de `~/.claude/skills/tower-control/`. Lancée au dernier merge du lot, ou dès
+que le dernier convoi est poussé, pendant sa CI (vingt minutes gagnées, cinq zones rendues avant le merge), en
 parallèle de la QA : elle ne lit que le code, n'a besoin d'aucune pile, et ne change rien. Elle ouvre des
 issues. Le protocole est celui de « Trier et relire le backlog » du skill (agents de lecture seule, format de
 constat imposé, textes rédigés par les mêmes agents, lecteur froid, humanize, création par script, aucune
@@ -9,14 +10,16 @@ constat imposé, textes rédigés par les mêmes agents, lecteur froid, humanize
 - **Zones** : trois à cinq, proposées par la tour depuis l'arborescence (un domaine métier, le socle, le
   web, les paquets partagés…), validées par l'utilisateur avec la question « avant quelle échéance ? ».
   Un agent `Explore` par zone, brief `assets/consigne-audit.md`, sur la base à jour (`git archive` du
-  dernier merge si le checkout est en retard) ; 100 à 150 k tokens chacun, une heure.
+  dernier merge ou du convoi si le checkout est en retard) ; 100 à 150 k tokens chacun, une heure.
 - **Le constat**, une ligne chacun : où (`fichier:ligne`), la mesure (lignes dupliquées, nombre d'appelants,
   branches, paramètres), le principe touché (SOLID, DRY ou KISS, lequel), le refactoring proposé, sa
   complexité en points, « avant l'échéance ? », et l'issue ouverte qu'il rejoint s'il y en a une. Un constat
   sans mesure est une opinion : il ne passe pas. Un agent dédoublonne l'ensemble avant la rédaction.
 - **Avant d'écrire une issue, confronter chaque constat au Backlog** (`board.sh lire`, puis `gh issue list
   --search`) : s'il rejoint une issue existante, c'est un commentaire avec `fichier:ligne`, pas une issue.
-- **Les textes** : un agent `Explore` ne peut pas écrire de fichier ; les constats passent à un agent
+- **Les textes** : un agent `Explore` ne peut pas écrire de fichier ; son rendu se range par `assets/rendu.py
+  <transcript> <sortie.md> <titre> [ligne sous le titre]`, depuis `~/.claude/projects/<cwd encodé>/<session de la
+  tour>/subagents/agent-<id>.jsonl` (cinq rendus en une commande au lieu de les recopier) ; les constats passent à un agent
   `general-purpose` repris par `SendMessage` (contexte gardé), qui rédige au gabarit d'issue, un fichier par
   issue au format de `~/.claude/skills/tc-commun/appliquer-issues.py`, relus par un lecteur froid, passés
   par humanize ; priorité et points proposés avec le texte, chacun avec sa raison. Le périmètre d'échéance se

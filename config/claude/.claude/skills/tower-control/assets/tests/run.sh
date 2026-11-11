@@ -205,4 +205,38 @@ check "appliquer dry-run annonce la création préfixée" "$(echo "$out" | grep 
 check "appliquer dry-run n'appelle pas gh" "$(wc -l < "$FAKE/journal" | tr -d ' ')" 0
 out=$(python3 -I "$ASSETS/../../tc-commun/appliquer-issues.py" o 1 o/r "$ASSETS/tests/issues-fausse" --dry-run 2>&1); check "appliquer refuse 4 points" "$?" 1
 
+# --- avancement.sh : l'heure en tête, même sans agent
+out=$(TZ=Asia/Tokyo "$ASSETS/avancement.sh" "$T/m2"); check "avancement sans agent" "$?" 0
+check "avancement donne l'heure dans le fuseau" "$(echo "$out" | head -1 | grep -c '^Il est [0-9][0-9] h [0-9][0-9] (Asia/Tokyo)\.$')" 1
+out=$(TZ=Europe/Pariss "$ASSETS/avancement.sh" "$T/m2"); check "avancement signale un fuseau inconnu" "$(echo "$out" | head -1 | grep -c 'absent ou inconnu')" 1
+out=$(env -u TZ "$ASSETS/avancement.sh" "$T/m2"); check "avancement signale le fuseau absent" "$(echo "$out" | head -1 | grep -c 'fuseau de l.utilisateur absent')" 1
+
+# --- guet-qa.sh
+mkdir -p "$T/qa"; printf '10:00 | L1 | OK | vu | c.png\n' > "$T/qa/qa-17-1-suivi.md"
+out=$(GUET_QA_MAX=1 GUET_QA_PAS=0.2 "$ASSETS/guet-qa.sh" "$T/qa" 17 0); check "guet-qa sort au délai sans signalement" "$(echo "$out" | head -1)" "DÉLAI : 0 signalements (vus : 0)"
+printf '10:05 | L2 | KO | rien | c.png\n' >> "$T/qa/qa-17-1-suivi.md"; printf '10:06 | attente tour | L9\n' > "$T/qa/qa-17-2-suivi.md"
+out=$(GUET_QA_MAX=30 "$ASSETS/guet-qa.sh" "$T/qa" 17 0); check "guet-qa sort sur un KO neuf" "$(echo "$out" | head -1)" "NEUF : 2 signalements (vus : 0)"
+check "guet-qa cite la ligne KO" "$(echo "$out" | grep -c '^2:10:05 | L2 | KO')" 1
+out=$(GUET_QA_MAX=1 GUET_QA_PAS=0.2 "$ASSETS/guet-qa.sh" "$T/qa" 17 2); check "guet-qa ignore les signalements déjà vus" "$(echo "$out" | head -1 | cut -d' ' -f1)" "DÉLAI"
+out=$("$ASSETS/guet-qa.sh" "$T/absent" 17 0 2>/dev/null); check "guet-qa refuse un dossier absent" "$?" 2
+out=$("$ASSETS/guet-qa.sh" "$T/qa" 17 abc 2>/dev/null); check "guet-qa refuse un compte non entier" "$?" 2
+mkdir -p "$T/qa2"; printf '10:00 | en cours | L1\n10:02 | L1 | OK | bloque bien l acces | c.png\n' > "$T/qa2/qa-17-1-suivi.md"
+printf '10:03 | L5 | KO | autre lot | c.png\n' > "$T/qa2/qa-16-1-suivi.md"
+out=$(GUET_QA_MAX=1 GUET_QA_PAS=0.2 "$ASSETS/guet-qa.sh" "$T/qa2" 17 0); check "guet-qa ignore un OK qui parle de blocage et un autre lot" "$(echo "$out" | head -1)" "DÉLAI : 0 signalements (vus : 0)"
+check "guet-qa ne compte pas les lignes en cours" "$(echo "$out" | grep -c '^qa-17-1-suivi.md : 1 lignes jouées$')" 1
+( sleep 1; printf '10:04 | L2 | bloquée | donnée absente | -\n' >> "$T/qa2/qa-17-1-suivi.md" ) &
+out=$(GUET_QA_MAX=20 GUET_QA_PAS=0.2 "$ASSETS/guet-qa.sh" "$T/qa2" 17 0); check "guet-qa sort sur une ligne bloquée arrivée pendant le guet" "$(echo "$out" | head -1)" "NEUF : 1 signalements (vus : 0)"
+out=$(GUET_QA_MAX=0 "$ASSETS/guet-qa.sh" "$T/qa2" 18 0); check "guet-qa dit qu'aucun suivi ne correspond au lot" "$(echo "$out" | grep -c '^aucun suivi qa-18-')" 1
+out=$(TZ=Europe/Pariss GUET_QA_MAX=0 "$ASSETS/guet-qa.sh" "$T/qa2" 17 0); check "guet-qa signale un fuseau inconnu" "$(echo "$out" | tail -1 | grep -c 'absent ou inconnu')" 1
+
+# --- rendu.py
+printf '%s\n' '{"message":{"role":"assistant","content":[{"type":"text","text":"brouillon"}]}}' 'pas du json' \
+  '{"message":{"role":"assistant","content":[{"type":"tool_use","name":"SubagentHandback","input":{"k":"ok","rendu":"a.ts:3 | 12 lignes | DRY"}}]}}' > "$T/agent.jsonl"
+out=$(python3 -I "$ASSETS/rendu.py" "$T/agent.jsonl" "$T/rendu.md" Zone "Format : x"); check "rendu extrait" "$?" 0
+check "rendu préfère le handback" "$(command cat "$T/rendu.md")" "$(printf '# Zone\n\nFormat : x\n\na.ts:3 | 12 lignes | DRY')"
+printf '%s\n' '{"message":{"role":"assistant","content":[{"type":"text","text":"dernier mot"}]}}' > "$T/agent2.jsonl"
+python3 -I "$ASSETS/rendu.py" "$T/agent2.jsonl" "$T/rendu2.md" Zone >/dev/null; check "rendu se replie sur le dernier texte" "$(sed -n 3p "$T/rendu2.md")" "dernier mot"
+: > "$T/vide.jsonl"; python3 -I "$ASSETS/rendu.py" "$T/vide.jsonl" "$T/r3.md" Zone 2>/dev/null; check "rendu refuse un transcript sans rendu" "$?" 1
+python3 -I "$ASSETS/rendu.py" "$T/absent.jsonl" "$T/r4.md" Zone 2>"$T/err"; check "rendu refuse un transcript absent sans trace" "$?:$(grep -c Traceback "$T/err")" "1:0"
+
 echo "$ok OK, $ko KO"; [ "$ko" = 0 ]

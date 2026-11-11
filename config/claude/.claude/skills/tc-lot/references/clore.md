@@ -21,7 +21,7 @@ groupée, avec une recommandation contre, et l'utilisateur ne s'est pas reconnu 
   `Explore`), avec la consigne de proposer les chemins d'or nouveaux sans les créer, puis de les appliquer
   dans un second passage (contexte gardé). Laissée en note de fin de `qa.md`, cette étape a été sautée, et
   les apprentissages d'une passe se perdent avec les worktrees.
-- **Passe SOLID / DRY / KISS, en parallèle de la QA**, dès le dernier merge : `tc-lot/references/audit.md`.
+- **Passe SOLID / DRY / KISS, en parallèle de la QA**, dès le dernier merge ou le push du dernier convoi : `tc-lot/references/audit.md`.
   Lecture seule, aucun changement de code ; des constats mesurés, confrontés au Backlog, puis des issues.
 - **Mesurer le dossier des comptes rendus et les dossiers temporaires des agents** (planches, maquettes des
   sous-agents de revue) : 9,7 Go et 2 Go s'y étaient accumulés en un lot. Proposer la liste à supprimer. Ce

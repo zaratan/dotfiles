@@ -19,8 +19,8 @@ Il est <heure locale de l'utilisateur, fuseau connu ou demandé>.
 À toi : <commit, PR, merge, verdict, réponse… ou « rien »>.
 ```
 
-- **État** : consigne envoyée, travaille, question, compte rendu, vérifié, PR, mergé. `assets/avancement.sh <dépôt>`
-  rend grappe, état herdr, depuis, contexte et le titre de l'agent ; la tour affine l'état et remplit Fait et ETA.
+- **État** : consigne envoyée, travaille, question, compte rendu, vérifié, PR, mergé. `TZ=<zone> assets/avancement.sh <dépôt>`
+  imprime l'heure en première ligne, puis rend grappe, état herdr, depuis, contexte et le titre de l'agent ; la tour affine l'état et remplit Fait et ETA.
   Un agent en vol sans guet en cours est une anomalie à corriger au point même : un agent lancé en fin de série
   sans son guet a attendu en silence.
 - **Fait** : ce qui est prouvé, pas un pourcentage de Must-Have (la tour ne coche qu'après vérification) :

@@ -145,7 +145,8 @@ l'enfant) : la parente reste en Backlog avec une priorité, sans points ni assig
 seules les sous-issues se traitent. GitHub ne ferme pas une parente quand ses enfants
 le sont : à chaque sous-issue fermée, la tour coche sa case dans la Must-Have de la
 parente (geste mécanique), et quand tout est coché, elle propose à l'utilisateur de la
-fermer.
+fermer. Avant de créer une sous-issue, lire la parente d'une issue voisine du même sujet : une parente recopiée
+d'un exemple a rattaché une issue à la mauvaise mère.
 
 ## Trier et relire le backlog
 
@@ -182,7 +183,8 @@ froid. Sur 87 textes passés par humanize, 30 restaient incompréhensibles hors 
 session. La consigne du lecteur dit qu'un texte à plusieurs points mineurs mais sans point
 bloquant reste « clair », sinon chaque lecteur applique sa règle. Puis une relecture
 factuelle, chaque chiffre (lignes, tests, numéros de ligne, pistes déjà faites) remesuré :
-un chiffre repris d'une doc ou d'un rapport est faux une fois sur trois. Plusieurs relecteurs
+un chiffre repris d'une doc ou d'un rapport est faux une fois sur trois. Une affirmation d'absence
+(« plus aucun », « seul ») se prouve par un `grep` sur tout le dépôt, pas sur les fichiers de l'issue. Plusieurs relecteurs
 aux angles distincts (architecture, langage cible, exactitude, utilisateur final) se
 recouvrent peu ; la seconde passe revient au même relecteur par `SendMessage`. Avant de
 montrer un texte à valider, compter les décisions encore ouvertes et les poser toutes : ce
@@ -219,7 +221,9 @@ points ont été relevées deux fois par l'utilisateur. `gh issue create` n'a pa
 `--json` : prendre le numéro sur l'URL imprimée.
 
 **Une décision prise avec l'utilisateur sur une issue va dans son How** (relire le
-corps, ajouter, réécrire, passe humanize), pas seulement dans la conversation. En lot,
+corps, ajouter, réécrire, passe humanize), pas seulement dans la conversation. L'ajout part avec les
+corrections du What, du Why ou de la Must-Have qu'il contredit, et le lecteur froid lit le corps entier :
+il a trouvé dix contradictions laissées ainsi en un lot. En lot,
 elle va aussi dans `lot-<n>/decisions.md`.
 
 **Une remarque qui se rattache à une issue existante** devient un commentaire sur
@@ -237,7 +241,9 @@ au-delà de quatre options, un seul tableau numéroté dans le message et la que
 la reposer seule, avec « je l'avais oubliée » en option. Chaque option se relit contre les
 décisions déjà prises (`decisions.md`, veille comprise) et cite celle qu'elle frôle : une
 option à contresens d'une décision de la veille a été cochée et a coûté deux redessins et un
-dépôt créé pour rien.
+dépôt créé pour rien. **Avant un `AskUserQuestion`, lancer en arrière-plan tout ce qui ne dépend pas
+de la réponse**, et quand une notification attendue dans les cinq minutes débloque un geste délégué (CI
+verte, merge), faire le geste puis poser la question : un merge prêt a attendu quarante minutes une réponse.
 
 - **Tout ce qui décide d'un comportement est à l'utilisateur** : un critère, un seuil,
   une sévérité, une règle ajoutée ou retirée, la forme d'un fichier livré, un choix
@@ -261,8 +267,9 @@ dépôt créé pour rien.
   ce qu'il rapporte. Les verdicts à l'œil (planches, images) : « Verdicts à l'œil » de
   `references/cas.md`.
 - **Les heures dans le fuseau de l'utilisateur, lues à l'horloge.** Le serveur peut être en UTC
-  pendant que l'utilisateur voyage : chaque heure écrite sort de `TZ=<zone> date` lancé à ce moment,
-  jamais de tête (deux heures fausses en un lot, deux encore au suivant, de dix minutes à trois heures) ;
+  pendant que l'utilisateur voyage : l'heure d'un point est la première ligne de `TZ=<zone> assets/avancement.sh <dépôt>` ;
+  hors point, `TZ=<zone> date` lancé à ce moment ; jamais de tête (deux heures fausses en un lot, deux au
+  suivant, trois au troisième : lue à part, la règle n'a pas tenu sur treize heures) ;
   après une question restée deux heures sans réponse, l'heure du message suivant se relit aussi.
   Demander le fuseau s'il n'est pas connu. De même,
   un niveau de contexte ne s'annonce jamais sans mesure : un `/compact` se demande sur un fait observé
@@ -279,7 +286,9 @@ dépôt créé pour rien.
 - **Tout geste git d'écriture de la tour passe par `git -C <chemin absolu>`**, jamais par un
   `cd <worktree> &&` en tête de chaîne : une fois, le `cd` n'a pas pris dans le shell de l'outil,
   `git add` a échoué sur un chemin inexistant et un `push` a visé le dépôt des issues, refusé
-  parce que la référence n'existait pas. Rien d'écrit, par chance.
+  parce que la référence n'existait pas. Rien d'écrit, par chance. Toute autre commande qui exige un
+  cwd se lance dans un sous-shell, `(cd <chemin> && …)` : un `cd wt/qa-2/e2e && node …` a laissé le shell
+  de la tour dans le worktree d'un agent pour l'appel suivant.
 - **Le shell de l'outil Bash est zsh**, cinq pièges qui ont chacun coûté un incident :
   `${VAR}:…` et jamais `$VAR:…` (`:r`, `:a` sont des modificateurs d'historique, un refspec a été
   tronqué deux fois le même jour) ; une variable ne se découpe pas en mots (`docker rm -f $C` a

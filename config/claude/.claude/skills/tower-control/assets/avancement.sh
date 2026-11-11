@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
-# avancement.sh <dépôt des issues> [--board] : le tableau des agents du projet pour le point (tc-lot/assets/point.md).
-# Agents herdr nommés `<dépôt>-<grappe>` par lancer.sh, ou dont le cwd est le dépôt ou un worktree ; la tour elle-même
+# avancement.sh <dépôt des issues> [--board] : l'heure, dans le fuseau de TZ, puis le tableau des agents du projet pour le
+# point (tc-lot/assets/point.md). Agents herdr nommés `<dépôt>-<grappe>` par lancer.sh, ou dont le cwd est le dépôt ou un worktree ; la tour elle-même
 # ($HERDR_PANE_ID) est exclue. Contexte % : fichier ~/.claude/tower-control/ctx/<session> écrit par la ligne d'état.
 # « Depuis » : dernière écriture du transcript de l'agent. --board ajoute la colonne du board (une lecture, à la demande).
 set -euo pipefail
 
 REPO=${1:?usage: avancement.sh <dépôt des issues> [--board]}
 BOARD=${2:-}
+if [ -n "${TZ:-}" ] && [ -e "/usr/share/zoneinfo/$TZ" ]; then echo "Il est $(date '+%H h %M') ($TZ)."
+else echo "Il est $(date '+%H h %M') à l'heure du serveur : fuseau de l'utilisateur absent ou inconnu (TZ=<zone> avancement.sh …)."; fi
 # shellcheck source=../../tc-commun/config-lib.sh
 source "$(dirname "$0")/../../tc-commun/config-lib.sh"
 command -v herdr >/dev/null || { echo "herdr absent du PATH" >&2; exit 2; }

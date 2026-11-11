@@ -28,8 +28,10 @@ Les tests de chaque PR ne voient pas une régression qui naît de la somme des m
 - **Avant d'écrire les lignes du lot, relire ses décisions et les comptes rendus des agents** : les deux KO d'une
   passe venaient de lignes de la tour qui décrivaient le contraire d'une décision prise le jour même.
 - **Un attendu que le rédacteur a calculé sans le mesurer est marqué « calculé »** : deux KO d'une passe
-  venaient d'attendus faux du cahier. La passe précédente sert d'oracle : chercher la ligne dans ses suivis
-  avant de compter un KO.
+  venaient d'attendus faux du cahier. Il dit d'où il est calculé : un test nommé, ou « le texte
+  de la page », qui ne prouve pas le comportement (deux attendus du lot suivant recopiaient un écran ou une
+  décision, malgré une relecture contre le code). La passe précédente sert d'oracle : chercher la ligne dans ses
+  suivis avant de compter un KO.
 - **Une ligne vaut par son résultat**, pas par l'absence d'erreur : réponses écrites et
   comptées, score affiché avec sa valeur, mail arrivé dans la boîte de test.
 - **Chaque attente du cahier se relit contre les règles du produit avant la passe** : une
@@ -53,13 +55,15 @@ Les tests de chaque PR ne voient pas une régression qui naît de la somme des m
 - **Suivi en direct** : chaque agent ajoute une ligne à `travail/qa-<n>-<k>-suivi.md` par ligne
   jouée, dès qu'elle l'est, datée par `date -u` (un agent a daté son suivi de tête, de 00:18 à 02:50 pour une
   passe finie à 00:50, et l'a rempli par paquets : la tour n'a rien pu faire au fil de l'eau), avec le détail
-  de chaque KO. La tour lit ces fichiers pendant la passe (un point toutes
-  les 15 minutes si l'utilisateur le demande). Elle n'attend pas le rapport final pour agir sur un
+  de chaque KO. La tour les guette par `TZ=<zone> assets/guet-qa.sh <travail/> <n>
+  <signalements vus>`, lancé comme `guetter.sh` (« Attendre » de `references/cycle.md`) et relancé avec le compte
+  qu'il imprime : il rend la main à chaque KO, « attente tour » ou ligne bloquée neuve, et toutes les 40 minutes
+  pour un point (`GUET_QA_MAX=900` si l'utilisateur en veut un toutes les 15 minutes). Elle n'attend pas le rapport final pour agir sur un
   KO : rejouer, ouvrir l'issue, et lancer le correctif dans une grappe neuve partie de
-  `origin/<base>`, en suivant le cycle normal (consigne, vérification, décisions posées,
+  `origin/<base>`, ou du train de QA s'il y en a un, en suivant le cycle normal (consigne, vérification, décisions posées,
   PR). Elle redirige l'agent si une ligne dépend d'un défaut déjà connu. Elle réordonne les
   lignes d'un agent quand une autre passe d'abord (correctif mergé, donnée prête). Une ligne KO
-  se rejoue après le merge de son correctif.
+  se rejoue après le merge de son correctif, dans la base ou dans le train de QA.
 - **Contournements partagés** : `travail/qa-<n>-contournements.md`, commun aux agents. Chacun y
   ajoute ce qui servirait aux autres (sélecteur, double facteur, préparation de donnée,
   libellé réel), et le relit avant chaque ligne. La tour y relaie ce qu'elle voit dans un fichier
@@ -68,15 +72,19 @@ Les tests de chaque PR ne voient pas une régression qui naît de la somme des m
 - **États hors écran** : une ligne qui exige un état que l'app refuse de fabriquer (transition
   interdite, doublon, dates passées) se signale « attente tour » dans le suivi. **Les états que le cahier
   marque « tour » se préparent avant d'envoyer les consignes**, ou se confient à l'agent comme manipulation
-  de test autorisée : un état attendu pendant que la tour posait une question à l'utilisateur a été
-  joué deux heures après la passe. Pour un état qui n'était pas prévu, la tour prépare
+  de test autorisée (« Manipulations autorisées » de la consigne), ce que seule la tour peut créer (worktrees
+  sur le commit d'avant le lot, dépendances installées) préparé d'avance : un état attendu pendant que la
+  tour posait une question à l'utilisateur a été joué deux heures après la passe ; préparés ainsi au lot suivant,
+  aucune ligne n'a attendu la tour. Pour un état qui n'était pas prévu, la tour prépare
   cet état elle-même sur la pile locale de l'agent (cinq minutes pour une session modifiée en SQL), au
   besoin en contournant les protections de
   l'app (jamais ailleurs que sur une pile locale), puis dit à l'agent ce qu'elle a fait et
   l'ajoute aux seeds à prévoir. Le garde-fou d'un agent a déjà refusé cette préparation, et la
   ligne est restée bloquée toute une passe. Un état fabriqué ainsi n'est pas une donnée normale :
   un écart vu dessus se rejoue sur des données faites par l'écran avant d'être compté comme KO.
-- **Chaque KO**, la tour le rejoue elle-même avant d'en parler. Puis elle le classe :
+- **Chaque KO**, la tour le rejoue elle-même avant d'en parler, et en confie le diagnostic à un sous-agent en
+  lecture seule, quatre questions imposées : la cause prouvée, la portée réelle, le commit, le test qui aurait dû le
+  voir (quatre à six minutes ; deux fois sur trois, il a changé le classement). Puis elle le classe :
   régression du lot (à dire tout de suite, avec la recommandation de ne pas livrer avant
   le correctif) ou défaut préexistant. Le classement se **date par `git log -- <fichiers de
   la cause>` entre la base du lot et la tête**, ou par le même fichier dans les deux versions d'une
@@ -85,7 +93,9 @@ Les tests de chaque PR ne voient pas une régression qui naît de la somme des m
   une passe, les quatre KO étaient antérieurs au lot, et le dire a changé la décision
   (corriger tout de suite ou trier). Dans les deux cas, une issue va au Backlog, et
   l'utilisateur trie ; un correctif décidé passe par le cycle normal, confié à l'agent qui a écrit le code
-  touché, dans son worktree libéré, `install` et `build` en tête de consigne : correctif, revue et retouche
+  touché, dans son worktree libéré, `install` et `build` en tête de consigne, dans le train de QA quand il y en a un
+  (`references/trains.md`). Sa consigne demande aussi la revue, mesure à l'appui, des endroits bâtis pareil : un
+  écrasement de donnée voisin a été trouvé ainsi. Correctif, revue et retouche
   en 40 minutes.
 - **Après la passe**, le jour même : faire évoluer les cahiers (étape de `clore.md`, avec les
   apprentissages des agents). Réunir leurs « seeds à ajouter » en une issue au Backlog, pour qu'une passe

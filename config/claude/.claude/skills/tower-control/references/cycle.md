@@ -83,7 +83,9 @@ guetteur sur une section, la compter dans le fichier** (`grep -c '^## <section>'
 présente a fait attendre un guetteur sans fin.
 
 **Attendre sans surveiller, un guetteur par agent** : `assets/guetter.sh <agent>
-<compte rendu attendu> [section]`, lancé en arrière-plan (`run_in_background`). Il rend la
+<compte rendu attendu> [section]`, lancé par `run_in_background`, sans `timeout`, sans `&`, seul dans sa
+commande : un guet lancé avec un délai aurait été tué au bout de dix minutes d'une passe de trois heures, et un guet
+lancé avec `&` ne notifie jamais. Il rend la
 main dès que l'agent est `blocked` (question ou demande de permission) ; quand le compte
 rendu a été **modifié après le lancement du guet** (un ancien fichier ne compte pas) et que
 l'agent est arrêté depuis trois minutes sans shell de fond, ou depuis dix minutes avec (un
@@ -171,7 +173,9 @@ d'une issue qui ne sort que des tableaux.
 ## Enchaîner une tâche
 
 À chaque pause naturelle d'un agent (compte rendu, retouche, fusion, issue suivante de la grappe),
-relever son contexte sur sa ligne d'état. **Au-delà de 40 %, compacter avant la tâche suivante** :
+relever son contexte sur sa ligne d'état ; avant l'issue suivante, lire `~/.claude/tower-control/ctx/<session>`
+dans la même commande que `branche-suivante.sh`, avant `envoyer.sh` : relevé après l'envoi, un agent à 49 % est
+reparti sans compactage. **Au-delà de 40 %, compacter avant la tâche suivante** :
 `herdr agent prompt <agent> "/compact"`, attendre `done`, relire le remplissage. Un agent à 79 % sur
 sa seconde issue a vu le résumé automatique tomber au milieu du travail ; un agent compacté entre deux
 issues (79 % → 0 %) n'a rien perdu, la consigne suivante se suffit. Après le `/compact`, lire l'écran
