@@ -28,7 +28,8 @@ Confirmer en une phrase ce qui est délégué et ce qui ne l'est pas, puis appli
 - le push par `~/.claude/skills/tower-control/assets/pousser.sh <worktree> origin/<base>` : il refuse une tête
   égale à la base ou un commit non signé quand le dépôt signe, pousse par refspec explicite (jamais `-u`, jamais la
   base, jamais `--force` : avec `push.default = upstream`, un `push -u` d'une branche créée depuis `origin/<base>`
-  est allé sur `main`), et relit la branche sur origin avant `gh pr create` ;
+  est allé sur `main`), et relit la branche sur origin. Sans tuyau derrière (`cycle.md`, « Branches et retard ») :
+  `gh pr create` ne part que sur son code 0, et l'issue ne passe en Review qu'avec l'URL de la PR ;
 - `gh pr create` vers la branche de base ;
 - `gh pr merge` quand la CI de la PR est verte ;
 - `git merge origin/<base>` dans une branche d'issue pour résoudre un conflit, avec revérification complète
@@ -113,8 +114,10 @@ pas mergée : la tour s'arrête et le dit.
   avec la base** (trois commits `--no-verify` portaient un travail qui ne compilait qu'après la fusion), et
   l'écrire dans le journal. Même chose pour un commit de fusion que lint-staged refuse (« Failed to back up ») :
   `--no-verify`, les gates rejouées à la main avant.
-- Une PR à la fois. Attendre sa CI, merger avec la méthode de ses merges précédents (merge commit, squash),
-  puis attendre que **toutes** les exécutions du commit de merge sur la branche de base soient terminées et
+- Une PR à la fois. Attendre sa CI, merger avec la méthode de ses merges précédents (merge commit, squash) et
+  que le dépôt autorise, lue au démarrage de la délégation (`gh api repos/<o>/<r> --jq '.allow_merge_commit,
+  .allow_squash_merge'`) : un premier lot n'a pas de merge précédent, et un `--merge` a été refusé sur un dépôt
+  en squash seul. Puis attendre que **toutes** les exécutions du commit de merge sur la branche de base soient terminées et
   vertes avant la PR suivante. Cette attente ne vaut qu'entre deux merges : lancer un agent sur une branche
   partie de la base n'attend pas, le contenu est celui que la CI de la PR a déjà validé.
 - PR empilée : viser la branche de la PR du dessous tant qu'elle n'est pas mergée ; après son merge, GitHub

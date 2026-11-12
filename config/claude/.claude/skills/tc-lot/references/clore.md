@@ -29,9 +29,6 @@ groupée, avec une recommandation contre, et l'utilisateur ne s'est pas reconnu 
   vide a fait perdre les scripts de mesure de deux agents.
 - **Relever la durée des jobs de CI et la comparer au lot précédent**, dans le journal du lot : e2e de 6,7 à
   14,6 min (208 à 431 tests, un worker) et unitaires de 213 à 511 s en trois semaines, sans que personne le voie.
-- **Un run de CI qui finit en quelques secondes sans étape** se lit dans les annotations du job
-  (`check-runs/<id>/annotations`) : facturation de l'organisation, quota. La tour le dit, suspend les merges, et ne
-  reprend sur preuves locales (tc-delegate) que sur décision de l'utilisateur.
 - Ranger chaque worktree selon « Ranger un worktree » de `references/cycle.md`.
 - **Si le lot se livre sur des instances** (migrations, déploiements) : « Livraison sur des instances » de
   `references/cas.md` avant d'écrire la livraison.

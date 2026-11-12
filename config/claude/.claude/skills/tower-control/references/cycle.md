@@ -200,8 +200,10 @@ le commit de la précédente : c'est la tour qui le fait (l'agent en est interdi
 l'utilisateur ou sous délégation. Le script part de `origin/<base>` après un `fetch` (le HEAD local ne
 « prend » jamais les merges des autres worktrees), refuse un arbre sale, crée sans amont (une branche
 qui suit la base a déjà poussé sur `main`) et vérifie que HEAD porte bien le nom demandé (trois agents
-sont partis sur des branches jamais créées). Le lancer sans tuyau derrière : un `| tail -1` a gardé le code
-de sortie du filtre, et l'agent suivant a reçu sa consigne sur une branche absente. On n'empile sur la branche précédente que si sa PR n'est
+sont partis sur des branches jamais créées). Aucun script de la tour ne se lance avec un tuyau derrière : un
+`| tail -1` garde le code de sortie du filtre. Derrière `branche-suivante.sh`, l'agent suivant a reçu sa consigne
+sur une branche absente ; derrière `pousser.sh`, un hook pre-push en échec a fait passer une issue en Review
+sans PR. On n'empile sur la branche précédente que si sa PR n'est
 pas encore mergée ; une fois cette PR mergée, la branche empilée est « N derrière, 0 devant » : le
 rebase est un déplacement, seuls les fichiers touchés par d'autres PR mergées entre-temps peuvent
 conflicter, le dire tel quel dans le point. Jamais `git pull` sur la branche de base, même en avance

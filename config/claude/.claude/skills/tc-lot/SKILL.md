@@ -37,8 +37,14 @@ Relire le fichier de l'étape en cours après un résumé automatique du context
 la PR s'ouvre. Une tour l'a oublié toute une matinée, l'utilisateur l'a vu avant elle. En même temps,
 `ISSUES[<grappe>]=<N>` dans le fichier de lot : c'est ce que `avancement.sh` affiche.
 
-**Chaque message suit `tc-lot/assets/point.md`** : heure locale, tableau des agents, « À toi » ; le
-tableau des étapes sur « ETA ? ».
+**Chaque message suit `tc-lot/assets/point.md`, dès le premier du lot** : heure locale lue par `avancement.sh`,
+tableau des agents, « À toi » ; le tableau des étapes sur « ETA ? ». Une heure de tête est partie au premier
+message d'un lot, alors que la règle était connue.
+
+**Au premier run de CI du lot, vérifier qu'il a des étapes.** Un run qui finit en quelques secondes sans étape
+se lit dans les annotations du job (`check-runs/<id>/annotations`) : facturation de l'organisation, quota. La
+tour le dit, suspend les merges, et ne reprend sur preuves locales (tc-delegate) que sur décision de
+l'utilisateur. Vu sur deux projets, chaque fois découvert trop tard.
 
 **Une chaîne sérielle sur les mêmes fichiers coûte une fusion par issue** dès qu'une autre branche touche
 ces fichiers en parallèle (sept fusions sur quatre motifs plus une branche voisine, deux heures de chemin
