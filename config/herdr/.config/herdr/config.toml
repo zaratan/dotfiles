@@ -72,7 +72,9 @@ show_agent_labels_on_pane_borders = true
 # show a clock, and the zsh RPS1 does not exist in agent or editor panes.
 hide_tab_bar_when_single_tab = false
 tab_bar_position = "bottom"
-tab_bar_right = [{ type = "datetime", format = "%a %d-%h %H:%M" }]
+# The clock renders on the Herdr server: ~/.cache/herdr-tz, written by the
+# lumiel function of the Mac, carries the time zone of the client.
+tab_bar_right = [{ type = "command", command = "f=~/.cache/herdr-tz; [ -s \"$f\" ] && export TZ=\"$(cat \"$f\")\"; LC_TIME=C date '+%a %d-%h %H:%M'", interval_seconds = 15 }]
 
 [ui.toast]
 # "terminal" is a dead end here: Ghostty 1.3.1 on macOS 26 never surfaces
