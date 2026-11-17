@@ -27,6 +27,8 @@ exacte.
   `git fetch` puis comparer `HEAD` à `origin/<base>` ; `git status` seul ne montre pas un retard sans fetch.
 - **Ne dépasse pas l'issue.** Un autre bug, un nettoyage, une doc à retoucher : tu le
   notes dans le compte rendu, tu ne le fais pas.
+- **Toute commande qui supprime cite ses variables par `"${VAR:?}"`** : un `rm -f $D/*.png` avec `$D` vide
+  visait la racine.
 - **N'écris pas dans la mémoire du projet** (`~/.claude/projects/…/memory/`). Elle est partagée par
   toutes les sessions ; une règle ou un fait que tu veux garder va dans ton compte rendu, la tour le range.
 
@@ -56,7 +58,9 @@ ce que tu fais, sinon dans le compte rendu. C'est toi qui as le code sous les ye
 - Chaque comportement ajouté ou corrigé vient avec son test, dont le nom dit le
   pourquoi. Pas de commentaire dans les tests.
 - Un test ne compte pas en dur les éléments d'un jeu de données que d'autres issues
-  enrichissent (fichiers, fiches, lignes) : il dérive le compte du jeu lui-même.
+  enrichissent (fichiers, fiches, lignes) : il dérive le compte du jeu lui-même. Quand un test casse parce
+  que le contenu réel a changé, la même correction relit tous les tests qui lisent ce contenu et dit pour
+  chacun pourquoi il tient : un test réparé seul a recassé le jour même.
 - Les conventions du dépôt (langue du code et des sorties, densité de commentaires)
   sont dans son `CLAUDE.md` : elles s'appliquent.
 - L'issue est petite : pas de revue de plan. Une revue `lead-engineer-reviewer`

@@ -13,11 +13,14 @@ Un fichier par issue, en-tête entre deux lignes `---` puis le corps :
   jalon: Recette fin novembre  facultatif
   numero: 251                  écrit en retour après la création ; présent = mise à jour
   empreinte: <sha256>          écrit en retour ; si le corps GitHub a changé depuis, le fichier est sauté
+Un renvoi vers une issue du même dossier s'écrit `#NEUVE-<nom du fichier sans .md>` : remplacé par `#<numéro>` à l'envoi,
+après la création de la cible (seconde passe si elle vient après). Un renvoi vers un fichier absent est refusé.
 Idempotent : relancer ne recrée rien. Pourquoi ce script : réécrit trois fois dans trois projets (210 lignes la
 dernière), et `gh project item-edit --url` épuise le quota GraphQL dès une dizaine d'issues."""
 import hashlib, json, pathlib, re, subprocess, sys, time
 
 FIB = {"1", "2", "3", "5", "8", "13"}
+RENVOI = re.compile(r"#NEUVE-([\w-]+)")
 
 
 def run(*args, **kw):
@@ -116,17 +119,29 @@ fichiers = sorted(DOSSIER.glob("*.md"))
 if not fichiers:
     sys.exit(f"aucun fichier .md dans {DOSSIER}")
 plans = [(f, *lire(f)) for f in fichiers]
+cibles = {f.stem: tete for f, tete, _ in plans}
+inconnus = sorted({f"{f.name} → #NEUVE-{n}" for f, _, corps in plans for n in RENVOI.findall(corps) if n not in cibles})
+if inconnus:
+    sys.exit("renvoi vers un fichier absent du dossier :\n  " + "\n  ".join(inconnus))
+
+
+def resoudre(corps):
+    return RENVOI.sub(lambda m: f"#{cibles[m.group(1)]['numero']}" if "numero" in cibles[m.group(1)] else m.group(0), corps)
+
+
 if DRY:
     for f, tete, corps in plans:
         titre, _ = titre_et_corps(tete, corps)
         action = f"mettre à jour #{tete['numero']}" if "numero" in tete else "créer"
+        renvois = sorted(set(RENVOI.findall(corps)))
         print(f"{f.name}: {action} « {titre} » labels={labels(tete)} prio={tete['priorite']} pts={tete['points']}"
-              + (f" parente=#{tete['parente']}" if "parente" in tete else "") + (f" jalon={tete['jalon']}" if "jalon" in tete else ""))
+              + (f" parente=#{tete['parente']}" if "parente" in tete else "") + (f" jalon={tete['jalon']}" if "jalon" in tete else "")
+              + (f" renvois={renvois}" if renvois else ""))
     sys.exit(0)
 
 board = Board(OWNER, PROJET)
 for f, tete, corps in plans:
-    titre, texte = titre_et_corps(tete, corps)
+    titre, texte = titre_et_corps(tete, resoudre(corps))
     if "numero" in tete:
         n = tete["numero"]
         actuel = json.loads(run("gh", "issue", "view", n, "--repo", REPO, "--json", "body"))["body"]
@@ -161,3 +176,21 @@ for f, tete, corps in plans:
         print(f"{f.name}: #{n} créée au Backlog ({tete['priorite']}, {tete['points']} pts)")
     tete["empreinte"] = sha(texte)
     ecrire(f, tete, corps)
+
+for f, tete, corps in plans:
+    if "numero" not in tete or not RENVOI.search(corps):
+        continue
+    titre, texte = titre_et_corps(tete, resoudre(corps))
+    if sha(texte) == tete.get("empreinte"):
+        continue
+    actuel = json.loads(run("gh", "issue", "view", tete["numero"], "--repo", REPO, "--json", "body"))["body"]
+    if sha(actuel) not in (tete.get("empreinte"), sha(texte)):
+        print(f"{f.name}: #{tete['numero']} renvois NON résolus, le corps a changé sur GitHub depuis l'export")
+        continue
+    run("gh", "issue", "edit", tete["numero"], "--repo", REPO, "--body", texte)
+    tete["empreinte"] = sha(texte)
+    ecrire(f, tete, corps)
+    print(f"{f.name}: #{tete['numero']} renvois résolus")
+restants = [f.name for f, tete, corps in plans if "numero" in tete and RENVOI.search(resoudre(corps))]
+if restants:
+    sys.exit(f"renvois #NEUVE- encore présents sur GitHub : {', '.join(restants)}")

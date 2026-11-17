@@ -6,7 +6,7 @@ Les chemins `assets/…` et `references/…` sont ceux de `~/.claude/skills/towe
 l'utilisateur qui trie ; la tour ne rediscute pas la sélection, elle lit chaque issue
 retenue et passe au groupement. La lecture du board et les règles d'assignation
 (assignée à quelqu'un d'autre, sans assigné, co-assignée, l'assignation n'est pas un
-verrou) sont dans « Le board et l'assignation » de tower-control : elles s'appliquent
+verrou) sont dans « Le board et l'assignation » de `references/github.md` : elles s'appliquent
 à chaque issue du lot.
 
 **Une méta que l'utilisateur pose en « À faire »** veut dire « toutes ses sous-issues ouvertes
@@ -14,12 +14,12 @@ dans le lot » : la tour les passe en « À faire » et les traite comme les aut
 pour les regrouper.
 
 **Un lot peut ne pas contenir de code** : un audit du dépôt ou une relecture complète
-du backlog suit « Trier et relire le backlog » de tower-control, avec un agent de
+du backlog suit « Trier et relire le backlog » de `references/github.md`, avec un agent de
 lecture seule par zone ou par groupe d'issues. Un lot qui planifie une réécriture dans
 un autre langage : « Réécriture » de `references/cas.md`.
 
 **Relire chaque issue contre le code avant de grouper** (« Trier et relire le backlog »
-de tower-control). Le résultat va dans `lot-<n>/decisions.md` du dépôt des issues
+de `references/github.md`). Le résultat va dans `lot-<n>/decisions.md` du dépôt des issues
 (prémisses corrigées, groupement, décisions de l'utilisateur) : c'est de là que les
 consignes se rédigent. **Garder au groupement les grappes hors lot encore ouvertes** dans
 le fichier de lot.
@@ -55,6 +55,9 @@ contredisait « le formateur seulement sur les fichiers touchés » (lot du 27/1
 vérification avant de l'écrire** : un spec d'intégration lancé sans sa config ne jouait aucun test. **Une preuve
 que la CI rend déjà ne se demande pas à l'agent, et aucune preuve ne touche un chemin hors du worktree** : chaque
 dialogue d'autorisation du mode auto bloque l'agent jusqu'à la tour (trois blocages sur deux issues).
+**Relire chaque consigne contre la Must-Have de son issue**, phrase par phrase quand elle restreint le
+périmètre, **et contre elle-même** : une consigne limitait les sélecteurs e2e que la Must-Have demandait de tous
+changer, une consigne de QA nommait deux bases différentes.
 **Relire chaque texte d'issue créé pour le lot contre la consigne commune** : un corps d'issue demandait des renvois
 au dépôt privé que la consigne interdit, l'agent a suivi l'issue (29 renvois retirés en retouche).
 

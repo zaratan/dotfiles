@@ -12,8 +12,20 @@ test "${HERDR_ENV:-}" = 1 || { echo "pas dans herdr" >&2; exit 2; }
 : "${WORKTREES_DIR:?}" "${MODEL:=claude-opus-5-5}" "${BOOTSTRAP_TIMEOUT:=900000}"
 [ ${#GRAPPES[@]} -gt 0 ] || { echo "GRAPPES manquant : l'écrire dans $LOT" >&2; exit 2; }
 
+wanted() { [ ${#ONLY[@]} -eq 0 ] && return 0; local g; for g in "${ONLY[@]}"; do [ "$g" = "$1" ] && return 0; done; return 1; }
+agent_of() { echo "$(basename "$REPO" | tr '[:upper:]' '[:lower:]')-$1"; }
+
+declare -A FETCHED=()
 for name in "${!GRAPPES[@]}"; do
+  wanted "$name" || continue
   r=$(tc_repo_of "${GRAPPES[$name]}"); code=$(tc_path_of "$r"); base=$(tc_base_of "$r")
+  # herdr refuse le nom après la création du worktree : la branche resterait derrière.
+  [[ $(agent_of "$name") =~ ^[a-z][a-z0-9_-]{0,31}$ ]] \
+    || { echo "grappe $name : nom d'agent « $(agent_of "$name") » refusé par herdr ([a-z][a-z0-9_-], 32 caractères au plus)" >&2; exit 2; }
+  if [[ $base == origin/* ]] && [ -z "${FETCHED[$code]:-}" ]; then
+    git -C "$code" fetch -q origin || { echo "fetch impossible dans $code" >&2; exit 2; }
+    FETCHED[$code]=1
+  fi
   git -C "$code" rev-parse --verify --quiet "$base" >/dev/null \
     || { echo "grappe $name : branche de base introuvable dans $code : $base" >&2; exit 2; }
 done
@@ -22,14 +34,13 @@ MEMORY="$HOME/.claude/projects/$(echo "$REPO" | tr '/' '-')/memory"
 mkdir -p "$WORKTREES_DIR"
 DENY="Bash(git add*) Bash(git commit*) Bash(git push*) Bash(git stash*) Bash(git switch*) Bash(git checkout*) Bash(git reset*) Bash(git rebase*) Bash(git merge*) Bash(git rm*) Bash(git mv*) Bash(git restore*) Bash(git clean*) Bash(git update-index*) Bash(rm -rf*)"
 
-wanted() { [ ${#ONLY[@]} -eq 0 ] && return 0; local g; for g in "${ONLY[@]}"; do [ "$g" = "$1" ] && return 0; done; return 1; }
 for name in "${!GRAPPES[@]}"; do
   wanted "$name" || continue
   r=$(tc_repo_of "${GRAPPES[$name]}")
   branch=$(tc_branch_of "${GRAPPES[$name]}")
   code=$(tc_path_of "$r"); base=$(tc_base_of "$r"); bootstrap=$(tc_bootstrap_of "$r"); check=$(tc_check_of "$r")
   path="$WORKTREES_DIR/$name"
-  echo "== $name → $path ($branch depuis $base, dépôt ${r:-$(basename "$code")})"
+  echo "== $name → $path ($branch depuis $base à $(git -C "$code" rev-parse --short "$base"), dépôt ${r:-$(basename "$code")})"
 
   # herdr refuse --workspace et --cwd ensemble.
   if [ -n "$r" ]; then origin=(--cwd "$code"); else origin=(--workspace "$HERDR_WORKSPACE_ID"); fi
@@ -56,8 +67,8 @@ for name in "${!GRAPPES[@]}"; do
   echo "   amorcé"
 
   if [ -n "$r" ]; then herdr pane run "$pane" "cd '$REPO'" >/dev/null; fi
-  # Nom d'agent global à la machine, minuscules imposées par herdr ; `agent_pane_busy` juste après l'amorçage, d'où les essais.
-  agent="$(basename "$REPO" | tr '[:upper:]' '[:lower:]')-$name"
+  # Nom d'agent global à la machine ; `agent_pane_busy` juste après l'amorçage, d'où les essais.
+  agent=$(agent_of "$name")
   started=0
   for _ in 1 2 3 4 5; do
     if herdr agent start "$agent" --kind claude --pane "$pane" --timeout 60000 -- \

@@ -9,7 +9,8 @@ zone>. Tu ne modifies rien, tu n'écris aucun fichier, tu ne lances ni build ni 
 Ce que tu cherches : ce qui a plus d'une raison de changer (S), ce qui est dupliqué (DRY), ce qui est plus
 compliqué que ce que les tests exigent (KISS), les dépendances dans le mauvais sens, les abstractions sans
 second cas d'usage. L'échéance du projet est <date ou « aucune »> : un refactoring ne vaut que s'il réduit un
-coût d'ici là, ou un risque de régression.
+coût d'ici là, ou un risque de régression. Décisions du lot, à ne pas rendre en constat : <decisions.md du lot,
+ou ses lignes qui touchent la zone>. Un constat qui en contredit une se rend à part, avec son numéro.
 
 Format, une ligne par constat, rien d'autre :
 `<fichier:ligne> | <mesure chiffrée : N lignes identiques dans M fichiers, N appelants, N branches, N paramètres> | <S, O, L, I, D, DRY ou KISS> | <refactoring en une phrase> | <points : 1, 2, 3, 5, 8> | <avant l'échéance : oui / non / sans objet>`

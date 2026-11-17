@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
-# train.sh <dépôt des issues> <grappe> <issue> <train> <titre> [--dry-run] : sous /tc-delegate, porte une issue vérifiée
+# train.sh <dépôt des issues> <grappe> <issue> <train> <titre> [--dry-run] [--fusionner] : sous /tc-delegate, porte une issue vérifiée
 # par la tour dans son train (references/trains.md) : commit, push sans hook par pousser.sh, PR vers le train, merge,
 # ligne dans lot-<n>/trains.md, issue en Review. Chaque étape déjà faite est sautée : on relance après un échec.
+# --fusionner, quand le train a avancé : commit du travail, fusion du train, fichiers communs aux deux côtés, puis arrêt.
 set -euo pipefail
 
-REPO=${1:?usage: train.sh <dépôt des issues> <grappe> <issue> <train/<lot>-<grappe>> <titre> [--dry-run]}
+REPO=${1:?usage: train.sh <dépôt des issues> <grappe> <issue> <train/<lot>-<grappe>> <titre> [--dry-run] [--fusionner]}
 GRAPPE=${2:?grappe manquante}; N=${3:?issue manquante}; TRAIN=${4:?train manquant}; TITRE=${5:?titre manquant}
-DRY=0
+DRY=0; FUSION=0
 for opt in "${@:6}"; do
-  case "$opt" in --dry-run) DRY=1 ;; *) echo "option inconnue : $opt" >&2; exit 2 ;; esac
+  case "$opt" in --dry-run) DRY=1 ;; --fusionner) FUSION=1 ;; *) echo "option inconnue : $opt" >&2; exit 2 ;; esac
 done
 ASSETS=$(cd "$(dirname "$0")" && pwd)
 # shellcheck source=../../tc-commun/config-lib.sh
@@ -27,9 +28,10 @@ g() { git -C "$WT" "$@"; }
 BR=$(g symbolic-ref --short -q HEAD) || refuse "HEAD détaché dans $WT"
 [ "$BR" != "$base" ] && [ "$BR" != "$TRAIN" ] || refuse "HEAD est sur $BR"
 [ -z "${ISSUES[$GRAPPE]:-}" ] || [ "${ISSUES[$GRAPPE]}" = "$N" ] || echo "attention : ISSUES[$GRAPPE] vaut ${ISSUES[$GRAPPE]}, pas $N"
+g rev-parse -q --verify MERGE_HEAD >/dev/null && refuse "fusion en cours dans $WT : résoudre, commiter la fusion, revérifier, relancer sans --fusionner"
 g fetch -q origin
 g rev-parse --verify -q "refs/remotes/origin/$TRAIN" >/dev/null \
-  || refuse "$TRAIN absent d'origin ; le créer : git -C $code push origin refs/remotes/origin/$base:refs/heads/$TRAIN"
+  || refuse "$TRAIN absent d'origin ; le créer : git -C $code push --no-verify origin refs/remotes/origin/$base:refs/heads/$TRAIN"
 
 interdit=${REFS_INTERDITES:-}
 [ -n "$interdit" ] || [ -z "$r" ] || interdit=$(printf '%s' "${ISSUES_REPO#*/}" | sed -E 's/[][\\.*^$+?(){}|]/\\&/g')
@@ -39,6 +41,8 @@ if [ -n "$interdit" ]; then
   trouve+=$(cd "$WT" && git ls-files -o --exclude-standard -z | xargs -0 -r grep -nE -- "$interdit" || true)
   [ -z "$trouve" ] || { echo "$trouve"; refuse "référence interdite ($interdit) dans le travail"; }
 fi
+
+[ "$FUSION" = 0 ] || ! g merge-base --is-ancestor "origin/$TRAIN" HEAD || refuse "$BR contient déjà la tête de $TRAIN : rien à fusionner, relancer sans --fusionner"
 
 slug=$(g remote get-url origin | sed -E 's#\.git$##; s#.*[:/]([^/]+/[^/]+)$#\1#')
 pr=$(gh pr list --repo "$slug" --head "$BR" --base "$TRAIN" --state all --json number,state \
@@ -50,8 +54,35 @@ if [ -z "$dirty" ] && [ -z "$devant" ]; then
   [ "$ETAT" = MERGED ] || refuse "rien à porter : $BR n'a ni travail ni commit au-delà de $TRAIN"
   echo "PR $P déjà mergée dans $TRAIN : reste la ligne et le board"
 else
-  g merge-base --is-ancestor "origin/$TRAIN" HEAD \
-    || refuse "$BR ne contient pas la tête de $TRAIN : fusionner $TRAIN dans $BR, revérifier l'arbre fusionné, relancer"
+  if ! g merge-base --is-ancestor "origin/$TRAIN" HEAD; then
+    [ "$FUSION" = 1 ] || refuse "$BR ne contient pas la tête de $TRAIN : relancer avec --fusionner"
+    mb=$(g merge-base HEAD "origin/$TRAIN")
+    communs=$(comm -12 <(g diff --no-renames --name-only "$mb" "origin/$TRAIN" | sort -u) \
+      <({ g diff --no-renames --name-only "$mb"; g ls-files -o --exclude-standard; } | sort -u))
+    if [ "$DRY" = 1 ]; then
+      echo "à faire : commit « $TITRE » si besoin, fusion de $TRAIN dans $BR ; fichiers communs : ${communs:-aucun}"
+      exit 0
+    fi
+    if [ -n "$dirty" ]; then
+      [ "$dernier" != "$TITRE" ] || refuse "arbre non commité, et le dernier commit porte déjà le titre « $TITRE »"
+      g add -A
+      g commit -q -m "$TITRE"
+      [ "$(g log -1 --format=%s)" = "$TITRE" ] || { echo "ÉCHEC : le commit n'a pas pris"; exit 1; }
+    fi
+    if ! g merge -q --no-verify --no-ff -m "Merge branch '$TRAIN' into $BR" "origin/$TRAIN"; then
+      conflits=$(g diff --name-only --diff-filter=U)
+      [ -n "$conflits" ] || { echo "ÉCHEC : git merge a échoué sans conflit (signature ?)"; exit 1; }
+      echo "En conflit :"; echo "$conflits"
+      refuse "fusion de $TRAIN en conflit, laissée en cours : confier la résolution à l'agent (consigne-fusion.md), commiter la fusion, revérifier, relancer sans --fusionner"
+    fi
+    if [ "$(g config --get commit.gpgsign || true)" = true ]; then
+      g cat-file commit HEAD | grep -q '^gpgsig' || refuse "commit de fusion non signé : $(g rev-parse --short HEAD)"
+    fi
+    echo "$TRAIN fusionné dans $BR ($(g rev-parse --short HEAD)). Fichiers communs : ${communs:-aucun}"
+    [ -z "$communs" ] || echo "Revérifier l'arbre fusionné sur ces fichiers (e2e de leur zone) avant de relancer."
+    echo "Relancer sans --fusionner."
+    exit 0
+  fi
   [ "$ETAT" != MERGED ] || { echo "PR $P déjà mergée : le travail neuf part dans une nouvelle PR"; P=""; ETAT=""; }
   if [ -n "$dirty" ]; then
     [ "$dernier" != "$TITRE" ] || refuse "arbre non commité, et le dernier commit porte déjà le titre « $TITRE »"
@@ -83,7 +114,7 @@ if [ "$ETAT" != MERGED ]; then
     sleep "$PAUSE"
   done
   [ "$fusion" != UNKNOWN ] || { echo "ÉCHEC : GitHub ne dit pas si la PR $P fusionne ; relancer"; exit 1; }
-  [ "$fusion" != CONFLICTING ] || refuse "PR $P en conflit avec $TRAIN : fusionner $TRAIN dans $BR, revérifier, relancer"
+  [ "$fusion" != CONFLICTING ] || refuse "PR $P en conflit avec $TRAIN : relancer avec --fusionner"
   sleep "$PAUSE"
   checks=$(gh pr view "$P" --repo "$slug" --json statusCheckRollup -q '.statusCheckRollup | length')
   [ "$checks" = 0 ] || refuse "PR $P a $checks checks : ce dépôt lance la CI vers les trains, ce que trains.md exclut. À revoir avec l'utilisateur ; rien n'est mergé"

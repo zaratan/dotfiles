@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# Faux gh : login « moi » ; assignés depuis $FAKE/assignees ; PR mergée depuis $FAKE/merged ; PR d'un train depuis $FAKE/pr_train, pr_vue, pr_checks et pr_etat ; journal dans $FAKE/journal.
+# Faux gh : login « moi » ; assignés depuis $FAKE/assignees ; PR mergée depuis $FAKE/merged ; PR d'un train depuis $FAKE/pr_train, pr_vue, pr_checks et pr_etat ; numéros d'issue créée depuis $FAKE/issue_num, échec de création au numéro $FAKE/issue_echec, corps dans $FAKE/corps-<n> ; journal dans $FAKE/journal.
 echo "$*" >> "$FAKE/journal"
+corps() { local prev=""; for a in "$@"; do [ "$prev" = --body ] && printf '%s' "$a"; prev=$a; done; }
 case "$*" in
   "api user -q .login") echo moi ;;
   *"issue view"*assignees*) echo "$(cat "$FAKE/assignees")" | tr ' ' '\n' | grep -v '^$' | paste -sd' ' - ;;
-  *"issue edit"*) : ;;
+  *"issue view"*"--json body"*) python3 -c 'import json,sys; print(json.dumps({"body": open(sys.argv[1]).read()}))' "$FAKE/corps-$3" ;;
+  *"issue edit"*) [ -z "$(corps "$@")" ] || corps "$@" > "$FAKE/corps-$3" ;;
   *"pr list"*"--state all"*) cat "$FAKE/pr_train" 2>/dev/null || true ;;
   *"pr create"*) echo "https://github.com/o/r/pull/55" ;;
   *"pr view"*mergeable*) cat "$FAKE/pr_vue" 2>/dev/null || echo MERGEABLE ;;
@@ -12,5 +14,10 @@ case "$*" in
   *"pr view"*state*) cat "$FAKE/pr_etat" 2>/dev/null || echo MERGED ;;
   *"pr merge"*) : ;;
   *"pr list"*merged*) n=$(cat "$FAKE/merged" 2>/dev/null); [ -z "$n" ] || echo "$n" ;;
+  *"issue create"*) n=$(( $(cat "$FAKE/issue_num" 2>/dev/null || echo 100) + 1 ))
+    [ "$n" != "$(cat "$FAKE/issue_echec" 2>/dev/null)" ] || { echo "création refusée" >&2; exit 1; }
+    echo "$n" > "$FAKE/issue_num"; corps "$@" > "$FAKE/corps-$n"; echo "https://github.com/o/r/issues/$n" ;;
+  *"project item-add"*) echo '{"id":"item"}' ;;
+  *"api graphql"*) echo '{"data":{"user":{"projectV2":{"id":"P","fields":{"nodes":[{"id":"F1","name":"Status","options":[{"id":"o1","name":"Backlog"}]},{"id":"F2","name":"Priorité","options":[{"id":"o2","name":"P2"}]},{"id":"F3","name":"Points"}]}}}}}' ;;
   *) echo '[]' ;;
 esac

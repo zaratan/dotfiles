@@ -27,6 +27,9 @@ if [ "$(g config --get commit.gpgsign || true)" = true ]; then
 fi
 echo "$(g rev-list --count "origin/$base..HEAD") commit(s) à pousser, tête $(g rev-parse --short HEAD)"
 if [ "$DRY" = 1 ]; then echo "git -C $WT push ${HOOK[*]+"${HOOK[*]}"} origin \"refs/heads/${BR}:refs/heads/${BR}\""; exit 0; fi
-g push ${HOOK[@]+"${HOOK[@]}"} origin "refs/heads/${BR}:refs/heads/${BR}"
+sortie=$(mktemp); trap 'rm -f "$sortie"' EXIT
+if ! g push ${HOOK[@]+"${HOOK[@]}"} origin "refs/heads/${BR}:refs/heads/${BR}" >"$sortie" 2>&1; then
+  tail -n 40 "$sortie"; echo "ÉCHEC : push refusé (fin de sa sortie ci-dessus) ; ni PR ni Review"; exit 1
+fi
 g ls-remote --exit-code --heads origin "$BR" >/dev/null || { echo "ÉCHEC : $BR absente d'origin après le push"; exit 1; }
 echo "poussée ; gh pr create peut partir"

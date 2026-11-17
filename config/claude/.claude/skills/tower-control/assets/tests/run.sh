@@ -54,9 +54,16 @@ out=$("$ASSETS/pousser.sh" "$T/wt" origin/main --dry-run); check "pousser refuse
 echo c > "$T/wt/c.txt"; git -C "$T/wt" add -A; git -C "$T/wt" -c user.name=t -c user.email=t@t commit -qm c
 out=$("$ASSETS/pousser.sh" "$T/wt" origin/main --dry-run); check "pousser dry-run" "$?" 0
 check "pousser refspec explicite" "$(echo "$out" | grep -c 'refs/heads/issue/2:refs/heads/issue/2')" 1
-out=$("$ASSETS/pousser.sh" "$T/wt" origin/main 2>/dev/null); check "pousser pousse" "$?" 0
+out=$("$ASSETS/pousser.sh" "$T/wt" origin/main 2>&1); check "pousser pousse" "$?" 0
 git -C "$T/wt" ls-remote --exit-code --heads origin issue/2 >/dev/null; check "pousser : branche sur origin" "$?" 0
 check "pousser : main inchangée" "$(git -C "$T/wt" ls-remote origin refs/heads/main | cut -f1)" "$(git -C "$T/wt" rev-parse origin/main)"
+check "pousser tait la sortie de git push" "$(echo "$out" | grep -c '^To ')" 0
+printf '#!/bin/sh\necho HOOK-ROUGE\nexit 1\n' > "$T/wt/.git/hooks/pre-push"; chmod +x "$T/wt/.git/hooks/pre-push"
+echo d > "$T/wt/d.txt"; git -C "$T/wt" add -A; git -C "$T/wt" -c user.name=t -c user.email=t@t commit -qm d
+out=$("$ASSETS/pousser.sh" "$T/wt" origin/main 2>&1); check "pousser sort en échec sur un hook rouge" "$?" 1
+check "pousser montre la sortie du hook rouge" "$(echo "$out" | grep -c '^HOOK-ROUGE$')" 1
+check "pousser dit que le push est refusé" "$(echo "$out" | grep -c '^ÉCHEC : push refusé')" 1
+rm "$T/wt/.git/hooks/pre-push"; git -C "$T/wt" reset -q --hard HEAD~1
 
 # --- board.sh assigner (faux gh)
 mkdir -p "$T/repo/.claude/tower-control"; printf 'ISSUES_REPO="o/r"\nPROJECT_OWNER="o"\nPROJECT_NUMBER=1\nWORKTREES_DIR="%s"\n' "$T/wts" > "$T/repo/.claude/tower-control/config.sh"
@@ -111,7 +118,7 @@ echo b > "$T/wts2/ds/b.txt"
 out=$(porter train/ds "Un titre" --dry-run); check "train refuse un train sans numéro de lot" "$?" 3
 out=$(porter train/16-ds "$(printf 'x%.0s' {1..101})" --dry-run); check "train refuse un titre de 101 caractères" "$?" 3
 out=$(porter train/16-zz "Un titre" --dry-run); check "train refuse un train absent d'origin" "$?" 3
-check "train donne la commande qui crée le train" "$(echo "$out" | grep -c 'push origin refs/remotes/origin/main:refs/heads/train/16-zz')" 1
+check "train donne la commande qui crée le train sans hook" "$(echo "$out" | grep -c 'push --no-verify origin refs/remotes/origin/main:refs/heads/train/16-zz')" 1
 echo "voir secret-prive" > "$T/wts2/ds/c.txt"; out=$(porter train/16-ds "Un titre" --dry-run); check "train refuse une référence interdite non suivie" "$?" 3
 rm "$T/wts2/ds/c.txt"; echo "secret-prive" >> "$T/wts2/ds/a.txt"; out=$(porter train/16-ds "Un titre" --dry-run); check "train refuse une référence interdite suivie" "$?" 3
 git -C "$T/wts2/ds" checkout -q -- a.txt; out=$(porter train/16-ds "Titre secret-prive" --dry-run); check "train refuse une référence interdite dans le titre" "$?" 3
@@ -152,6 +159,30 @@ echo e > "$T/wts2/ds/e.txt"; out=$(porter train/16-ds "Deux"); check "train refu
 rm "$T/wts2/ds/e.txt"; : > "$FAKE/pr_train"
 git -C "$T/wts2/ds" switch -q -c train/16-ds; out=$(porter train/16-ds "Trois" --dry-run); check "train refuse HEAD sur le train" "$?" 3
 git -C "$T/wts2/ds" switch -q issue/10
+avancer_train() { git -C "$T/m2" fetch -q origin; git -C "$T/m2" checkout -q --detach origin/train/16-ds; echo "$2" > "$T/m2/$1"
+  git -C "$T/m2" add "$1"; git -C "$T/m2" commit -qm "avance $1"; git -C "$T/m2" push -q --no-verify origin HEAD:refs/heads/train/16-ds; git -C "$T/m2" checkout -q main; }
+avancer_train g.txt g; echo h > "$T/wts2/ds/h.txt"
+out=$(porter train/16-ds "Quatre"); check "train refuse un train avancé sans --fusionner" "$?" 3
+check "train propose --fusionner" "$(echo "$out" | grep -c 'relancer avec --fusionner')" 1
+out=$(porter train/16-ds "Quatre" --fusionner --dry-run); check "train --fusionner dry-run" "$?" 0
+check "train --fusionner dry-run ne commite pas" "$(git -C "$T/wts2/ds" status --short | grep -c h.txt)" 1
+check "train --fusionner dry-run sans fichier commun" "$(echo "$out" | grep -c 'fichiers communs : aucun$')" 1
+out=$(porter train/16-ds "Quatre" --fusionner); check "train --fusionner fusionne" "$?" 0
+check "train --fusionner : sujet de fusion" "$(git -C "$T/wts2/ds" log -1 --format=%s)" "Merge branch 'train/16-ds' into issue/10"
+check "train --fusionner : travail commité avant" "$(git -C "$T/wts2/ds" log -1 --format=%s HEAD^1)" Quatre
+git -C "$T/wts2/ds" merge-base --is-ancestor origin/train/16-ds HEAD; check "train --fusionner : tête du train contenue" "$?" 0
+out=$(porter train/16-ds "Quatre" --fusionner); check "train --fusionner refuse quand rien n'est à fusionner" "$?" 3
+check "train --fusionner renvoie à la relance sans l'option" "$(echo "$out" | grep -c 'rien à fusionner, relancer sans --fusionner')" 1
+: > "$FAKE/journal"; out=$(porter train/16-ds "Quatre"); check "train porte l'issue après la fusion" "$?" 0
+check "train ouvre la PR après la fusion" "$(grep -c 'pr create.*--base train/16-ds' "$FAKE/journal")" 1
+avancer_train g.txt "g train"; echo "g branche" > "$T/wts2/ds/g.txt"
+out=$(porter train/16-ds "Cinq" --fusionner --dry-run); check "train --fusionner nomme les fichiers communs" "$(echo "$out" | grep -c 'fichiers communs : g.txt$')" 1
+out=$(porter train/16-ds "Cinq" --fusionner); check "train --fusionner refuse un conflit" "$?" 3
+check "train --fusionner liste le conflit" "$(echo "$out" | grep -c '^g.txt$')" 1
+git -C "$T/wts2/ds" rev-parse -q --verify MERGE_HEAD >/dev/null; check "train --fusionner laisse la fusion en cours" "$?" 0
+out=$(porter train/16-ds "Cinq"); check "train refuse une fusion en cours" "$?" 3
+check "train dit quoi faire d'une fusion en cours" "$(echo "$out" | grep -c 'fusion en cours dans .* relancer sans --fusionner')" 1
+git -C "$T/wts2/ds" merge --abort
 
 # --- verif-train.sh
 verifier() { JOURNAUX="$T/j" "$ASSETS/verif-train.sh" "$T/m2" _ verif-1 "$@" 2>&1; }
@@ -204,6 +235,24 @@ out=$(python3 -I "$ASSETS/../../tc-commun/appliquer-issues.py" o 1 o/r "$ASSETS/
 check "appliquer dry-run annonce la création préfixée" "$(echo "$out" | grep -c 'créer « \[app\] Le compteur')" 1
 check "appliquer dry-run n'appelle pas gh" "$(wc -l < "$FAKE/journal" | tr -d ' ')" 0
 out=$(python3 -I "$ASSETS/../../tc-commun/appliquer-issues.py" o 1 o/r "$ASSETS/tests/issues-fausse" --dry-run 2>&1); check "appliquer refuse 4 points" "$?" 1
+appliquer() { python3 -I "$ASSETS/../../tc-commun/appliquer-issues.py" o 1 o/r "$@" 2>&1; }
+mkdir -p "$T/iss" "$T/iss-faux"
+printf -- '---\ntitre: A\npriorite: P2\npoints: 3\n---\nVoir #NEUVE-b.\n' > "$T/iss/a.md"
+printf -- '---\ntitre: B\npriorite: P2\npoints: 2\n---\nSuite de #NEUVE-a.\n' > "$T/iss/b.md"
+cp "$T/iss/"*.md "$T/iss-faux/"; echo 'Et #NEUVE-zz.' >> "$T/iss-faux/a.md"
+out=$(appliquer "$T/iss-faux" --dry-run); check "appliquer refuse un renvoi vers un fichier absent" "$?" 1
+check "appliquer nomme le renvoi absent" "$(echo "$out" | grep -c 'a.md → #NEUVE-zz')" 1
+out=$(appliquer "$T/iss" --dry-run); check "appliquer dry-run liste les renvois" "$(echo "$out" | grep -c "renvois=\['b'\]")" 1
+: > "$FAKE/journal"; echo 100 > "$FAKE/issue_num"
+out=$(appliquer "$T/iss"); check "appliquer crée avec renvois" "$?" 0
+check "appliquer résout un renvoi arrière à la création" "$(grep -c '^issue create .*--body Suite de #101\.$' "$FAKE/journal")" 1
+check "appliquer résout un renvoi avant en seconde passe" "$(grep -c '^issue edit 101 --repo o/r --body Voir #102\.$' "$FAKE/journal")" 1
+check "appliquer garde le renvoi dans le fichier" "$(grep -c '#NEUVE-b' "$T/iss/a.md")" 1
+mkdir -p "$T/iss2"; cp "$T/iss-faux/b.md" "$T/iss2/b.md"; printf -- '---\ntitre: A\npriorite: P2\npoints: 3\n---\nVoir #NEUVE-b.\n' > "$T/iss2/a.md"
+echo 200 > "$FAKE/issue_num"; echo 202 > "$FAKE/issue_echec"
+out=$(appliquer "$T/iss2"); check "appliquer s'arrête sur une création refusée" "$?" 1
+rm -f "$FAKE/issue_echec"; out=$(appliquer "$T/iss2"); check "appliquer reprend après une création refusée" "$?" 0
+check "appliquer résout à la reprise le renvoi d'une issue créée avant" "$(command cat "$FAKE/corps-201")" "Voir #202."
 
 # --- avancement.sh : l'heure en tête, même sans agent
 out=$(TZ=Asia/Tokyo "$ASSETS/avancement.sh" "$T/m2"); check "avancement sans agent" "$?" 0
@@ -238,5 +287,21 @@ printf '%s\n' '{"message":{"role":"assistant","content":[{"type":"text","text":"
 python3 -I "$ASSETS/rendu.py" "$T/agent2.jsonl" "$T/rendu2.md" Zone >/dev/null; check "rendu se replie sur le dernier texte" "$(sed -n 3p "$T/rendu2.md")" "dernier mot"
 : > "$T/vide.jsonl"; python3 -I "$ASSETS/rendu.py" "$T/vide.jsonl" "$T/r3.md" Zone 2>/dev/null; check "rendu refuse un transcript sans rendu" "$?" 1
 python3 -I "$ASSETS/rendu.py" "$T/absent.jsonl" "$T/r4.md" Zone 2>"$T/err"; check "rendu refuse un transcript absent sans trace" "$?:$(grep -c Traceback "$T/err")" "1:0"
+
+# --- lancer.sh : contrôles avant toute création
+git init -q -b main "$T/lz"; git -C "$T/lz" -c user.name=t -c user.email=t@t commit -q --allow-empty -m init
+mkdir -p "$T/lz/.claude/tower-control"; printf 'WORKTREES_DIR="%s"\nBASE_BRANCH=main\n' "$T/wlz" > "$T/lz/.claude/tower-control/config.sh"
+printf 'declare -A GRAPPES=([%s]="issue/1")\n' "$(printf 'x%.0s' {1..30})" > "$T/lz/.claude/tower-control/lot-moi.sh"
+: > "$FAKE/journal"; out=$(HERDR_ENV=1 HERDR_WORKSPACE_ID=w "$ASSETS/lancer.sh" "$T/lz" 2>&1); check "lancer refuse un nom d'agent de 33 caractères" "$?" 2
+check "lancer n'a rien créé" "$(grep -c 'worktree create' "$FAKE/journal")" 0
+check "lancer dit pourquoi" "$(echo "$out" | grep -c 'refusé par herdr')" 1
+printf 'declare -A GRAPPES=([%s]="issue/1")\n' "$(printf 'x%.0s' {1..29})" > "$T/lz/.claude/tower-control/lot-moi.sh"
+: > "$FAKE/journal"; out=$(HERDR_ENV=1 HERDR_WORKSPACE_ID=w "$ASSETS/lancer.sh" "$T/lz" 2>&1)
+check "lancer accepte un nom d'agent de 32 caractères" "$(grep -c 'worktree create' "$FAKE/journal")" 1
+git clone -q "$T/o2.git" "$T/autre" 2>/dev/null; git -C "$T/autre" checkout -q main
+echo n > "$T/autre/n.txt"; git -C "$T/autre" add n.txt; git -C "$T/autre" -c user.name=t -c user.email=t@t commit -qm neuf; git -C "$T/autre" push -q --no-verify origin main
+out=$(HERDR_ENV=1 HERDR_WORKSPACE_ID=w "$ASSETS/lancer.sh" "$T/m2" ds 2>&1)
+check "lancer fetch une base origin/" "$(git -C "$T/m2" rev-parse origin/main)" "$(git -C "$T/autre" rev-parse HEAD)"
+check "lancer affiche le SHA de départ" "$(echo "$out" | grep -c "depuis origin/main à $(git -C "$T/autre" rev-parse --short HEAD),")" 1
 
 echo "$ok OK, $ko KO"; [ "$ko" = 0 ]

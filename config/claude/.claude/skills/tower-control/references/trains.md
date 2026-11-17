@@ -26,7 +26,8 @@ de la tour (cycle.md, « Vérifier ») : refus d'un titre de plus de 100 caract�
 (`REFS_INTERDITES` du `config.sh`), commit (signé si le dépôt signe), push `--no-verify` par refspec explicite,
 PR vers le train, merge, ligne dans `lot-<n>/trains.md`, issue en Review. `--dry-run` d'abord. Sont refusés : un
 train absent d'origin (avec la commande qui le crée), une branche qui ne contient pas la tête du train (la tour a
-vérifié un autre arbre que celui qui entre : fusionner le train, revérifier, relancer), une PR en conflit, et une
+vérifié un autre arbre que celui qui entre : `--fusionner` commite, fusionne le train et nomme les fichiers communs
+aux deux côtés ; s'il y en a, rejouer l'e2e de leur zone, puis relancer sans l'option ; cinq fois dans une seule QA), une PR en conflit, et une
 PR qui a des checks (ce dépôt lance alors la CI vers les trains : le modèle est à revoir avec l'utilisateur). Après
 un échec, on relance la même commande : le commit fait, la PR mergée et la ligne écrite sont sautés ; un correctif
 sur une branche dont la PR est déjà mergée part dans une nouvelle PR.

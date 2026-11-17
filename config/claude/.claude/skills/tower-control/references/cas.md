@@ -10,9 +10,7 @@ des worktrees, seuil d'espace disque avant tout balayage. Deux niveaux : `lourd`
 construction de zéro, tests lents ; deux agents peuvent le tenir ensemble) et `chrono`, exclusif (un temps
 publié attend que tout le lourd soit fini) ; un script Python `fcntl.flock` fait les deux et reste compatible
 avec `lockf`. Un verrou se prend par `flock` ou `fcntl`, jamais en cherchant un processus par son nom : un
-`pgrep -f` attrapait les shells qui attendaient le verrou, et ils se sont attendus deux heures. Même piège pour
-`pkill -f <motif>` lancé depuis une commande qui contient le motif : il tue son propre shell ; tuer par PID (`$!`,
-fichier de PID) ou par un motif qui ne se reconnaît pas lui-même (`[e]2e-local`). Toute compilation
+`pgrep -f` attrapait les shells qui attendaient le verrou, et ils se sont attendus deux heures. Toute compilation
 chronométrée ou partie de zéro passe sous le verrou, comme la mesure. **Le
 réseau n'est jamais sous le verrou** : un téléchargement de 11 Go mis sous le verrou a bloqué les mesures
 24 min. Le critère de calme se mesure sur la machine au repos avant d'être écrit (la charge moyenne d'un Mac
@@ -47,7 +45,9 @@ piste et jamais par numéro, qui change à chaque réglage. Les verdicts d'une p
 traite en allers-retours courts avec un rendu en image à chaque passe : c'est l'image qui déclenche les
 retouches, pas le compte rendu. Un fichier de plus de 30 Mo ne s'envoie pas : découper par cas ou donner une
 commande `scp`, demander lequel avant de produire. Un agent ne capture pas une application du poste (Terminal,
-Finder, notification) : rendre le texte par `magick`, laisser les vraies captures à l'utilisateur.
+Finder, notification) : rendre le texte par `magick`, laisser les vraies captures à l'utilisateur. Un choix
+visuel posé sur téléphone part en captures côte à côte (`magick a.png b.png +append`) par `SendUserFile` ; les
+captures de l'agent nommées par largeur (`c-1440`, `c-390`, `c-768`) ont fait trancher trois cadrages en une retouche.
 
 ## Données hors git (gros fichiers, dossiers synchronisés, LFS)
 
@@ -96,7 +96,11 @@ que le commit suivant du rebase corrige, et laisse `git add` et `rebase --contin
 Une copie d'un worktree garde son nom de projet compose : `docker compose` depuis la copie recrée la pile de
 l'original en plein run ; poser `COMPOSE_PROJECT_NAME`, ou pas de compose du tout. Dependabot ne monte pas une
 peer installée automatiquement par pnpm : un override temporaire force la résolution, à retirer une fois le
-lockfile écrit. Un spec nouveau qui nettoie des tables se joue dans la même commande que ses voisins qui
+lockfile écrit. Au lancement d'un lot parallèle, auditer la pile d'un worktree (`docker stats`) et arrêter
+les services qui ne servent pas (journaux, studio, runtime edge, base de graphe) : 650 Mio par pile pour 2 Mio de
+données, à sept agents. Des ports de pile dans la plage éphémère du noyau (32768-60999) font échouer un démarrage
+au hasard : le correctif est dans le dépôt (base des ports hors de la plage), et deux worktrees peuvent hériter du
+même décalage, à vérifier au lancement. Un spec nouveau qui nettoie des tables se joue dans la même commande que ses voisins qui
 écrivent dans ces tables : seul, il passe sur une table parente vide et tombe en CI.
 
 Une montée majeure de framework change un comportement transverse sans qu'aucun test ne rougisse : un routeur
@@ -126,3 +130,21 @@ cahier ordonné qui modifie les données en dernier ; l'utilisateur colle chaque
 étape sur le disque (empreintes, heures, journal). Quand la porte de release est une passe manuelle d'une heure,
 prévoir dès la première version la voie d'un correctif : statut « non rejoué » ligne par ligne, accepté sur un
 numéro de correctif, avec ce que le correctif change.
+
+## Un client qui passe par son propre Claude
+
+Le `CLAUDE.md` du dépôt le cadre : il cherche une issue ouverte (`gh issue list --search`) et la commente avant
+d'en créer une, sans label ni priorité (un doublon est arrivé le premier jour) ; il ouvre ses PR en brouillon et
+lance `gh pr ready` quand il a fini. Ses micro-commits relancent la CI à chaque push, et chaque job est facturé à
+la minute entamée : pas d'e2e sur une PR en brouillon (`if: !github.event.pull_request.draft`, `ready_for_review`
+dans `pull_request.types`), lint, tests unitaires et build dans un seul job. Un test qui lit le contenu qu'il
+édite casse quand il le remplit : consigne commune, « Qualité attendue ».
+
+## Vérifications longues relancées par la CI
+
+Quand les vérifications du projet dépassent une dizaine de minutes par issue et que la CI de la PR les relance,
+la tour ne refait que ce que la CI ne voit pas, soit les tests locaux sur des données absentes de la CI, le diff
+(commentaires, fichiers non suivis), et un temps annoncé quand il compte, remesuré au calme. Sur un projet
+vidéo, la relance de `check`, des tests lents et de la référence coûtait 15 à 20 min de verrou par issue, pour
+des tests que l'agent venait de lancer et que la CI relançait sur trois systèmes. Avec des tests rapides, la
+vérification complète reste la règle.

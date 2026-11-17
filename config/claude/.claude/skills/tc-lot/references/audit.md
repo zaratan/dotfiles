@@ -3,13 +3,14 @@
 Les chemins `assets/…` sont ceux de `~/.claude/skills/tower-control/`. Lancée au dernier merge du lot, ou dès
 que le dernier convoi est poussé, pendant sa CI (vingt minutes gagnées, cinq zones rendues avant le merge), en
 parallèle de la QA : elle ne lit que le code, n'a besoin d'aucune pile, et ne change rien. Elle ouvre des
-issues. Le protocole est celui de « Trier et relire le backlog » du skill (agents de lecture seule, format de
+issues. Le protocole est celui de « Trier et relire le backlog » de `references/github.md` de tower-control (agents de lecture seule, format de
 constat imposé, textes rédigés par les mêmes agents, lecteur froid, humanize, création par script, aucune
 écriture GitHub par un agent) ; ce fichier dit ce qui est propre à l'audit.
 
 - **Zones** : trois à cinq, proposées par la tour depuis l'arborescence (un domaine métier, le socle, le
   web, les paquets partagés…), validées par l'utilisateur avec la question « avant quelle échéance ? ».
-  Un agent `Explore` par zone, brief `assets/consigne-audit.md`, sur la base à jour (`git archive` du
+  Un agent `Explore` par zone, brief `assets/consigne-audit.md` avec les décisions du lot (un audit en a
+  contredit quatre, sur deux projets), sur la base à jour (`git archive` du
   dernier merge ou du convoi si le checkout est en retard) ; 100 à 150 k tokens chacun, une heure.
 - **Le constat**, une ligne chacun : où (`fichier:ligne`), la mesure (lignes dupliquées, nombre d'appelants,
   branches, paramètres), le principe touché (SOLID, DRY ou KISS, lequel), le refactoring proposé, sa

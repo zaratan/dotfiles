@@ -6,7 +6,7 @@ Dès qu'un agent est en vol, le tableau des agents est entre les deux. Le tablea
 message sur une autre laissait invisible ; des ETA en UTC ont été lues fausses pendant qu'il voyageait.
 
 ```
-Il est <heure locale de l'utilisateur, fuseau connu ou demandé>.
+Il est <heure lue par avancement.sh, ou par `TZ=<zone> date` dans le même appel que le dernier geste ; jamais de tête>.
 
 <le sujet du message, court : ce qui est fait, les chiffres vérifiés, ce qui reste ouvert>
 

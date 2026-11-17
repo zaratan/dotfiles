@@ -57,8 +57,8 @@ premier qui a écrit.
 ## Avant d'écrire la consigne
 
 - L'issue est assignée au login courant, seul, relu après l'assignation (« Le board
-  et l'assignation » du skill) ; sinon, ne pas lancer.
-- Elle a été relue contre le code (« Trier et relire le backlog » du skill) ; sinon,
+  et l'assignation » de `references/github.md`) ; sinon, ne pas lancer.
+- Elle a été relue contre le code (« Trier et relire le backlog » de `references/github.md`) ; sinon,
   le faire maintenant.
 - **Premier lancement sur un projet** : relire le workflow du `CLAUDE.md` du dépôt. Écrit avant les skills,
   il demande souvent un mode plan relu par trois agents, des arrêts par sous-phase et un `git add` permis,
@@ -135,8 +135,9 @@ nom (checksum modulo) pour les noms hors table, et lire la sortie du pane quand 
 celle qui l'a écrit : un script écrit sur Mac a cassé trois fois sur un serveur EL
 (« Hôte Linux » de `references/cas.md`). Le nom
 d'agent herdr est global à la machine : le lanceur le préfixe par le dépôt des issues
-(`<méta>-<grappe>`), et c'est ce nom que la tour emploie dans `agent prompt`, `agent get` et
-le guetteur.
+(`<méta>-<grappe>`, 32 caractères au plus ; un nom mal formé est refusé avant toute création), et c'est ce nom que la tour
+emploie dans `agent prompt`, `agent get` et le guetteur. Il fait un `fetch` quand la base est
+`origin/<base>` et imprime le SHA de départ de chaque grappe : le comparer au merge attendu avant d'envoyer.
 La sonde de port libre doit aussi interroger docker (`docker ps --format '{{.Ports}}'`) : `ss` ne voit pas
 un port qu'un conteneur publie, et un worktree a reçu le PostgreSQL d'un autre, puis deux fois les mêmes
 ports d'images.
@@ -149,4 +150,4 @@ Envoyer à chaque agent le fichier assemblé **en un seul envoi, par `assets/env
 <envoyee>`** : en deux envois, l'agent répond au cadre par « quelle issue ? » et la consigne reste
 derrière sa question. Le script vérifie que l'agent a bien pris le texte (« Attendre » de `cycle.md`).
 
-Passer les issues lancées en « En cours » sur le board (« Poser un champ » du skill).
+Passer les issues lancées en « En cours » sur le board (« Poser un champ » de `references/github.md`).

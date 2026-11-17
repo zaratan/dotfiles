@@ -24,7 +24,7 @@ leçons qu'aucun skill ne porte encore, et celles propres au projet.
 2. **Lancer** : `references/lancer.md` de tower-control, en nommant les grappes du lot
    (`lancer.sh <chemin du dépôt des issues> <grappe…>`) : sans nom, le lanceur
    relancerait aussi une grappe hors lot encore ouverte.
-3. **Dépiler** : `references/cycle.md` de tower-control, pour chaque issue, avec les
+3. **Dépiler** : `references/cycle.md` et `references/merge.md` de tower-control, pour chaque issue, avec les
    règles de lot ci-dessous.
 4. **Clore** : `tc-lot/references/clore.md`. Ordre de merge, QA de fin de lot,
    rangement, journal, leçons.
@@ -41,10 +41,10 @@ la PR s'ouvre. Une tour l'a oublié toute une matinée, l'utilisateur l'a vu ava
 tableau des agents, « À toi » ; le tableau des étapes sur « ETA ? ». Une heure de tête est partie au premier
 message d'un lot, alors que la règle était connue.
 
-**Au premier run de CI du lot, vérifier qu'il a des étapes.** Un run qui finit en quelques secondes sans étape
-se lit dans les annotations du job (`check-runs/<id>/annotations`) : facturation de l'organisation, quota. La
-tour le dit, suspend les merges, et ne reprend sur preuves locales (tc-delegate) que sur décision de
-l'utilisateur. Vu sur deux projets, chaque fois découvert trop tard.
+**Chaque CI guettée se lit avec la durée et le nombre d'étapes de chaque job.** Un job fini en quelques
+secondes sans étape se lit dans ses annotations (`check-runs/<id>/annotations`) : facturation, quota. La tour le
+dit, suspend les merges, et ne reprend sur preuves locales (tc-delegate) que sur décision de l'utilisateur ;
+`gh run rerun` une fois réglé. Vu sur deux projets, la seconde fois en plein lot après un premier run sain.
 
 **Une chaîne sérielle sur les mêmes fichiers coûte une fusion par issue** dès qu'une autre branche touche
 ces fichiers en parallèle (sept fusions sur quatre motifs plus une branche voisine, deux heures de chemin
@@ -55,12 +55,15 @@ identifiant se tire de la base », et la fusion le vérifie par `up`, `down`, `u
 
 **Une grappe enchaîne ses issues dans le même worktree.** Après le commit de l'une, la
 tour crée la branche de la suivante et lui envoie sa consigne (« Branches et retard »
-de `cycle.md`). Un hors-périmètre dont le fichier est dans la grappe va en bloc
+de `merge.md`). Un hors-périmètre dont le fichier est dans la grappe va en bloc
 « reliquats » dans la consigne suivante.
 
 **Les e2e en local sont à la tour**, pas aux agents : avant chaque push, la tour joue les specs de la
 zone touchée dans le worktree de la branche (le dépôt dit comment, un script ou une recette), et la CI de
-la PR joue la suite complète. Un agent ne lance jamais la suite, sauf quand l'issue porte sur elle. Deux
+la PR joue la suite complète. Un agent ne lance jamais la suite, sauf quand l'issue porte sur elle. Une spec
+nouvelle se joue en `--repeat-each` sous la charge du lot avant d'entrer dans un train ou une PR : des specs
+vertes en local ont échoué en CI, autrement à chaque tentative (action avant l'hydratation, données laissées par
+une spec, défilement non attendu : `expect.poll` sur l'état), et une base a été mergée rouge. Deux
 agents sur une pile aux ports fixes ont testé les serveurs l'un de l'autre, et l'un a tué le run de l'autre.
 
 **Entre deux issues d'une grappe, relever le contexte de l'agent et compacter s'il le faut** : « Enchaîner une

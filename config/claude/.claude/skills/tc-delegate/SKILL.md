@@ -28,7 +28,7 @@ Confirmer en une phrase ce qui est délégué et ce qui ne l'est pas, puis appli
 - le push par `~/.claude/skills/tower-control/assets/pousser.sh <worktree> origin/<base>` : il refuse une tête
   égale à la base ou un commit non signé quand le dépôt signe, pousse par refspec explicite (jamais `-u`, jamais la
   base, jamais `--force` : avec `push.default = upstream`, un `push -u` d'une branche créée depuis `origin/<base>`
-  est allé sur `main`), et relit la branche sur origin. Sans tuyau derrière (`cycle.md`, « Branches et retard ») :
+  est allé sur `main`), et relit la branche sur origin. Sans tuyau derrière (`merge.md`, « Branches et retard ») :
   `gh pr create` ne part que sur son code 0, et l'issue ne passe en Review qu'avec l'URL de la PR ;
 - `gh pr create` vers la branche de base ;
 - `gh pr merge` quand la CI de la PR est verte ;
@@ -36,8 +36,8 @@ Confirmer en une phrase ce qui est délégué et ce qui ne l'est pas, puis appli
   de l'arbre fusionné avant de pousser. La tour commite d'abord le travail vérifié de l'agent, puis fusionne :
   jamais de fusion demandée à un agent sur du travail non commité ;
 - quand l'utilisateur a choisi les trains et convois (`tower-control/references/trains.md`) : créer et pousser
-  les branches `train/*` et `convoi/*` (refspec explicite, jamais `--force`), y fusionner et commiter, ouvrir la
-  PR d'issue vers son train et la merger sans CI par `tower-control/assets/train.sh`, qui refuse une PR vers un
+  les branches `train/*` et `convoi/*` (refspec explicite, jamais `--force`), y fusionner et commiter, fusionner `origin/<train>` dans une
+  branche d'issue (`train.sh --fusionner`), ouvrir la PR d'issue vers son train et la merger sans CI par `tower-control/assets/train.sh`, qui refuse une PR vers un
   train qui a des checks.
 
 **Pas délégué** : tout le reste. Pas de commit dans le méta-dépôt ni dans un autre dépôt, pas de
@@ -96,7 +96,7 @@ pas mergée : la tour s'arrête et le dit.
   les gates et la suite e2e sur l'arbre fusionné, pousser, puis merger. Deux PR vertes se sont cassées l'une
   l'autre (un test e2e écrit sur un parcours à cinq étapes, mergé après la PR qui en ajoutait une sixième),
   la base est restée rouge cinquante minutes. Quand les fichiers de la PR sont disjoints de ce qui a été
-  fusionné, le close/reopen de `cycle.md` (« Commit, PR, CI ») rejoue la CI sur la fusion réelle sans
+  fusionné, le close/reopen de `merge.md` (« Commit, PR, CI ») rejoue la CI sur la fusion réelle sans
   toucher la branche.
 - **Migrations des branches ouvertes** : à chaque prédiction de fusion et avant de proposer un ordre de
   merge, comparer leurs horodatages et leurs identifiants de semence. Les instances refusent une migration
@@ -121,7 +121,7 @@ pas mergée : la tour s'arrête et le dit.
   vertes avant la PR suivante. Cette attente ne vaut qu'entre deux merges : lancer un agent sur une branche
   partie de la base n'attend pas, le contenu est celui que la CI de la PR a déjà validé.
 - PR empilée : viser la branche de la PR du dessous tant qu'elle n'est pas mergée ; après son merge, GitHub
-  recible sur la base sans relancer la CI : close/reopen (`cycle.md`), **avant chaque série de merges**, pas
+  recible sur la base sans relancer la CI : close/reopen (`merge.md`), **avant chaque série de merges**, pas
   plus tard : une PR empilée dont la base est mergée n'est plus reciblable si on attend. Une PR sans CI propre
   (« no checks reported ») n'entre pas dans une série : ses rouges n'apparaissent qu'au merge.
 - Après chaque merge : fermer l'issue privée avec la PR et le commit, en lot, lui poser le label

@@ -71,7 +71,8 @@ herdr agent start <nom> --kind claude --pane <pane> --timeout 60000 -- \
 Le pane doit être à un prompt shell interactif. `start` ne rend la main qu'une fois
 Claude détecté et prêt. Le cwd de Claude est celui du shell au moment du `start` :
 le lanceur fait `herdr pane run <pane> "cd '<méta>'"` avant, en mode méta-dépôt,
-pour que l'agent démarre à la racine du méta et non dans le worktree. Le nom suit `[a-z][a-z0-9_-]{0,31}` et doit être unique.
+pour que l'agent démarre à la racine du méta et non dans le worktree. Le nom suit `[a-z][a-z0-9_-]{0,31}` et doit être unique ; refusé, il laisse la branche
+du worktree derrière lui (le lanceur le contrôle avant de créer).
 
 ```bash
 herdr agent prompt <nom> "<texte>"                             # envoie et rend la main aussitôt
@@ -93,7 +94,7 @@ secondes, sinon `agent_prompt_stalled` : un texte long passe en collage bracket�
 c'est prévu.
 
 Un `prompt` vers un agent `blocked` est refusé (`agent_blocked`) : lire l'écran,
-décider, répondre par `send-keys` ou `prompt`, puis seulement envoyer la suite.
+décider, fermer par `send-keys esc`, répondre par `envoyer.sh` (« Les questions des agents » de `cycle.md`).
 
 `agent read` lit le terminal, pas la conversation : un compte rendu long peut être
 tronqué. D'où le repli « écris-le aussi dans un fichier » dans la consigne commune.
@@ -142,7 +143,8 @@ minutes d'arrêt sans compte rendu (trente avec des shells). Un guetteur par age
   amorcer dans ce pane, `agent start` dessus.
 - **`herdr agent prompt <nom> '<texte>'`** : des apostrophes dans le texte cassent les guillemets
   simples, des backticks s'expansent dans les doubles. Écrire la consigne dans un fichier et envoyer
-  `"$(cat fichier)"` : le résultat d'une substitution de commande n'est pas réinterprété.
+  `"$(cat fichier)"` : le résultat d'une substitution de commande n'est pas réinterprété. Des backticks dans
+  un `agent prompt "…"` ont exécuté deux commandes dans le shell de la tour, dont un `dev:down` réel.
 - **`agent start` juste après l'amorçage répond parfois `agent_pane_busy`** alors que le
   prompt est affiché (2 fois sur 4 sur un lot) : réessayer, cinq fois à 3 s d'écart suffisent
   (le lanceur le fait).
