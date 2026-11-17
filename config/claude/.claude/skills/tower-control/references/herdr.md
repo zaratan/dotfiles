@@ -71,7 +71,10 @@ herdr agent start <nom> --kind claude --pane <pane> --timeout 60000 -- \
 Le pane doit être à un prompt shell interactif. `start` ne rend la main qu'une fois
 Claude détecté et prêt. Le cwd de Claude est celui du shell au moment du `start` :
 le lanceur fait `herdr pane run <pane> "cd '<méta>'"` avant, en mode méta-dépôt,
-pour que l'agent démarre à la racine du méta et non dans le worktree. Le nom suit `[a-z][a-z0-9_-]{0,31}` et doit être unique ; refusé, il laisse la branche
+pour que l'agent démarre à la racine du méta et non dans le worktree. Pour une grappe de
+`CODE_MODE`, tout démarrage à la main, relance comprise, passe aussi
+`herdr pane run <pane> "export CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1"` avant le `start` : sans
+lui, l'agent repart sans Code Mode et la grappe change de camp sans que personne le voie. Le nom suit `[a-z][a-z0-9_-]{0,31}` et doit être unique ; refusé, il laisse la branche
 du worktree derrière lui (le lanceur le contrôle avant de créer).
 
 ```bash

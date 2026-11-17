@@ -55,6 +55,15 @@ demandé », l'écran de l'agent dit s'il est actif, et un essai ne compte qu'à
 La session ne se reprend qu'avec la variable posée. Pour juger l'essai, comparer tokens et
 durée à une grappe de taille proche lancée sans.
 
+Le transcript d'un agent est `~/.claude/projects/<cwd, chaque / devenu ->/<session>.jsonl`,
+la session étant `.result.agent.agent_session.value` de `herdr agent get <agent>` ; ses
+sous-agents sont dans `<session>/subagents/*.jsonl`. En méta-dépôt, tous les agents partagent le
+dossier du méta : relever la session de chaque agent à son démarrage et à chaque relance. Pour
+compter, une requête est un `message.id` d'une ligne `assistant` : le même id se répète sur
+plusieurs lignes, une par bloc de contenu. Écarter les messages `"model": "<synthetic>"` :
+Code Mode en écrit un, à usage nul, pour chaque outil appelé par son code, et ils faussent le
+nombre de requêtes et le contexte moyen.
+
 Le fichier de lot peut aussi corriger un chemin de poste, élément par élément
 (`REPO_PATH[app]=…`), ou faire partir les branches de `origin/<base>` plutôt que de
 la branche locale (`REPO_BASE[app]="origin/develop"`, avec un `git fetch` avant de
