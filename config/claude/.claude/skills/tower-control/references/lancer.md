@@ -43,6 +43,18 @@ sans toucher aux grappes d'un lot en vol ; les tableaux sont déclarés par `tc-
 avant la lecture du fichier (`tc-commun/config.example.sh` donne les deux formes). Lancer
 `lancer.sh <chemin du dépôt des issues> <nom>`, qui ne démarre que celle-là.
 
+**Code Mode est à l'essai, grappe par grappe.** `CODE_MODE=(<grappe>…)` dans le fichier de
+lot fait démarrer l'agent de ces grappes avec `CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1`, exporté
+dans son pane ; un nom absent de `GRAPPES` arrête `lancer.sh` avant toute création. Avant le
+premier essai sur un poste, lancer une fois `CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1 claude
+--permission-mode auto` à la main et accepter la confirmation, gardée ensuite par le poste :
+sinon `herdr agent start` attend 60 s, échoue, et ses essais suivants tapent `claude …` dans la
+boîte de confirmation. Claude Code peut aussi refuser Code Mode et démarrer avec les outils
+ordinaires (un plugin à hooks comme Token Optimizer suffit) : `lancer.sh` dit « Code Mode
+demandé », l'écran de l'agent dit s'il est actif, et un essai ne compte qu'à cette condition.
+La session ne se reprend qu'avec la variable posée. Pour juger l'essai, comparer tokens et
+durée à une grappe de taille proche lancée sans.
+
 Le fichier de lot peut aussi corriger un chemin de poste, élément par élément
 (`REPO_PATH[app]=…`), ou faire partir les branches de `origin/<base>` plutôt que de
 la branche locale (`REPO_BASE[app]="origin/develop"`, avec un `git fetch` avant de

@@ -36,3 +36,4 @@ PROD_START='pnpm build && pnpm start'          # pour demarrer-prod.sh
 #   declare -A GRAPPES=([irn]="app p0/2-echelle" [keys]="infra p1/62-cles")              # méta-dépôt
 #   REPO_PATH[app]="$HOME/code/app"      # correction de poste, élément par élément : un `declare -A` effacerait les autres
 #   declare -A ISSUES=([p0-controle]="4" [p0-photos]="5")   # issue en cours par grappe, tenue par la tour (avancement.sh)
+#   CODE_MODE=(p0-controle)              # grappes dont l'agent démarre en Code Mode (expérimental), voir tower-control/references/lancer.md

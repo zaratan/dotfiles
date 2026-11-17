@@ -12,5 +12,6 @@ case "$1 $2" in
   "agent send-keys") echo "send-keys $3 $4" >> "$FAKE/journal"; echo '{}' ;;
   "agent list") echo '{"result":{"agents":[]}}' ;;
   "worktree list") echo '{"result":{"worktrees":[]}}' ;;
+  "worktree create") command cat "$FAKE/worktree-cree" 2>/dev/null || echo '{}' ;;
   *) echo '{}' ;;
 esac
