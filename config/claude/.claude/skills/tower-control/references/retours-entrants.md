@@ -54,3 +54,8 @@ Ce qu'un lot a appris et qu'aucun skill ne porte encore. Lu au début de chaque 
   sur l'appareil par l'utilisateur, puis l'issue. Vu une fois.
 - Une revue UI/UX menée dans un artefact (captures avant/après par fiche, choix relus par `ArtifactData`) : 25
   fiches tranchées en deux tours, issues créées depuis les choix. Vu une fois ; cas de `cas.md` ?
+- Deux branches qui touchent un même tableau Markdown conflictent dès que l'une le fait réaligner par Prettier (une
+  ligne plus large) : quand deux grappes touchent le même tableau de doc, le fragment de lot dit qu'une seule
+  réaligne, l'autre ajoute sa ligne après le merge. Vu une fois ; règle de `preparer.md` ?
+- Une ligne de cahier « vérifier la couleur après une bascule de thème » a donné trois faux écarts, lue en pleine
+  transition CSS : attendre la fin de `document.getAnimations()`. Vu une fois ; `consigne-qa.md` ?

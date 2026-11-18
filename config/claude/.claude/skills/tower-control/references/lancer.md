@@ -53,7 +53,8 @@ boîte de confirmation. Claude Code peut aussi refuser Code Mode et démarrer av
 ordinaires (un plugin à hooks comme Token Optimizer suffit) : `lancer.sh` dit « Code Mode
 demandé », l'écran de l'agent dit s'il est actif, et un essai ne compte qu'à cette condition.
 La session ne se reprend qu'avec la variable posée. Pour juger l'essai, comparer tokens et
-durée à une grappe de taille proche lancée sans.
+durée à une grappe de taille proche lancée sans. Premier essai, sous-agents compris : 3,6 fois plus
+de requêtes, contexte moyen ~6 fois plus petit, 38 % de tokens lus du cache en moins.
 
 Le transcript d'un agent est `~/.claude/projects/<cwd, chaque / devenu ->/<session>.jsonl`,
 la session étant `.result.agent.agent_session.value` de `herdr agent get <agent>` ; ses

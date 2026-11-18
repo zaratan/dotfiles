@@ -185,7 +185,8 @@ commence par l'heure locale de l'utilisateur et finit par une ligne « À toi : 
 PR, merge, verdict, ou « rien ») ; dès qu'un agent est en vol, le tableau des agents est entre
 les deux, et le tableau des étapes sort sur « ETA ? ». Le gabarit et `avancement.sh` sont
 dans `~/.claude/skills/tc-lot/assets/point.md`. Une commande que l'utilisateur doit lancer
-lui-même (clone refusé à la tour par le classificateur, fusion) s'écrit dans un script de
+lui-même (clone refusé à la tour par le classificateur, fusion, merge vers la production, refusé
+même après un go et sous délégation : le prévoir dès la préparation) s'écrit dans un script de
 `travail/` et se donne par `! bash travail/x.sh` : un terminal qui replie les messages avale
 une commande en prose.
 

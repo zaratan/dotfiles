@@ -153,7 +153,8 @@ où ranger la réponse) sont dans « Les questions » du skill. En plus, pour le
 
 - Lire le contexte (`herdr agent read`) avant de répondre.
 - **Un agent `blocked` sur une question refuse `agent prompt`** (`agent_blocked`) : fermer la question par
-  `agent send-keys <nom> esc`, vérifier qu'il est `done`, puis envoyer la réponse par `envoyer.sh`, avec le texte
+  `agent send-keys <nom> esc`, relire l'état jusqu'à `done` ou `idle` (lancé juste après le `esc`,
+  `envoyer.sh` le trouve encore `blocked` et refuse), puis envoyer la réponse par `envoyer.sh`, avec le texte
   de l'option choisie. Jamais `send-keys enter` sur une option : le classificateur le refuse (deux projets).
 - **Une demande de permission bloque l'agent comme une question.** La lire avant de
   répondre ; refuser un `rm` dont le chemin dépend d'une variable qui peut être vide, et

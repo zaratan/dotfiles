@@ -13,7 +13,10 @@ main à la fois.
 
 **Lire la CI soi-même** : celle de chaque PR jusqu'au bout (boucler tant qu'une tâche est
 « pending » ; `gh pr checks --watch` rend la main au premier résultat) et celle de la
-branche de base après chaque merge. Une tâche annulée par son délai n'est pas un test qui
+branche de base après chaque merge. **Boucler par l'API REST** (`repos/<o>/<r>/commits/<sha>/check-runs`),
+toutes les 30 s au moins, jamais par `gh pr checks` : trois boucles à 15 s ont épuisé le quota GraphQL
+en une heure, `rate_limit` affichant encore ~4 000 points, et bloqué `board-field.py` et `gh issue view`
+avec. GraphQL refusé, merger par `PUT pulls/<n>/merge` et fermer par `PATCH issues/<n>`. Une tâche annulée par son délai n'est pas un test qui
 échoue : lire l'étape avant de relancer, et proposer la cause et le correctif avec la
 relance. Un temps de CI s'explique par étape (`actions/runs/<id>` → `jobs[].steps[]`) avant
 d'être réduit ou parallélisé ; un gain de parallélisme se mesure sur les runners de la CI, sur

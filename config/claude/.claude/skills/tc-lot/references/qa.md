@@ -17,7 +17,9 @@ Les tests de chaque PR ne voient pas une régression qui naît de la somme des m
     a été jugée trop mince et refaite ; la seconde a doublé le fichier ;
   - les **chemins d'argent**, dans `.claude/tower-control/chemins-d-argent.md` s'il existe : variantes,
     refus et erreurs, écrans peu visités. Une passe qui ne joue que les chemins d'or ne voit pas les
-    régressions de variantes. Les attendus que le lot a pu changer se corrigent dans le cahier du lot ;
+    régressions de variantes. Les attendus que le lot a pu changer se corrigent dans le cahier du lot, et
+    ceux qu'a changés ce que la base a reçu hors lot depuis la passe précédente (issues hors lot, contenu du
+    client) aussi, le brief du rédacteur le demande : sans cela, des dizaines de faux KO ;
   - **une ligne par issue du label `lot: <n>`**, tirée de la section « Vérifier sur une
     instance » de son runbook, ou de la vérification d'après merge écrite dans le How de
     l'issue, à défaut de l'Attendu de sa consigne ;
