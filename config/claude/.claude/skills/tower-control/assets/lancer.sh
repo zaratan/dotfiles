@@ -11,12 +11,12 @@ source "$(dirname "$0")/../../tc-commun/config-lib.sh"
 test "${HERDR_ENV:-}" = 1 || { echo "pas dans herdr" >&2; exit 2; }
 : "${WORKTREES_DIR:?}" "${MODEL:=claude-opus-5-5}" "${BOOTSTRAP_TIMEOUT:=900000}"
 [ ${#GRAPPES[@]} -gt 0 ] || { echo "GRAPPES manquant : l'écrire dans $LOT" >&2; exit 2; }
-for g in "${CODE_MODE[@]}"; do
-  [ -n "${GRAPPES[$g]+x}" ] || { echo "CODE_MODE : grappe inconnue dans $LOT : $g" >&2; exit 2; }
+for g in "${SANS_CODE_MODE[@]}"; do
+  [ -n "${GRAPPES[$g]+x}" ] || { echo "SANS_CODE_MODE : grappe inconnue dans $LOT : $g" >&2; exit 2; }
 done
 
 wanted() { [ ${#ONLY[@]} -eq 0 ] && return 0; local g; for g in "${ONLY[@]}"; do [ "$g" = "$1" ] && return 0; done; return 1; }
-in_code_mode() { local g; for g in "${CODE_MODE[@]}"; do [ "$g" = "$1" ] && return 0; done; return 1; }
+without_code_mode() { [[ $1 == qa-* ]] && return 0; local g; for g in "${SANS_CODE_MODE[@]}"; do [ "$g" = "$1" ] && return 0; done; return 1; }
 agent_of() { echo "$(basename "$REPO" | tr '[:upper:]' '[:lower:]')-$1"; }
 
 declare -A FETCHED=()
@@ -71,8 +71,10 @@ for name in "${!GRAPPES[@]}"; do
   echo "   amorcé"
 
   if [ -n "$r" ]; then herdr pane run "$pane" "cd '$REPO'" >/dev/null; fi
-  mode=""
-  if in_code_mode "$name"; then
+  if without_code_mode "$name"; then
+    herdr pane run "$pane" "export CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=0" >/dev/null
+    mode=" (sans Code Mode)"
+  else
     herdr pane run "$pane" "export CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1" >/dev/null
     mode=" (Code Mode demandé)"
   fi

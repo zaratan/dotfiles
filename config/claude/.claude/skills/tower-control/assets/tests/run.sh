@@ -298,23 +298,27 @@ check "lancer dit pourquoi" "$(echo "$out" | grep -c 'refusé par herdr')" 1
 printf 'declare -A GRAPPES=([%s]="issue/1")\n' "$(printf 'x%.0s' {1..29})" > "$T/lz/.claude/tower-control/lot-moi.sh"
 : > "$FAKE/journal"; out=$(HERDR_ENV=1 HERDR_WORKSPACE_ID=w "$ASSETS/lancer.sh" "$T/lz" 2>&1)
 check "lancer accepte un nom d'agent de 32 caractères" "$(grep -c 'worktree create' "$FAKE/journal")" 1
-printf 'declare -A GRAPPES=([cm]="issue/1" [sans]="issue/2")\nCODE_MODE=(cm cn)\n' > "$T/lz/.claude/tower-control/lot-moi.sh"
-: > "$FAKE/journal"; out=$(HERDR_ENV=1 HERDR_WORKSPACE_ID=w "$ASSETS/lancer.sh" "$T/lz" 2>&1); check "lancer refuse une grappe Code Mode inconnue" "$?" 2
-check "lancer n'a rien créé pour une grappe Code Mode inconnue" "$(grep -c 'worktree create' "$FAKE/journal")" 0
-check "lancer nomme la grappe Code Mode inconnue" "$(echo "$out" | grep -c 'CODE_MODE : grappe inconnue .* : cn$')" 1
-printf 'declare -A GRAPPES=([cm]="issue/1" [sans]="issue/2")\nCODE_MODE=(cm)\n' > "$T/lz/.claude/tower-control/lot-moi.sh"
+printf 'declare -A GRAPPES=([cm]="issue/1" [sans]="issue/2")\nSANS_CODE_MODE=(sans sn)\n' > "$T/lz/.claude/tower-control/lot-moi.sh"
+: > "$FAKE/journal"; out=$(HERDR_ENV=1 HERDR_WORKSPACE_ID=w "$ASSETS/lancer.sh" "$T/lz" 2>&1); check "lancer refuse une grappe sans Code Mode inconnue" "$?" 2
+check "lancer n'a rien créé pour une grappe sans Code Mode inconnue" "$(grep -c 'worktree create' "$FAKE/journal")" 0
+check "lancer nomme la grappe sans Code Mode inconnue" "$(echo "$out" | grep -c 'SANS_CODE_MODE : grappe inconnue .* : sn$')" 1
+printf 'declare -A GRAPPES=([cm]="issue/1" [sans]="issue/2")\nSANS_CODE_MODE=(sans)\n' > "$T/lz/.claude/tower-control/lot-moi.sh"
 echo '{"result":{"root_pane":{"pane_id":"p1"}}}' > "$FAKE/worktree-cree"; mkdir -p "$T/wlz/cm" "$T/wlz/sans"
 : > "$FAKE/journal"; out=$(HERDR_ENV=1 HERDR_WORKSPACE_ID=w "$ASSETS/lancer.sh" "$T/lz" cm 2>&1)
-check "lancer exporte Code Mode avant de démarrer l'agent" "$(grep -E 'export CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1|agent start' "$FAKE/journal" | cut -d' ' -f1-3)" "$(printf 'pane run p1\nagent start lz-cm')"
+check "lancer démarre une grappe en Code Mode par défaut, export avant l'agent" "$(grep -E 'export CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1|agent start' "$FAKE/journal" | cut -d' ' -f1-3)" "$(printf 'pane run p1\nagent start lz-cm')"
 check "lancer annonce Code Mode comme demandé, pas comme actif" "$(echo "$out" | grep -c 'agent lz-cm prêt (Code Mode demandé)$')" 1
 : > "$FAKE/journal"; out=$(HERDR_ENV=1 HERDR_WORKSPACE_ID=w "$ASSETS/lancer.sh" "$T/lz" sans 2>&1)
-check "lancer laisse Code Mode aux grappes non listées" "$(grep -c 'CLAUDE_CODE_EXPERIMENTAL_CODE_MODE' "$FAKE/journal"):$(grep -c 'agent start lz-sans' "$FAKE/journal")" "0:1"
-rm "$FAKE/worktree-cree"
-printf 'declare -A GRAPPES=([cm]="issue/1")\ndeclare -A CODE_MODE=([cm]=1)\n' > "$T/lz/.claude/tower-control/lot-moi.sh"
-: > "$FAKE/journal"; out=$(HERDR_ENV=1 HERDR_WORKSPACE_ID=w "$ASSETS/lancer.sh" "$T/lz" 2>&1); check "lancer refuse CODE_MODE écrit en tableau associatif plutôt que de l'ignorer" "$?:$(grep -c 'worktree create' "$FAKE/journal")" "1:0"
+check "lancer coupe Code Mode explicitement pour une grappe exclue" "$(grep -c 'CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1' "$FAKE/journal"):$(grep -c 'export CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=0' "$FAKE/journal"):$(grep -c 'agent start lz-sans' "$FAKE/journal")" "0:1:1"
+check "lancer annonce une grappe sans Code Mode" "$(echo "$out" | grep -c 'agent lz-sans prêt (sans Code Mode)$')" 1
+printf 'declare -A GRAPPES=([qa-1]="issue/3")\n' > "$T/lz/.claude/tower-control/lot-moi.sh"; mkdir -p "$T/wlz/qa-1"
+: > "$FAKE/journal"; out=$(HERDR_ENV=1 HERDR_WORKSPACE_ID=w "$ASSETS/lancer.sh" "$T/lz" 2>&1)
+check "lancer démarre la QA sans Code Mode sans qu'on la liste" "$(grep -c 'CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1' "$FAKE/journal"):$(grep -c 'export CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=0' "$FAKE/journal"):$(echo "$out" | grep -c 'agent lz-qa-1 prêt (sans Code Mode)$')" "0:1:1"
 printf 'declare -A GRAPPES=([cm]="issue/1")\n' > "$T/lz/.claude/tower-control/lot-moi.sh"
-: > "$FAKE/journal"; out=$(CODE_MODE=cm HERDR_ENV=1 HERDR_WORKSPACE_ID=w "$ASSETS/lancer.sh" "$T/lz" 2>&1)
-check "lancer ignore une variable CODE_MODE héritée du shell" "$(grep -c 'CLAUDE_CODE_EXPERIMENTAL_CODE_MODE' "$FAKE/journal")" 0
+: > "$FAKE/journal"; out=$(SANS_CODE_MODE=cm HERDR_ENV=1 HERDR_WORKSPACE_ID=w "$ASSETS/lancer.sh" "$T/lz" 2>&1)
+check "lancer ignore une variable SANS_CODE_MODE héritée du shell" "$(grep -c 'CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1' "$FAKE/journal")" 1
+rm "$FAKE/worktree-cree"
+printf 'declare -A GRAPPES=([cm]="issue/1")\ndeclare -A SANS_CODE_MODE=([cm]=1)\n' > "$T/lz/.claude/tower-control/lot-moi.sh"
+: > "$FAKE/journal"; out=$(HERDR_ENV=1 HERDR_WORKSPACE_ID=w "$ASSETS/lancer.sh" "$T/lz" 2>&1); check "lancer refuse SANS_CODE_MODE écrit en tableau associatif plutôt que de l'ignorer" "$?:$(grep -c 'worktree create' "$FAKE/journal")" "1:0"
 git clone -q "$T/o2.git" "$T/autre" 2>/dev/null; git -C "$T/autre" checkout -q main
 echo n > "$T/autre/n.txt"; git -C "$T/autre" add n.txt; git -C "$T/autre" -c user.name=t -c user.email=t@t commit -qm neuf; git -C "$T/autre" push -q --no-verify origin main
 out=$(HERDR_ENV=1 HERDR_WORKSPACE_ID=w "$ASSETS/lancer.sh" "$T/m2" ds 2>&1)

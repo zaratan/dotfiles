@@ -43,18 +43,18 @@ sans toucher aux grappes d'un lot en vol ; les tableaux sont déclarés par `tc-
 avant la lecture du fichier (`tc-commun/config.example.sh` donne les deux formes). Lancer
 `lancer.sh <chemin du dépôt des issues> <nom>`, qui ne démarre que celle-là.
 
-**Code Mode est à l'essai, grappe par grappe.** `CODE_MODE=(<grappe>…)` dans le fichier de
-lot fait démarrer l'agent de ces grappes avec `CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1`, exporté
-dans son pane ; un nom absent de `GRAPPES` arrête `lancer.sh` avant toute création. Avant le
-premier essai sur un poste, lancer une fois `CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1 claude
+**Les agents démarrent en Code Mode** (expérimental) : `lancer.sh` exporte
+`CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1` dans le pane de chaque grappe, sauf celles de la QA (`qa-*`), qui démarrent sans.
+`SANS_CODE_MODE=(<grappe>…)` dans le fichier de lot y pose `0`, pour une grappe témoin ou si
+Code Mode casse ; un nom absent de `GRAPPES` arrête `lancer.sh` avant toute création. Sur un
+poste neuf, lancer une fois `CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1 claude
 --permission-mode auto` à la main et accepter la confirmation, gardée ensuite par le poste :
 sinon `herdr agent start` attend 60 s, échoue, et ses essais suivants tapent `claude …` dans la
 boîte de confirmation. Claude Code peut aussi refuser Code Mode et démarrer avec les outils
 ordinaires (un plugin à hooks comme Token Optimizer suffit) : `lancer.sh` dit « Code Mode
-demandé », l'écran de l'agent dit s'il est actif, et un essai ne compte qu'à cette condition.
-La session ne se reprend qu'avec la variable posée. Pour juger l'essai, comparer tokens et
-durée à une grappe de taille proche lancée sans. Premier essai, sous-agents compris : 3,6 fois plus
-de requêtes, contexte moyen ~6 fois plus petit, 38 % de tokens lus du cache en moins.
+demandé », l'écran de l'agent dit s'il est actif. La session ne se reprend qu'avec la variable
+posée. Mesurer l'effet demande deux moitiés d'un même lot : d'un lot à l'autre, le coût par
+point varie autant que l'effet.
 
 Le transcript d'un agent est `~/.claude/projects/<cwd, chaque / devenu ->/<session>.jsonl`,
 la session étant `.result.agent.agent_session.value` de `herdr agent get <agent>` ; ses
