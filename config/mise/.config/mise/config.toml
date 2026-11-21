@@ -1,12 +1,17 @@
 [tools]
-node = "24"
+node = "26"
 ruby = "4.0"
 python = "3"
 
 bun = "latest"
 uv = "latest"
 pnpm = "latest"
+lua-language-server = "latest"
+stylua = "latest"
+"npm:@fsouza/prettierd" = "latest"
 "npm:@prisma/language-server" = "latest"
+"npm:@tailwindcss/language-server" = "latest"
+"npm:@vtsls/language-server" = "latest"
 "npm:eslint_d" = "latest"
 "npm:prettier" = "latest"
 "github:basecamp/hey-cli" = "latest"
